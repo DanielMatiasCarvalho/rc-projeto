@@ -32,13 +32,13 @@ void CommandManager::readCommand(ClientState state) {
         line = "";
     } else {
         name = line.substr(0, position);
-        line.erase(0, position+1);
+        line.erase(0, position + 1);
     }
 
     position = line.find(" ");
     while (position != std::string::npos) {
         args.push_back(line.substr(0, position));
-        line.erase(0, position+1);
+        line.erase(0, position + 1);
         position = line.find(" ");
     }
 
@@ -64,6 +64,8 @@ void LoginCommand::handle(std::vector<std::string> args, ClientState state) {
         std::cout << "Error on arguments!" << std::endl;
         return;
     }
+
+    (void)state;
 
     std::string UID = args[0];
     std::string password = args[1];
