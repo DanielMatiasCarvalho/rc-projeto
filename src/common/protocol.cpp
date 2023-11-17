@@ -4,7 +4,7 @@ char ProtocolCommunication::readChar(std::stringstream &message) {
     char c = (char)message.get();
 
     if (!message.good()) {
-        std::cout << "Protocol error!" << std::endl;
+        throw ProtocolViolationException();
     }
 
     return c;
@@ -13,7 +13,7 @@ char ProtocolCommunication::readChar(std::stringstream &message) {
 void ProtocolCommunication::readChar(std::stringstream &message,
                                      char expected) {
     if (readChar(message) != expected) {
-        std::cout << "Protocol error!" << std::endl;
+        throw ProtocolViolationException();
     }
 }
 
@@ -39,7 +39,7 @@ std::string ProtocolCommunication::readString(std::stringstream &message,
         char c = (char)message.get();
 
         if (!message.good()) {
-            std::cout << "Protocol error!" << std::endl;
+            throw ProtocolViolationException();
         }
 
         if (c == ' ' || c == '\n') {
@@ -56,7 +56,7 @@ std::string ProtocolCommunication::readString(std::stringstream &message,
 void ProtocolCommunication::readString(std::stringstream &message,
                                        std::string expected) {
     if (readString(message) != expected) {
-        std::cout << "Protocol error!" << std::endl;
+        throw ProtocolViolationException();
     }
 }
 
@@ -66,7 +66,7 @@ int ProtocolCommunication::readNumber(std::stringstream &message) {
     // Check if string only contains digits
     for (auto c : string) {
         if (c < '0' || c > '9') {
-            std::cout << "Protocol error!" << std::endl;
+            throw ProtocolViolationException();
         }
     }
 
@@ -77,7 +77,7 @@ void ProtocolCommunication::writeChar(std::stringstream &message, char c) {
     message.put(c);
 
     if (!message.good()) {
-        std::cout << "Protocol error!" << std::endl;
+        throw ProtocolViolationException();
     }
 }
 
@@ -93,9 +93,9 @@ std::stringstream LoginCommunication::encodeRequest() {
 
     writeString(message, "LIN");
     writeChar(message, ' ');
-    writeString(message, uid);
+    writeString(message, _uid);
     writeChar(message, ' ');
-    writeString(message, password);
+    writeString(message, _password);
     writeChar(message, '\n');
 
     return message;
@@ -104,16 +104,26 @@ std::stringstream LoginCommunication::encodeRequest() {
 void LoginCommunication::decodeRequest(std::stringstream &message) {
     readString(message, "LIN");
     readSpace(message);
-    uid = readString(message, 6);
+    _uid = readString(message, 6);
     readSpace(message);
-    password = readString(message, 8);
+    _password = readString(message, 8);
     readDelimiter(message);
 }
 
 std::stringstream LoginCommunication::encodeResponse() {
-    return std::stringstream();
+    std::stringstream message;
+
+    writeString(message, "RLI");
+    writeChar(message, ' ');
+    writeString(message, _status);
+    writeChar(message, '\n');
+
+    return message;
 }
 
 void LoginCommunication::decodeResponse(std::stringstream &message) {
-    (void)message;
+    readString(message, "RLI");
+    readSpace(message);
+    _status = readString(message, 3);
+    readDelimiter(message);
 }

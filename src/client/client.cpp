@@ -12,7 +12,11 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<LoginCommand>());
 
     while (1) {
-        manager.readCommand(state);
+        try {
+            manager.readCommand(state);
+        } catch (CommandException const &e) {
+            std::cout << e.what() << std::endl;
+        }
     }
 
     return 0;
