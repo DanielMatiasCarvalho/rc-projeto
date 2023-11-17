@@ -53,7 +53,7 @@ class CommandException : public std::runtime_error {
 class CommandArgumentException : public CommandException {
   public:
     CommandArgumentException(std::string usage)
-        : CommandException("Invalid arguments.\n\tUsage: " + usage){};
+        : CommandException("Invalid arguments.\nUsage: " + usage){};
 };
 
 class UnknownCommandException : public CommandException {

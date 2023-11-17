@@ -30,13 +30,28 @@ class ProtocolCommunication {
 
 class LoginCommunication : ProtocolCommunication {
   public:
-    std::string uid;
-    std::string password;
+    // Request parameters:
+    std::string _uid;
+    std::string _password;
+
+    // Response parameters:
+    std::string _status;
 
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
 };
+
+class ProtocolException : public std::runtime_error {
+  public:
+    ProtocolException() : std::runtime_error("There was an error while communicating with the server.") {};
+};
+
+class ProtocolViolationException : public ProtocolException {};
+
+class UnexpectedResponseException : public ProtocolException {};
+
+class ProtocolMessageErrorException : public ProtocolException {};
 
 #endif
