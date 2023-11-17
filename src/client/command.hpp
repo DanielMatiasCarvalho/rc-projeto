@@ -44,4 +44,21 @@ class LoginCommand : public CommandHandler {
                          std::vector<std::string>({"ln"})){};
 };
 
+class CommandException : public std::runtime_error {
+  public:
+    CommandException(std::string reason)
+        : std::runtime_error("ERROR: " + reason){};
+};
+
+class CommandArgumentException : public CommandException {
+  public:
+    CommandArgumentException(std::string usage)
+        : CommandException("Invalid arguments.\n\tUsage: " + usage){};
+};
+
+class UnknownCommandException : public CommandException {
+  public:
+    UnknownCommandException() : CommandException("Unknown Command."){};
+};
+
 #endif

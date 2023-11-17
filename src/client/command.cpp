@@ -48,21 +48,16 @@ void CommandManager::readCommand(ClientState state) {
 
     auto handler = this->handlers.find(name);
     if (handler == this->handlers.end()) {
-        std::cout << "Unknown Command" << std::endl;
-        return;
+        throw UnknownCommandException();
     }
-
-    try {
-        handler->second->handle(args, state);
-    } catch (...) {
-        std::cout << "Error" << std::endl;
-    }
+    
+    handler->second->handle(args, state);
+    
 }
 
 void LoginCommand::handle(std::vector<std::string> args, ClientState state) {
     if (args.size() != 2) {
-        std::cout << "Error on arguments!" << std::endl;
-        return;
+        throw CommandArgumentException(_usage);
     }
 
     (void)state;
@@ -71,7 +66,6 @@ void LoginCommand::handle(std::vector<std::string> args, ClientState state) {
     std::string password = args[1];
 
     if (UID.length() != 6 || password.length() != 8) {
-        std::cout << "Error on arguments!" << std::endl;
-        return;
+        throw CommandArgumentException(_usage);
     }
 }
