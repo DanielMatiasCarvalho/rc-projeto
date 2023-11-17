@@ -1,5 +1,7 @@
 #include "client.hpp"
 #include "command.hpp"
+#include "protocol.hpp"
+
 #include <iostream>
 #include <unistd.h>
 
