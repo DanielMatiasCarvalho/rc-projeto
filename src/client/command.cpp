@@ -67,6 +67,10 @@ void LoginCommand::handle(std::vector<std::string> args, ClientState state) {
     if (UID.length() != 6 || password.length() != 8) {
         throw CommandArgumentException(_usage);
     }
+
+    if (!isNumeric(UID)) {
+        throw CommandArgumentException(_usage);
+    }
 }
 
 void LogoutCommand::handle(std::vector<std::string> args, ClientState state) {
@@ -75,16 +79,15 @@ void LogoutCommand::handle(std::vector<std::string> args, ClientState state) {
     }
 
     (void)state;
-
 }
 
-void UnregisterCommand::handle(std::vector<std::string> args, ClientState state) {
+void UnregisterCommand::handle(std::vector<std::string> args,
+                               ClientState state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
     (void)state;
-
 }
 
 void ExitCommand::handle(std::vector<std::string> args, ClientState state) {
@@ -93,7 +96,6 @@ void ExitCommand::handle(std::vector<std::string> args, ClientState state) {
     }
 
     (void)state;
-
 }
 
 void OpenCommand::handle(std::vector<std::string> args, ClientState state) {
@@ -108,7 +110,12 @@ void OpenCommand::handle(std::vector<std::string> args, ClientState state) {
     std::string start_value = args[2];
     std::string timeactive = args[3];
 
-    if (name.length() > 10 || asset_fname.length() > 24 || start_value.length() > 6 || timeactive.length() > 5) {
+    if (name.length() > 10 || asset_fname.length() > 24 ||
+        start_value.length() > 6 || timeactive.length() > 5) {
+        throw CommandArgumentException(_usage);
+    }
+
+    if (!isNumeric(start_value) || !isNumeric(timeactive)) {
         throw CommandArgumentException(_usage);
     }
 }
@@ -125,36 +132,41 @@ void CloseCommand::handle(std::vector<std::string> args, ClientState state) {
     if (AID.length() != 3) {
         throw CommandArgumentException(_usage);
     }
+
+    if (!isNumeric(AID)) {
+        throw CommandArgumentException(_usage);
+    }
 }
 
-void ListUserAuctionsCommand::handle(std::vector<std::string> args, ClientState state) {
+void ListUserAuctionsCommand::handle(std::vector<std::string> args,
+                                     ClientState state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
     (void)state;
-
 }
 
-void ListUserBidsCommand::handle(std::vector<std::string> args, ClientState state) {
+void ListUserBidsCommand::handle(std::vector<std::string> args,
+                                 ClientState state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
     (void)state;
-
 }
 
-void ListAllAuctionsCommand::handle(std::vector<std::string> args, ClientState state) {
+void ListAllAuctionsCommand::handle(std::vector<std::string> args,
+                                    ClientState state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
     (void)state;
-
 }
 
-void ShowAssetCommand::handle(std::vector<std::string> args, ClientState state) {
+void ShowAssetCommand::handle(std::vector<std::string> args,
+                              ClientState state) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -164,6 +176,10 @@ void ShowAssetCommand::handle(std::vector<std::string> args, ClientState state) 
     std::string AID = args[0];
 
     if (AID.length() != 3) {
+        throw CommandArgumentException(_usage);
+    }
+
+    if (!isNumeric(AID)) {
         throw CommandArgumentException(_usage);
     }
 }
@@ -181,9 +197,14 @@ void BidCommand::handle(std::vector<std::string> args, ClientState state) {
     if (AID.length() != 3 || value.length() > 6) {
         throw CommandArgumentException(_usage);
     }
+
+    if (!isNumeric(AID) || !isNumeric(value)) {
+        throw CommandArgumentException(_usage);
+    }
 }
 
-void ShowRecordCommand::handle(std::vector<std::string> args, ClientState state) {
+void ShowRecordCommand::handle(std::vector<std::string> args,
+                               ClientState state) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -193,6 +214,10 @@ void ShowRecordCommand::handle(std::vector<std::string> args, ClientState state)
     std::string AID = args[0];
 
     if (AID.length() != 3) {
+        throw CommandArgumentException(_usage);
+    }
+
+    if (!isNumeric(AID)) {
         throw CommandArgumentException(_usage);
     }
 }
