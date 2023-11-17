@@ -132,7 +132,7 @@ std::stringstream LoginCommunication::encodeRequest() {
 }
 
 void LoginCommunication::decodeRequest(std::stringstream &message) {
-    readString(message, "LIN");
+    // readString(message, "LIN");
 
     readSpace(message);
 
@@ -164,5 +164,123 @@ void LoginCommunication::decodeResponse(std::stringstream &message) {
     readString(message, "RLI");
     readSpace(message);
     _status = readString(message, {"OK", "NOK", "REG", "ERR"});
+    readDelimiter(message);
+}
+
+std::stringstream LogoutCommunication::encodeRequest() {
+    std::stringstream message;
+
+    writeString(message, "LOU");
+    writeSpace(message);
+
+    if (_uid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+    writeString(message, _uid);
+
+    writeSpace(message);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+    writeString(message, _password);
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void LogoutCommunication::decodeRequest(std::stringstream &message) {
+    // readString(message, "LOU");
+
+    readSpace(message);
+
+    _uid = readString(message, 6);
+
+    if (!isNumeric(_uid)) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _password = readString(message, 8);
+
+    readDelimiter(message);
+}
+
+std::stringstream LogoutCommunication::encodeResponse() {
+    std::stringstream message;
+
+    writeString(message, "RLO");
+    writeSpace(message);
+    writeString(message, _status);
+    writeDelimiter(message);
+
+    return message;
+}
+
+void LogoutCommunication::decodeResponse(std::stringstream &message) {
+    readString(message, "RLO");
+    readSpace(message);
+    _status = readString(message, {"OK", "NOK", "REG", "ERR"});
+    readDelimiter(message);
+}
+
+std::stringstream UnregisterCommunication::encodeRequest() {
+    std::stringstream message;
+
+    writeString(message, "UNR");
+    writeSpace(message);
+
+    if (_uid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+    writeString(message, _uid);
+
+    writeSpace(message);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+    writeString(message, _password);
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void UnregisterCommunication::decodeRequest(std::stringstream &message) {
+    // readString(message, "UNR");
+
+    readSpace(message);
+
+    _uid = readString(message, 6);
+
+    if (!isNumeric(_uid)) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _password = readString(message, 8);
+
+    readDelimiter(message);
+}
+
+std::stringstream UnregisterCommunication::encodeResponse() {
+    std::stringstream message;
+
+    writeString(message, "RUR");
+    writeSpace(message);
+    writeString(message, _status);
+    writeDelimiter(message);
+
+    return message;
+}
+
+void UnregisterCommunication::decodeResponse(std::stringstream &message) {
+    readString(message, "RUR");
+    readSpace(message);
+    _status = readString(message, {"OK", "NOK", "UNR", "ERR"});
     readDelimiter(message);
 }
