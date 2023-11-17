@@ -1,6 +1,7 @@
 #ifndef __CLIENT_HPP__
 #define __CLIENT_HPP__
 
+#include "protocol.hpp"
 #include <string>
 
 class ClientState {

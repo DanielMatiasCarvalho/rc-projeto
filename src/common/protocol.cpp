@@ -18,7 +18,7 @@ void ProtocolCommunication::readChar(std::stringstream &message,
 }
 
 void ProtocolCommunication::readDelimiter(std::stringstream &message) {
-    readChar(message, '\n');
+    readChar(message, PROTOCOL_MESSAGE_DELIMITER);
 }
 
 void ProtocolCommunication::readSpace(std::stringstream &message) {
@@ -42,7 +42,7 @@ std::string ProtocolCommunication::readString(std::stringstream &message,
             throw ProtocolViolationException();
         }
 
-        if (c == ' ' || c == '\n') {
+        if (c == ' ' || c == PROTOCOL_MESSAGE_DELIMITER) {
             message.unget();
             break;
         }
@@ -60,14 +60,26 @@ void ProtocolCommunication::readString(std::stringstream &message,
     }
 }
 
+std::string
+ProtocolCommunication::readString(std::stringstream &message,
+                                  std::vector<std::string> options) {
+    std::string string = readString(message);
+
+    for (auto option : options) {
+        if (string == option) {
+            return string;
+        }
+    }
+
+    throw ProtocolViolationException();
+}
+
 int ProtocolCommunication::readNumber(std::stringstream &message) {
     std::string string = readString(message);
 
     // Check if string only contains digits
-    for (auto c : string) {
-        if (c < '0' || c > '9') {
-            throw ProtocolViolationException();
-        }
+    if (!isNumeric(string)) {
+        throw ProtocolViolationException();
     }
 
     return stoi(string);
@@ -81,6 +93,14 @@ void ProtocolCommunication::writeChar(std::stringstream &message, char c) {
     }
 }
 
+void ProtocolCommunication::writeDelimiter(std::stringstream &message) {
+    writeChar(message, PROTOCOL_MESSAGE_DELIMITER);
+}
+
+void ProtocolCommunication::writeSpace(std::stringstream &message) {
+    writeChar(message, ' ');
+}
+
 void ProtocolCommunication::writeString(std::stringstream &message,
                                         std::string string) {
     for (auto c : string) {
@@ -92,21 +112,40 @@ std::stringstream LoginCommunication::encodeRequest() {
     std::stringstream message;
 
     writeString(message, "LIN");
-    writeChar(message, ' ');
+    writeSpace(message);
+
+    if (_uid.length() != 6) {
+        throw ProtocolViolationException();
+    }
     writeString(message, _uid);
-    writeChar(message, ' ');
+
+    writeSpace(message);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
     writeString(message, _password);
-    writeChar(message, '\n');
+
+    writeDelimiter(message);
 
     return message;
 }
 
 void LoginCommunication::decodeRequest(std::stringstream &message) {
     readString(message, "LIN");
+
     readSpace(message);
+
     _uid = readString(message, 6);
+
+    if (!isNumeric(_uid)) {
+        throw ProtocolViolationException();
+    }
+
     readSpace(message);
+
     _password = readString(message, 8);
+
     readDelimiter(message);
 }
 
@@ -114,9 +153,9 @@ std::stringstream LoginCommunication::encodeResponse() {
     std::stringstream message;
 
     writeString(message, "RLI");
-    writeChar(message, ' ');
+    writeSpace(message);
     writeString(message, _status);
-    writeChar(message, '\n');
+    writeDelimiter(message);
 
     return message;
 }
@@ -124,6 +163,6 @@ std::stringstream LoginCommunication::encodeResponse() {
 void LoginCommunication::decodeResponse(std::stringstream &message) {
     readString(message, "RLI");
     readSpace(message);
-    _status = readString(message, 3);
+    _status = readString(message, {"OK", "NOK", "REG", "ERR"});
     readDelimiter(message);
 }

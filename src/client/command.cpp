@@ -50,9 +50,8 @@ void CommandManager::readCommand(ClientState state) {
     if (handler == this->handlers.end()) {
         throw UnknownCommandException();
     }
-    
+
     handler->second->handle(args, state);
-    
 }
 
 void LoginCommand::handle(std::vector<std::string> args, ClientState state) {

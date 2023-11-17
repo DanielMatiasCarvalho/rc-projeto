@@ -4,6 +4,10 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
+
+#include "config.hpp"
+#include "utils.hpp"
 
 class ProtocolCommunication {
   public:
@@ -23,8 +27,13 @@ class ProtocolCommunication {
     std::string readString(std::stringstream &message);
     std::string readString(std::stringstream &message, size_t n);
     void readString(std::stringstream &message, std::string expected);
+    std::string readString(std::stringstream &message,
+                           std::vector<std::string> options);
     int readNumber(std::stringstream &message);
+
     void writeChar(std::stringstream &message, char c);
+    void writeDelimiter(std::stringstream &message);
+    void writeSpace(std::stringstream &message);
     void writeString(std::stringstream &message, std::string string);
 };
 
@@ -45,12 +54,12 @@ class LoginCommunication : ProtocolCommunication {
 
 class ProtocolException : public std::runtime_error {
   public:
-    ProtocolException() : std::runtime_error("There was an error while communicating with the server.") {};
+    ProtocolException()
+        : std::runtime_error(
+              "There was an error while communicating with the server."){};
 };
 
 class ProtocolViolationException : public ProtocolException {};
-
-class UnexpectedResponseException : public ProtocolException {};
 
 class ProtocolMessageErrorException : public ProtocolException {};
 
