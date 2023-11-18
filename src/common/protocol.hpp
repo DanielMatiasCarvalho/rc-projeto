@@ -1,6 +1,8 @@
 #ifndef __PROTOCOL_HPP__
 #define __PROTOCOL_HPP__
 
+#include <ctime>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -48,6 +50,7 @@ class ProtocolCommunication {
     void writeDelimiter(std::stringstream &message);
     void writeSpace(std::stringstream &message);
     void writeString(std::stringstream &message, std::string string);
+    std::time_t readDateTime(std::stringstream &message);
 };
 
 class LoginCommunication : ProtocolCommunication {
@@ -132,6 +135,18 @@ class ListAllAuctionsCommunication : ProtocolCommunication {
     // Response parameters:
     std::string _status;
     std::unordered_map<std::string, std::string> _auctions;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
+class ShowRecordCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+
+    // Response parameters:
 
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);
