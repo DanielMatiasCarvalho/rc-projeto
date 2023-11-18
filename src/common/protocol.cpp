@@ -122,9 +122,45 @@ void ProtocolCommunication::writeString(std::stringstream &message,
 }
 
 std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
+    std::stringstream stream;
+    std::string aux;
+
+    aux = readString(message, 4);
+    stream << aux;
+
+    readChar(message, '-');
+    stream << '-';
+
+    aux = readString(message, 2);
+    stream << aux;
+
+    readChar(message, '-');
+    stream << '-';
+
+    aux = readString(message, 2);
+    stream << aux;
+
+    readSpace(message);
+    stream << ' ';
+
+    aux = readString(message, 2);
+    stream << aux;
+
+    readChar(message, ':');
+    stream << ':';
+
+    aux = readString(message, 2);
+    stream << aux;
+
+    readChar(message, ':');
+    stream << ':';
+
+    aux = readString(message, 2);
+    stream << aux;
+
     std::tm tm;
 
-    message >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    stream >> std::get_time(&tm, "%Y-%m-%d%n%H:%M:%S");
 
     if (!message) {
         throw ProtocolViolationException();
