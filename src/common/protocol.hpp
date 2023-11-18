@@ -147,7 +147,7 @@ class ShowRecordCommunication : ProtocolCommunication {
     // Request parameters:
 
     // Response parameters:
-  
+
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
