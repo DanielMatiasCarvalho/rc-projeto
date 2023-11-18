@@ -113,12 +113,41 @@ class ListUserAuctionsCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
+class ListUserBidsCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _uid;
+
+    // Response parameters:
+    std::string _status;
+    std::unordered_map<std::string, std::string> _bids;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
+class ListAllAuctionsCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+
+    // Response parameters:
+    std::string _status;
+    std::unordered_map<std::string, std::string> _auctions;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
 class ShowRecordCommunication : ProtocolCommunication {
   public:
     // Request parameters:
 
     // Response parameters:
-
+  
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
