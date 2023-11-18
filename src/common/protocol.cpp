@@ -121,6 +121,20 @@ void ProtocolCommunication::writeString(std::stringstream &message,
     }
 }
 
+std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
+    std::tm tm;
+    
+    message >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+
+    if (!message) {
+        throw ProtocolViolationException();
+    }
+
+    std::time_t time = std::mktime(&tm);
+
+    return time;
+}
+
 std::stringstream LoginCommunication::encodeRequest() {
     std::stringstream message;
 

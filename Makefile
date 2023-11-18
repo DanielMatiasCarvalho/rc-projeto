@@ -1,6 +1,6 @@
-CC = g++
-CXX = g++
-LD = g++
+CC = g++-13
+CXX = g++-13
+LD = g++-13
 
 INCLUDE_DIRS := src/client src/server src/common src/
 INCLUDES = $(addprefix -I, $(INCLUDE_DIRS))
