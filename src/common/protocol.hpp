@@ -128,7 +128,7 @@ class ListUserBidsCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
-class ListAllAuctionsCommunication : ProtocolCommunication {
+class ListAllAuctionsCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
 
@@ -142,12 +142,11 @@ class ListAllAuctionsCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
-class ShowRecordCommunication : ProtocolCommunication {
+class ShowRecordCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
 
     // Response parameters:
-
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
