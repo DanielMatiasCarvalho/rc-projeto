@@ -123,7 +123,7 @@ void ProtocolCommunication::writeString(std::stringstream &message,
 
 std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
     std::tm tm;
-    
+
     message >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
 
     if (!message) {
