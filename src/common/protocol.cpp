@@ -17,7 +17,8 @@ void ProtocolCommunication::readChar(std::stringstream &message,
     }
 }
 
-char ProtocolCommunication::readChar(std::stringstream &message, std::vector<char> options) {
+char ProtocolCommunication::readChar(std::stringstream &message,
+                                     std::vector<char> options) {
     char c = readChar(message);
 
     for (auto option : options) {
@@ -72,7 +73,8 @@ void ProtocolCommunication::readString(std::stringstream &message,
     }
 }
 
-std::string ProtocolCommunication::readString(std::stringstream &message,
+std::string
+ProtocolCommunication::readString(std::stringstream &message,
                                   std::vector<std::string> options) {
     std::string string = readString(message);
 
@@ -335,7 +337,8 @@ std::stringstream ListUserAuctionsCommunication::encodeResponse() {
     writeString(message, _status);
 
     for (auto auction : _auctions) {
-        if (!isNumeric(auction.first) || (auction.second != "0" && auction.second != "1")) {
+        if (!isNumeric(auction.first) ||
+            (auction.second != "0" && auction.second != "1")) {
             throw ProtocolViolationException();
         }
         writeSpace(message);
@@ -375,7 +378,8 @@ void ListUserAuctionsCommunication::decodeResponse(std::stringstream &message) {
 
             readSpace(message);
 
-            std::string status = readString(message, std::vector<std::string>{"0", "1"});
+            std::string status =
+                readString(message, std::vector<std::string>{"0", "1"});
 
             _auctions.insert({AID, status});
         }
