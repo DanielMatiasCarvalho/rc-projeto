@@ -5,9 +5,21 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "config.hpp"
 #include "utils.hpp"
+
+class ProtocolException : public std::runtime_error {
+  public:
+    ProtocolException()
+        : std::runtime_error(
+              "There was an error while communicating with the server."){};
+};
+
+class ProtocolViolationException : public ProtocolException {};
+
+class ProtocolMessageErrorException : public ProtocolException {};
 
 class ProtocolCommunication {
   public:
@@ -22,6 +34,7 @@ class ProtocolCommunication {
     // General purpose methods to allow parsing and encoding.
     char readChar(std::stringstream &message);
     void readChar(std::stringstream &message, char expected);
+    char readChar(std::stringstream &message, std::vector<char> options);
     void readDelimiter(std::stringstream &message);
     void readSpace(std::stringstream &message);
     std::string readString(std::stringstream &message);
@@ -52,15 +65,49 @@ class LoginCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
-class ProtocolException : public std::runtime_error {
+class LogoutCommunication : ProtocolCommunication {
   public:
-    ProtocolException()
-        : std::runtime_error(
-              "There was an error while communicating with the server."){};
+    // Request parameters:
+    std::string _uid;
+    std::string _password;
+
+    // Response parameters:
+    std::string _status;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
 };
 
-class ProtocolViolationException : public ProtocolException {};
+class UnregisterCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _uid;
+    std::string _password;
 
-class ProtocolMessageErrorException : public ProtocolException {};
+    // Response parameters:
+    std::string _status;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
+class ListUserAuctionsCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _uid;
+
+    // Response parameters:
+    std::string _status;
+    std::unordered_map<std::string, std::string> _auctions;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
 
 #endif
