@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "config.hpp"
 #include "utils.hpp"
@@ -33,6 +34,7 @@ class ProtocolCommunication {
     // General purpose methods to allow parsing and encoding.
     char readChar(std::stringstream &message);
     void readChar(std::stringstream &message, char expected);
+    char readChar(std::stringstream &message, std::vector<char> options);
     void readDelimiter(std::stringstream &message);
     void readSpace(std::stringstream &message);
     std::string readString(std::stringstream &message);
@@ -86,6 +88,21 @@ class UnregisterCommunication : ProtocolCommunication {
 
     // Response parameters:
     std::string _status;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
+class ListUserAuctionsCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _uid;
+
+    // Response parameters:
+    std::string _status;
+    std::unordered_map<std::string, std::string> _auctions;
 
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);

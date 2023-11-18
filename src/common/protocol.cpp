@@ -17,6 +17,18 @@ void ProtocolCommunication::readChar(std::stringstream &message,
     }
 }
 
+char ProtocolCommunication::readChar(std::stringstream &message, std::vector<char> options) {
+    char c = readChar(message);
+
+    for (auto option : options) {
+        if (option == c) {
+            return c;
+        }
+    }
+
+    throw ProtocolViolationException();
+}
+
 void ProtocolCommunication::readDelimiter(std::stringstream &message) {
     readChar(message, PROTOCOL_MESSAGE_DELIMITER);
 }
@@ -60,8 +72,7 @@ void ProtocolCommunication::readString(std::stringstream &message,
     }
 }
 
-std::string
-ProtocolCommunication::readString(std::stringstream &message,
+std::string ProtocolCommunication::readString(std::stringstream &message,
                                   std::vector<std::string> options) {
     std::string string = readString(message);
 
@@ -283,4 +294,90 @@ void UnregisterCommunication::decodeResponse(std::stringstream &message) {
     readSpace(message);
     _status = readString(message, {"OK", "NOK", "UNR", "ERR"});
     readDelimiter(message);
+}
+
+std::stringstream ListUserAuctionsCommunication::encodeRequest() {
+    std::stringstream message;
+
+    writeString(message, "LMA");
+    writeSpace(message);
+
+    if (_uid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+    writeString(message, _uid);
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void ListUserAuctionsCommunication::decodeRequest(std::stringstream &message) {
+    // readString(message, "LMA");
+
+    readSpace(message);
+
+    _uid = readString(message, 6);
+
+    if (!isNumeric(_uid)) {
+        throw ProtocolViolationException();
+    }
+
+    readDelimiter(message);
+}
+
+std::stringstream ListUserAuctionsCommunication::encodeResponse() {
+    std::stringstream message;
+
+    writeString(message, "RMA");
+
+    writeSpace(message);
+    writeString(message, _status);
+
+    for (auto auction : _auctions) {
+        if (!isNumeric(auction.first) || (auction.second != "0" && auction.second != "1")) {
+            throw ProtocolViolationException();
+        }
+        writeSpace(message);
+        writeString(message, auction.first);
+        writeSpace(message);
+        writeString(message, auction.second);
+    }
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void ListUserAuctionsCommunication::decodeResponse(std::stringstream &message) {
+    readString(message, "RMA");
+
+    readSpace(message);
+
+    _status = readString(message, {"OK", "NOK", "NLG", "ERR"});
+
+    if (_status != "OK") {
+        readDelimiter(message);
+        return;
+    }
+
+    while (1) {
+        char c = readChar(message, {' ', PROTOCOL_MESSAGE_DELIMITER});
+
+        if (c == PROTOCOL_MESSAGE_DELIMITER) {
+            break;
+        } else {
+            std::string AID = readString(message, 3);
+
+            if (AID.length() != 3 || !isNumeric(AID)) {
+                throw ProtocolViolationException();
+            }
+
+            readSpace(message);
+
+            std::string status = readString(message, std::vector<std::string>{"0", "1"});
+
+            _auctions.insert({AID, status});
+        }
+    }
 }
