@@ -478,7 +478,7 @@ std::stringstream ListAllAuctionsCommunication::encodeRequest() {
     std::stringstream message;
 
     writeString(message, "LST");
-    
+
     writeDelimiter(message);
 
     return message;
