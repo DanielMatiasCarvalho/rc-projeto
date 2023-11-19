@@ -837,3 +837,147 @@ void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
         }
     }
 }
+
+std::stringstream OpenAuctionCommunication::encodeRequest() {
+    std::stringstream message;
+
+    writeString(message, "OPA");
+
+    writeSpace(message);
+
+    if (!isNumeric(_uid) || _uid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _uid);
+
+    writeSpace(message);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _password);
+
+    writeSpace(message);
+
+    if (_name.length() > 10) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _name);
+
+    writeSpace(message);
+
+    if (_fileName.length() > 24) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _fileName);
+
+    writeSpace(message);
+
+    writeNumber(message, _fileSize);
+
+    writeSpace(message);
+
+    for (int i = 0; i < _fileSize; i++) {
+        char c = readChar(_fileData);
+
+        writeChar(message, c);
+    }
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void OpenAuctionCommunication::decodeRequest(std::stringstream &message) {
+    // readString(message, "OPA");
+
+    readSpace(message);
+
+    _uid = readString(message, 6);
+
+    if (!isNumeric(_uid) || _uid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _password = readString(message, 6);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _name = readString(message, 10);
+
+    readSpace(message);
+
+    _timeActive = readNumber(message);
+
+    readSpace(message);
+
+    _fileName = readString(message, 24);
+
+    readSpace(message);
+
+    _fileSize = readNumber(message);
+
+    readSpace(message);
+
+    for (int i = 0; i < _fileSize; i++) {
+        char c = readChar(message);
+
+        writeChar(_fileData, c);
+    }
+
+    readDelimiter(message);
+}
+
+std::stringstream OpenAuctionCommunication::encodeResponse() {
+    std::stringstream message;
+
+    writeString(message, "ROA");
+
+    writeSpace(message);
+
+    writeString(message, _status);
+
+    if (_status == "OK") {
+        if (_aid.length() != 3) {
+            throw ProtocolViolationException();
+        }
+
+        writeSpace(message);
+
+        writeString(message, _aid);
+    }
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void OpenAuctionCommunication::decodeResponse(std::stringstream &message) {
+    // readString(message, "ROA");
+
+    readSpace(message);
+
+    _status = readString(message, {"OK", "NOK", "NLG", "ERR"});
+
+    if (_status == "OK") {
+        readSpace(message);
+
+        _aid = readString(message, 3);
+
+        if (!isNumeric(_aid) || _aid.length() != 3) {
+            throw ProtocolViolationException();
+        }
+    }
+
+    readDelimiter(message);
+}

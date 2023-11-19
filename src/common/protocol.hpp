@@ -175,4 +175,26 @@ class ShowRecordCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
+class OpenAuctionCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _uid;
+    std::string _password;
+    std::string _name;
+    int _startValue;
+    int _timeActive;
+    std::string _fileName;
+    int _fileSize;
+    std::stringstream _fileData;
+
+    // Response parameters:
+    std::string _status;
+    std::string _aid;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
 #endif
