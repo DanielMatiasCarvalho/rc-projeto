@@ -121,6 +121,20 @@ void ProtocolCommunication::writeString(std::stringstream &message,
     }
 }
 
+void ProtocolCommunication::writeNumber(std::stringstream &message,
+                                        int number) {
+    std::string value = std::to_string(number);
+
+    writeString(message, value);
+}
+
+void ProtocolCommunication::writeDateTime(std::stringstream &message,
+                                          std::time_t time) {
+    std::tm tm = *(std::localtime(&time));
+
+    message << std::put_time(&tm, "%Y-%m-%d%n%H:%M:%S");
+}
+
 std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
     std::stringstream stream;
     std::string aux;
@@ -669,15 +683,15 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 
     writeSpace(message);
 
-    // writeNumber(message, _startValue);
+    writeNumber(message, _startValue);
 
     readSpace(message);
 
-    // writeDateTime(message, _startDateTime);
+    writeDateTime(message, _startDateTime);
 
     writeSpace(message);
 
-    // writeNumber(message, _timeActive);
+    writeNumber(message, _timeActive);
 
     writeSpace(message);
 
@@ -693,25 +707,25 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 
         writeSpace(message);
 
-        // readNumber(message, _bidValues[i]);
+        writeNumber(message, _bidValues[i]);
 
         writeSpace(message);
 
-        // writeDateTime(message, _bidDateTime[i]);
+        writeDateTime(message, _bidDateTime[i]);
 
         writeSpace(message);
 
-        // int bidSecTime = wrtieNumber(message,_bidSecTimes[i]);
+        writeNumber(message, _bidSecTimes[i]);
     }
 
     if (_hasEnded) {
         writeSpace(message);
 
-        // writeDateTime(message, _endDateTime);
+        writeDateTime(message, _endDateTime);
 
         writeSpace(message);
 
-        // writeNumber(message, _endSecTime);
+        writeNumber(message, _endSecTime);
     }
 
     writeDelimiter(message);
