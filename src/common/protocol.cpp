@@ -1021,9 +1021,9 @@ void CloseAuctionCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _aid = readString(message, 6);
+    _uid = readString(message, 6);
 
-    if (!isNumeric(_aid) || _aid.length() != 6) {
+    if (!isNumeric(_uid) || _uid.length() != 6) {
         throw ProtocolViolationException();
     }
 
@@ -1065,7 +1065,7 @@ void CloseAuctionCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    readString(message, {"OK", "NLG", "EAU", "AID", "EOW", "END"});
+    readString(message, {"OK", "NLG", "EAU", "EOW", "END"});
 
     readDelimiter(message);
 }
@@ -1116,6 +1116,8 @@ std::stringstream ShowAssetCommunication::encodeResponse() {
         return message;
     }
 
+    writeSpace(message);
+
     if (_fileName.length() > 24) {
         throw ProtocolViolationException();
     }
@@ -1152,11 +1154,15 @@ void ShowAssetCommunication::decodeResponse(std::stringstream &message) {
         return;
     }
 
+    readSpace(message);
+
     _fileName = readString(message, 24);
 
     readSpace(message);
 
     _fileSize = readNumber(message);
+
+    readSpace(message);
 
     for (int i = 0; i < _fileSize; i++) {
         char c = readChar(message);
@@ -1170,19 +1176,95 @@ void ShowAssetCommunication::decodeResponse(std::stringstream &message) {
 std::stringstream BidCommunication::encodeRequest() {
     std::stringstream message;
 
+    writeString(message, "BID");
+
+    writeSpace(message);
+
+    if (!isNumeric(_uid) || _uid.size() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _uid);
+
+    writeSpace(message);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _password);
+
+    writeSpace(message);
+
+    if (!isNumeric(_aid) || _aid.length() != 3) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _aid);
+
+    writeSpace(message);
+
+    writeNumber(message, _value);
+
+    writeDelimiter(message);
+
     return message;
 }
 
 void BidCommunication::decodeRequest(std::stringstream &message) {
-    (void)message;
+    readString(message, "BID");
+
+    readSpace(message);
+
+    _uid = readString(message, 6);
+
+    if (!isNumeric(_uid) || _uid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _password = readString(message, 8);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _aid = readString(message, 3);
+
+    if (!isNumeric(_aid) || _aid.length() != 3) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _value = readNumber(message);
+
+    readDelimiter(message);
 }
 
 std::stringstream BidCommunication::encodeResponse() {
     std::stringstream message;
 
+    writeString(message, "RBD");
+
+    writeSpace(message);
+
+    writeString(message, _status);
+
+    writeDelimiter(message);
+
     return message;
 }
 
 void BidCommunication::decodeResponse(std::stringstream &message) {
-    (void)message;
+    readString(message, "RBD");
+
+    readSpace(message);
+
+    readString(message, {"NLG", "NOK", "ACC", "ILG", "REF"});
+
+    readDelimiter(message);
 }
