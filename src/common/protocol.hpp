@@ -45,12 +45,13 @@ class ProtocolCommunication {
     std::string readString(std::stringstream &message,
                            std::vector<std::string> options);
     int readNumber(std::stringstream &message);
-
+    std::time_t readDateTime(std::stringstream &message);
     void writeChar(std::stringstream &message, char c);
     void writeDelimiter(std::stringstream &message);
     void writeSpace(std::stringstream &message);
     void writeString(std::stringstream &message, std::string string);
-    std::time_t readDateTime(std::stringstream &message);
+    void writeNumber(std::stringstream &message, int number);
+    void writeDateTime(std::stringstream &message, std::time_t time);
 };
 
 class LoginCommunication : ProtocolCommunication {
@@ -128,7 +129,7 @@ class ListUserBidsCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
-class ListAllAuctionsCommunication : public ProtocolCommunication {
+class ListAllAuctionsCommunication : ProtocolCommunication {
   public:
     // Request parameters:
 
@@ -142,7 +143,7 @@ class ListAllAuctionsCommunication : public ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
-class ShowRecordCommunication : public ProtocolCommunication {
+class ShowRecordCommunication : ProtocolCommunication {
   public:
     // Request parameters:
     std::string _aid;
