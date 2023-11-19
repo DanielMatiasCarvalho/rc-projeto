@@ -1005,7 +1005,7 @@ std::stringstream CloseAuctionCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (!isNumeric(_aid) || _aid.length() != 3) {
+    if (!isNumeric(_aid) || _aid.length() != 3) {
         throw ProtocolViolationException();
     }
 
