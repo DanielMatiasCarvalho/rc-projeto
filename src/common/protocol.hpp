@@ -213,4 +213,21 @@ class CloseAuctionCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
+class ShowAssetCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _aid;
+
+    // Response parameters:
+    std::string _status;
+    std::string _fileName;
+    int _fileSize;
+    std::stringstream _fileData;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
 #endif
