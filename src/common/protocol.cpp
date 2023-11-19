@@ -177,7 +177,7 @@ std::stringstream LoginCommunication::encodeRequest() {
     writeString(message, "LIN");
     writeSpace(message);
 
-    if (_uid.length() != 6) {
+    if (_uid.length() != 6 || !isNumeric(_uid)) {
         throw ProtocolViolationException();
     }
     writeString(message, _uid);
@@ -236,7 +236,7 @@ std::stringstream LogoutCommunication::encodeRequest() {
     writeString(message, "LOU");
     writeSpace(message);
 
-    if (_uid.length() != 6) {
+    if (_uid.length() != 6 || !isNumeric(_uid)) {
         throw ProtocolViolationException();
     }
     writeString(message, _uid);
@@ -295,7 +295,7 @@ std::stringstream UnregisterCommunication::encodeRequest() {
     writeString(message, "UNR");
     writeSpace(message);
 
-    if (_uid.length() != 6) {
+    if (_uid.length() != 6 || !isNumeric(_uid)) {
         throw ProtocolViolationException();
     }
     writeString(message, _uid);
@@ -354,7 +354,7 @@ std::stringstream ListUserAuctionsCommunication::encodeRequest() {
     writeString(message, "LMA");
     writeSpace(message);
 
-    if (_uid.length() != 6) {
+    if (_uid.length() != 6 || !isNumeric(_uid)) {
         throw ProtocolViolationException();
     }
     writeString(message, _uid);
@@ -442,7 +442,7 @@ std::stringstream ListUserBidsCommunication::encodeRequest() {
     writeString(message, "LMB");
     writeSpace(message);
 
-    if (_uid.length() != 6) {
+    if (_uid.length() != 6 || !isNumeric(_uid)) {
         throw ProtocolViolationException();
     }
     writeString(message, _uid);
@@ -594,6 +594,229 @@ void ListAllAuctionsCommunication::decodeResponse(std::stringstream &message) {
                 readString(message, std::vector<std::string>{"0", "1"});
 
             _auctions.insert({AID, status});
+        }
+    }
+}
+
+std::stringstream ShowRecordCommunication::encodeRequest() {
+    std::stringstream message;
+
+    writeString(message, "SRC");
+    writeSpace(message);
+
+    if (_aid.length() != 3 || !isNumeric(_aid)) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _aid);
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void ShowRecordCommunication::decodeRequest(std::stringstream &message) {
+    // readString(message, "SRC");
+
+    readSpace(message);
+
+    _aid = readString(message, 3);
+
+    if (!isNumeric(_aid)) {
+        throw ProtocolViolationException();
+    }
+
+    readDelimiter(message);
+}
+
+std::stringstream ShowRecordCommunication::encodeResponse() {
+    std::stringstream message;
+
+    writeString(message, "SRC");
+
+    writeSpace(message);
+
+    writeString(message, _status);
+
+    if (_status != "OK") {
+        writeDelimiter(message);
+        return message;
+    }
+
+    writeSpace(message);
+
+    if (!isNumeric(_hostUid) || _hostUid.size() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _hostUid);
+
+    writeSpace(message);
+
+    if (_auctionName.size() != 10) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _auctionName);
+
+    writeSpace(message);
+
+    if (_assetFname.size() != 24) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _assetFname);
+
+    writeSpace(message);
+
+    // writeNumber(message, _startValue);
+
+    readSpace(message);
+
+    // writeDateTime(message, _startDateTime);
+
+    writeSpace(message);
+
+    // writeNumber(message, _timeActive);
+
+    writeSpace(message);
+
+    for (long unsigned int i = 0; i < _bidderUids.size(); i++) {
+
+        writeSpace(message);
+
+        if (!isNumeric(_bidderUids[i]) || _bidderUids[i].size() != 6) {
+            throw ProtocolViolationException();
+        }
+
+        writeString(message, _bidderUids[i]);
+
+        writeSpace(message);
+
+        // readNumber(message, _bidValues[i]);
+
+        writeSpace(message);
+
+        // writeDateTime(message, _bidDateTime[i]);
+
+        writeSpace(message);
+
+        // int bidSecTime = wrtieNumber(message,_bidSecTimes[i]);
+    }
+
+    if (_hasEnded) {
+        writeSpace(message);
+
+        // writeDateTime(message, _endDateTime);
+
+        writeSpace(message);
+
+        // writeNumber(message, _endSecTime);
+    }
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
+    readString(message, "SRC");
+
+    readSpace(message);
+
+    _status = readString(message, {"OK", "NOK", "ERR"});
+
+    if (_status != "OK") {
+        readDelimiter(message);
+        return;
+    }
+
+    readSpace(message);
+
+    _hostUid = readString(message, 6);
+
+    if (!isNumeric(_hostUid) || _hostUid.size() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _auctionName = readString(message, 10);
+
+    if (_auctionName.size() != 10) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _assetFname = readString(message, 24);
+
+    if (_assetFname.size() != 24) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _startValue = readNumber(message);
+
+    readSpace(message);
+
+    _startDateTime = readDateTime(message);
+
+    readSpace(message);
+
+    _timeActive = readNumber(message);
+
+    readSpace(message);
+
+    while (1) {
+        char c = readChar(message, {' ', PROTOCOL_MESSAGE_DELIMITER});
+
+        if (c == PROTOCOL_MESSAGE_DELIMITER) {
+            break;
+        }
+
+        char decider = readChar(message, {'B', 'E'});
+
+        readSpace(message);
+
+        if (decider == 'B') {
+
+            std::string bidderUid = readString(message, 6);
+
+            if (!isNumeric(bidderUid) || bidderUid.size() != 6) {
+                throw ProtocolViolationException();
+            }
+
+            _bidderUids.push_back(bidderUid);
+
+            readSpace(message);
+
+            int bidValue = readNumber(message);
+
+            _bidValues.push_back(bidValue);
+
+            readSpace(message);
+
+            std::time_t bidDateTime = readDateTime(message);
+
+            _bidDateTime.push_back(bidDateTime);
+
+            readSpace(message);
+
+            int bidSecTime = readNumber(message);
+
+            _bidSecTimes.push_back(bidSecTime);
+        }
+
+        if (decider == 'E') {
+            _hasEnded = true;
+
+            _endDateTime = readDateTime(message);
+
+            readSpace(message);
+
+            _endSecTime = readNumber(message);
         }
     }
 }
