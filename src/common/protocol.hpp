@@ -145,8 +145,29 @@ class ListAllAuctionsCommunication : public ProtocolCommunication {
 class ShowRecordCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
+    std::string _aid;
 
     // Response parameters:
+    // Auction info
+    std::string _status;
+    std::string _hostUid;
+    std::string _auctionName;
+    std::string _assetFname;
+    int _startValue;
+    std::time_t _startDateTime;
+    int _timeActive;
+
+    // Bidders info
+    std::vector<std::string> _bidderUids;
+    std::vector<int> _bidValues;
+    std::vector<std::time_t> _bidDateTime;
+    std::vector<int> _bidSecTimes;
+
+    // End info
+    bool _hasEnded;
+    std::time_t _endDateTime;
+    int _endSecTime;
+
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
