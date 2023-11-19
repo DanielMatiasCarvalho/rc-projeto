@@ -132,7 +132,7 @@ void ProtocolCommunication::writeDateTime(std::stringstream &message,
                                           std::time_t time) {
     std::tm tm = *(std::localtime(&time));
 
-    message << std::put_time(&tm, "%Y-%m-%d%n%H:%M:%S");
+    message << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
 }
 
 std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
@@ -646,7 +646,7 @@ void ShowRecordCommunication::decodeRequest(std::stringstream &message) {
 std::stringstream ShowRecordCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "SRC");
+    writeString(message, "RRC");
 
     writeSpace(message);
 
@@ -667,7 +667,7 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 
     writeSpace(message);
 
-    if (_auctionName.size() != 10) {
+    if (_auctionName.size() > 10) {
         throw ProtocolViolationException();
     }
 
@@ -675,7 +675,7 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 
     writeSpace(message);
 
-    if (_assetFname.size() != 24) {
+    if (_assetFname.size() > 24) {
         throw ProtocolViolationException();
     }
 
@@ -685,7 +685,7 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 
     writeNumber(message, _startValue);
 
-    readSpace(message);
+    writeSpace(message);
 
     writeDateTime(message, _startDateTime);
 
@@ -693,9 +693,10 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 
     writeNumber(message, _timeActive);
 
-    writeSpace(message);
-
     for (long unsigned int i = 0; i < _bidderUids.size(); i++) {
+        writeSpace(message);
+
+        writeChar(message, 'B');
 
         writeSpace(message);
 
@@ -721,6 +722,10 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
     if (_hasEnded) {
         writeSpace(message);
 
+        writeChar(message, 'E');
+
+        writeSpace(message);
+
         writeDateTime(message, _endDateTime);
 
         writeSpace(message);
@@ -734,7 +739,7 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 }
 
 void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "SRC");
+    readString(message, "RRC");
 
     readSpace(message);
 
@@ -757,7 +762,7 @@ void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
 
     _auctionName = readString(message, 10);
 
-    if (_auctionName.size() != 10) {
+    if (_auctionName.size() > 10) {
         throw ProtocolViolationException();
     }
 
@@ -765,7 +770,7 @@ void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
 
     _assetFname = readString(message, 24);
 
-    if (_assetFname.size() != 24) {
+    if (_assetFname.size() > 24) {
         throw ProtocolViolationException();
     }
 
@@ -780,8 +785,6 @@ void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
     readSpace(message);
 
     _timeActive = readNumber(message);
-
-    readSpace(message);
 
     while (1) {
         char c = readChar(message, {' ', PROTOCOL_MESSAGE_DELIMITER});
