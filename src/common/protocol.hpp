@@ -230,4 +230,21 @@ class ShowAssetCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
+class BidCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _uid;
+    std::string _password;
+    std::string _aid;
+    int _value;
+
+    // Response parameters:
+    std::string _status;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
 #endif

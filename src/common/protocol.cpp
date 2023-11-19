@@ -1166,3 +1166,23 @@ void ShowAssetCommunication::decodeResponse(std::stringstream &message) {
 
     readDelimiter(message);
 }
+
+std::stringstream BidCommunication::encodeRequest() {
+    std::stringstream message;
+
+    return message;
+}
+
+void BidCommunication::decodeRequest(std::stringstream &message) {
+    (void)message;
+}
+
+std::stringstream BidCommunication::encodeResponse() {
+    std::stringstream message;
+
+    return message;
+}
+
+void BidCommunication::decodeResponse(std::stringstream &message) {
+    (void)message;
+}
