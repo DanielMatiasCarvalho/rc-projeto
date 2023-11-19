@@ -197,4 +197,54 @@ class OpenAuctionCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
+class CloseAuctionCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _uid;
+    std::string _password;
+    std::string _aid;
+
+    // Response parameters:
+    std::string _status;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
+class ShowAssetCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _aid;
+
+    // Response parameters:
+    std::string _status;
+    std::string _fileName;
+    int _fileSize;
+    std::stringstream _fileData;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
+class BidCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _uid;
+    std::string _password;
+    std::string _aid;
+    int _value;
+
+    // Response parameters:
+    std::string _status;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
 #endif

@@ -981,3 +981,208 @@ void OpenAuctionCommunication::decodeResponse(std::stringstream &message) {
 
     readDelimiter(message);
 }
+
+std::stringstream CloseAuctionCommunication::encodeRequest() {
+    std::stringstream message;
+
+    writeString(message, "CLS");
+
+    writeSpace(message);
+
+    if (!isNumeric(_uid) || _uid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _uid);
+
+    writeSpace(message);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _password);
+
+    writeSpace(message);
+
+    if (!isNumeric(_aid) || _aid.length() != 3) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _aid);
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void CloseAuctionCommunication::decodeRequest(std::stringstream &message) {
+    // readString(message, "CLS");
+
+    readSpace(message);
+
+    _aid = readString(message, 6);
+
+    if (!isNumeric(_aid) || _aid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _password = readString(message, 8);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _aid = readString(message, 3);
+
+    if (!isNumeric(_aid) || _aid.length() != 3) {
+        throw ProtocolViolationException();
+    }
+
+    readDelimiter(message);
+}
+
+std::stringstream CloseAuctionCommunication::encodeResponse() {
+    std::stringstream message;
+
+    writeString(message, "RCL");
+
+    writeSpace(message);
+
+    writeString(message, _status);
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void CloseAuctionCommunication::decodeResponse(std::stringstream &message) {
+    readString(message, "RCL");
+
+    readSpace(message);
+
+    readString(message, {"OK", "NLG", "EAU", "AID", "EOW", "END"});
+
+    readDelimiter(message);
+}
+
+std::stringstream ShowAssetCommunication::encodeRequest() {
+    std::stringstream message;
+
+    writeString(message, "SAS");
+
+    writeSpace(message);
+
+    if (!isNumeric(_aid) || _aid.length() != 3) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _aid);
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void ShowAssetCommunication::decodeRequest(std::stringstream &message) {
+    // readString(message, "SAS");
+
+    readSpace(message);
+
+    _aid = readString(message);
+
+    if (!isNumeric(_aid) || _aid.length() != 3) {
+        throw ProtocolViolationException();
+    }
+
+    readDelimiter(message);
+}
+
+std::stringstream ShowAssetCommunication::encodeResponse() {
+    std::stringstream message;
+
+    writeString(message, "RSA");
+
+    writeSpace(message);
+
+    writeString(message, _status);
+
+    if (_status != "OK") {
+        writeDelimiter(message);
+        return message;
+    }
+
+    if (_fileName.length() > 24) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _fileName);
+
+    writeSpace(message);
+
+    writeNumber(message, _fileSize);
+
+    writeSpace(message);
+
+    for (int i = 0; i < _fileSize; i++) {
+        char c = readChar(_fileData);
+
+        writeChar(message, c);
+    }
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void ShowAssetCommunication::decodeResponse(std::stringstream &message) {
+    readString(message, "RSA");
+
+    readSpace(message);
+
+    _status = readString(message, {"OK", "NOK", "ERR"});
+
+    if (_status != "OK") {
+        readDelimiter(message);
+
+        return;
+    }
+
+    _fileName = readString(message, 24);
+
+    readSpace(message);
+
+    _fileSize = readNumber(message);
+
+    for (int i = 0; i < _fileSize; i++) {
+        char c = readChar(message);
+
+        writeChar(_fileData, c);
+    }
+
+    readDelimiter(message);
+}
+
+std::stringstream BidCommunication::encodeRequest() {
+    std::stringstream message;
+
+    return message;
+}
+
+void BidCommunication::decodeRequest(std::stringstream &message) {
+    (void)message;
+}
+
+std::stringstream BidCommunication::encodeResponse() {
+    std::stringstream message;
+
+    return message;
+}
+
+void BidCommunication::decodeResponse(std::stringstream &message) {
+    (void)message;
+}
