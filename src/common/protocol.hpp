@@ -197,4 +197,20 @@ class OpenAuctionCommunication : ProtocolCommunication {
     void decodeResponse(std::stringstream &message);
 };
 
+class CloseAuctionCommunication : ProtocolCommunication {
+  public:
+    // Request parameters:
+    std::string _uid;
+    std::string _password;
+    std::string _aid;
+
+    // Response parameters:
+    std::string _status;
+
+    std::stringstream encodeRequest();
+    void decodeRequest(std::stringstream &message);
+    std::stringstream encodeResponse();
+    void decodeResponse(std::stringstream &message);
+};
+
 #endif

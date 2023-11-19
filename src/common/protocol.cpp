@@ -981,3 +981,89 @@ void OpenAuctionCommunication::decodeResponse(std::stringstream &message) {
 
     readDelimiter(message);
 }
+
+std::stringstream CloseAuctionCommunication::encodeRequest() {
+    std::stringstream message;
+
+    writeString(message, "CLS");
+
+    writeSpace(message);
+
+    if (!isNumeric(_uid) || _uid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _uid);
+
+    writeSpace(message);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _password);
+
+    writeSpace(message);
+
+    if (!isNumeric(_aid) || _aid.length() != 3) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, _aid);
+
+    writeDelimiter(message);
+}
+
+void CloseAuctionCommunication::decodeRequest(std::stringstream &message) {
+    // readString(message, "CLS");
+
+    readSpace(message);
+
+    _aid = readString(message, 6);
+
+    if (!isNumeric(_aid) || _aid.length() != 6) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _password = readString(message, 8);
+
+    if (_password.length() != 8) {
+        throw ProtocolViolationException();
+    }
+
+    readSpace(message);
+
+    _aid = readString(message, 3);
+
+    if (!isNumeric(_aid) || _aid.length() != 3) {
+        throw ProtocolViolationException();
+    }
+
+    readDelimiter(message);
+}
+
+std::stringstream CloseAuctionCommunication::encodeResponse() {
+    std::stringstream message;
+
+    writeString(message, "RCL");
+
+    writeSpace(message);
+
+    writeString(message, _status);
+
+    writeDelimiter(message);
+
+    return message;
+}
+
+void CloseAuctionCommunication::decodeResponse(std::stringstream &message) {
+    readString(message, "RCL");
+
+    readSpace(message);
+
+    readString(message, {"OK", "NLG", "EAU", "AID", "EOW", "END"});
+
+    readDelimiter(message);
+}
