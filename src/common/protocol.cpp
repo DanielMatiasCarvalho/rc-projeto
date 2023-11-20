@@ -169,6 +169,16 @@ std::string ProtocolCommunication::readPassword(std::stringstream &message) {
     return password;
 }
 
+std::string ProtocolCommunication::readAid(std::stringstream &message) {
+    std::string aid = readString(message, PROTOCOL_AID_SIZE);
+
+    if (!isAlphaNumeric(aid) || aid.length() != PROTOCOL_AID_SIZE) {
+        throw ProtocolViolationException();
+    }
+
+    return aid;
+}
+
 void ProtocolCommunication::writeChar(std::stringstream &message, char c) {
     message.put(c);
 
@@ -223,6 +233,15 @@ void ProtocolCommunication::writePassword(std::stringstream &message,
     }
 
     writeString(message, password);
+}
+
+void ProtocolCommunication::writeAid(std::stringstream &message,
+                                     std::string aid) {
+    if (!isNumeric(aid) || aid.length() != PROTOCOL_AID_SIZE) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, aid);
 }
 
 std::stringstream LoginCommunication::encodeRequest() {
@@ -404,12 +423,11 @@ std::stringstream ListUserAuctionsCommunication::encodeResponse() {
     writeString(message, _status);
 
     for (auto auction : _auctions) {
-        if (!isNumeric(auction.first) ||
-            (auction.second != "0" && auction.second != "1")) {
+        if (auction.second != "0" && auction.second != "1") {
             throw ProtocolViolationException();
         }
         writeSpace(message);
-        writeString(message, auction.first);
+        writeAid(message, auction.first);
         writeSpace(message);
         writeString(message, auction.second);
     }
@@ -437,11 +455,7 @@ void ListUserAuctionsCommunication::decodeResponse(std::stringstream &message) {
         if (c == PROTOCOL_MESSAGE_DELIMITER) {
             break;
         } else {
-            std::string AID = readString(message, 3);
-
-            if (AID.length() != 3 || !isNumeric(AID)) {
-                throw ProtocolViolationException();
-            }
+            std::string AID = readAid(message);
 
             readSpace(message);
 
@@ -485,12 +499,12 @@ std::stringstream ListUserBidsCommunication::encodeResponse() {
     writeString(message, _status);
 
     for (auto auction : _bids) {
-        if (!isNumeric(auction.first) ||
-            (auction.second != "0" && auction.second != "1")) {
+        if (auction.second != "0" && auction.second != "1") {
             throw ProtocolViolationException();
         }
+
         writeSpace(message);
-        writeString(message, auction.first);
+        writeAid(message, auction.first);
         writeSpace(message);
         writeString(message, auction.second);
     }
@@ -518,11 +532,7 @@ void ListUserBidsCommunication::decodeResponse(std::stringstream &message) {
         if (c == PROTOCOL_MESSAGE_DELIMITER) {
             break;
         } else {
-            std::string AID = readString(message, 3);
-
-            if (AID.length() != 3 || !isNumeric(AID)) {
-                throw ProtocolViolationException();
-            }
+            std::string AID = readAid(message);
 
             readSpace(message);
 
@@ -559,12 +569,11 @@ std::stringstream ListAllAuctionsCommunication::encodeResponse() {
     writeString(message, _status);
 
     for (auto auction : _auctions) {
-        if (!isNumeric(auction.first) ||
-            (auction.second != "0" && auction.second != "1")) {
+        if (auction.second != "0" && auction.second != "1") {
             throw ProtocolViolationException();
         }
         writeSpace(message);
-        writeString(message, auction.first);
+        writeAid(message, auction.first);
         writeSpace(message);
         writeString(message, auction.second);
     }
@@ -592,11 +601,7 @@ void ListAllAuctionsCommunication::decodeResponse(std::stringstream &message) {
         if (c == PROTOCOL_MESSAGE_DELIMITER) {
             break;
         } else {
-            std::string AID = readString(message, 3);
-
-            if (AID.length() != 3 || !isNumeric(AID)) {
-                throw ProtocolViolationException();
-            }
+            std::string AID = readAid(message);
 
             readSpace(message);
 
@@ -614,11 +619,7 @@ std::stringstream ShowRecordCommunication::encodeRequest() {
     writeString(message, "SRC");
     writeSpace(message);
 
-    if (_aid.length() != 3 || !isNumeric(_aid)) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _aid);
+    writeAid(message, _aid);
 
     writeDelimiter(message);
 
@@ -630,11 +631,7 @@ void ShowRecordCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _aid = readString(message, 3);
-
-    if (!isNumeric(_aid)) {
-        throw ProtocolViolationException();
-    }
+    _aid = readAid(message);
 
     readDelimiter(message);
 }
@@ -911,11 +908,7 @@ std::stringstream OpenAuctionCommunication::encodeResponse() {
     writeString(message, _status);
 
     if (_status == "OK") {
-        if (_aid.length() != 3) {
-            throw ProtocolViolationException();
-        }
-
-        writeSpace(message);
+        writeAid(message, _aid);
 
         writeString(message, _aid);
     }
@@ -935,11 +928,7 @@ void OpenAuctionCommunication::decodeResponse(std::stringstream &message) {
     if (_status == "OK") {
         readSpace(message);
 
-        _aid = readString(message, 3);
-
-        if (!isNumeric(_aid) || _aid.length() != 3) {
-            throw ProtocolViolationException();
-        }
+        _aid = readAid(message);
     }
 
     readDelimiter(message);
@@ -960,11 +949,7 @@ std::stringstream CloseAuctionCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (!isNumeric(_aid) || _aid.length() != 3) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _aid);
+    writeAid(message, _aid);
 
     writeDelimiter(message);
 
@@ -984,11 +969,7 @@ void CloseAuctionCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _aid = readString(message, 3);
-
-    if (!isNumeric(_aid) || _aid.length() != 3) {
-        throw ProtocolViolationException();
-    }
+    _aid = readAid(message);
 
     readDelimiter(message);
 }
@@ -1024,11 +1005,7 @@ std::stringstream ShowAssetCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (!isNumeric(_aid) || _aid.length() != 3) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _aid);
+    writeAid(message, _aid);
 
     writeDelimiter(message);
 
@@ -1040,11 +1017,7 @@ void ShowAssetCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _aid = readString(message);
-
-    if (!isNumeric(_aid) || _aid.length() != 3) {
-        throw ProtocolViolationException();
-    }
+    _aid = readAid(message);
 
     readDelimiter(message);
 }
@@ -1135,11 +1108,7 @@ std::stringstream BidCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (!isNumeric(_aid) || _aid.length() != 3) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _aid);
+    writeAid(message, _aid);
 
     writeSpace(message);
 
@@ -1163,11 +1132,7 @@ void BidCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _aid = readString(message, 3);
-
-    if (!isNumeric(_aid) || _aid.length() != 3) {
-        throw ProtocolViolationException();
-    }
+    _aid = readAid(message);
 
     readSpace(message);
 
