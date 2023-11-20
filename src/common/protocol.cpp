@@ -98,43 +98,6 @@ int ProtocolCommunication::readNumber(std::stringstream &message) {
     return stoi(string);
 }
 
-void ProtocolCommunication::writeChar(std::stringstream &message, char c) {
-    message.put(c);
-
-    if (!message.good()) {
-        throw ProtocolViolationException();
-    }
-}
-
-void ProtocolCommunication::writeDelimiter(std::stringstream &message) {
-    writeChar(message, PROTOCOL_MESSAGE_DELIMITER);
-}
-
-void ProtocolCommunication::writeSpace(std::stringstream &message) {
-    writeChar(message, ' ');
-}
-
-void ProtocolCommunication::writeString(std::stringstream &message,
-                                        std::string string) {
-    for (auto c : string) {
-        writeChar(message, c);
-    }
-}
-
-void ProtocolCommunication::writeNumber(std::stringstream &message,
-                                        int number) {
-    std::string value = std::to_string(number);
-
-    writeString(message, value);
-}
-
-void ProtocolCommunication::writeDateTime(std::stringstream &message,
-                                          std::time_t time) {
-    std::tm tm = *(std::localtime(&time));
-
-    message << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
-}
-
 std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
     std::stringstream stream;
     std::string aux;
@@ -185,16 +148,71 @@ std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
     return time;
 }
 
+std::string ProtocolCommunication::readUid(std::stringstream &message) {
+    std::string uid;
+
+    uid = readString(message, PROTOCOL_UID_SIZE);
+
+    if (!isNumeric(uid) || uid.length() != PROTOCOL_UID_SIZE) {
+        throw ProtocolViolationException();
+    }
+
+    return uid;
+}
+
+void ProtocolCommunication::writeChar(std::stringstream &message, char c) {
+    message.put(c);
+
+    if (!message.good()) {
+        throw ProtocolViolationException();
+    }
+}
+
+void ProtocolCommunication::writeDelimiter(std::stringstream &message) {
+    writeChar(message, PROTOCOL_MESSAGE_DELIMITER);
+}
+
+void ProtocolCommunication::writeSpace(std::stringstream &message) {
+    writeChar(message, ' ');
+}
+
+void ProtocolCommunication::writeString(std::stringstream &message,
+                                        std::string string) {
+    for (auto c : string) {
+        writeChar(message, c);
+    }
+}
+
+void ProtocolCommunication::writeNumber(std::stringstream &message,
+                                        int number) {
+    std::string value = std::to_string(number);
+
+    writeString(message, value);
+}
+
+void ProtocolCommunication::writeDateTime(std::stringstream &message,
+                                          std::time_t time) {
+    std::tm tm = *(std::localtime(&time));
+
+    message << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
+}
+
+void ProtocolCommunication::writeUid(std::stringstream &message,
+                                     std::string uid) {
+    if (!isNumeric(uid) || uid.length() != PROTOCOL_UID_SIZE) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, uid);
+}
+
 std::stringstream LoginCommunication::encodeRequest() {
     std::stringstream message;
 
     writeString(message, "LIN");
     writeSpace(message);
 
-    if (_uid.length() != 6 || !isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
-    writeString(message, _uid);
+    writeUid(message, _uid);
 
     writeSpace(message);
 
@@ -213,11 +231,7 @@ void LoginCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _uid = readString(message, 6);
-
-    if (!isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
+    _uid = readUid(message);
 
     readSpace(message);
 
@@ -250,10 +264,7 @@ std::stringstream LogoutCommunication::encodeRequest() {
     writeString(message, "LOU");
     writeSpace(message);
 
-    if (_uid.length() != 6 || !isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
-    writeString(message, _uid);
+    writeUid(message, _uid);
 
     writeSpace(message);
 
@@ -272,11 +283,7 @@ void LogoutCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _uid = readString(message, 6);
-
-    if (!isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
+    _uid = readUid(message);
 
     readSpace(message);
 
@@ -309,10 +316,7 @@ std::stringstream UnregisterCommunication::encodeRequest() {
     writeString(message, "UNR");
     writeSpace(message);
 
-    if (_uid.length() != 6 || !isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
-    writeString(message, _uid);
+    writeUid(message, _uid);
 
     writeSpace(message);
 
@@ -331,11 +335,7 @@ void UnregisterCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _uid = readString(message, 6);
-
-    if (!isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
+    _uid = readUid(message);
 
     readSpace(message);
 
@@ -368,10 +368,7 @@ std::stringstream ListUserAuctionsCommunication::encodeRequest() {
     writeString(message, "LMA");
     writeSpace(message);
 
-    if (_uid.length() != 6 || !isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
-    writeString(message, _uid);
+    writeUid(message, _uid);
 
     writeDelimiter(message);
 
@@ -383,11 +380,7 @@ void ListUserAuctionsCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _uid = readString(message, 6);
-
-    if (!isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
+    _uid = readUid(message);
 
     readDelimiter(message);
 }
@@ -456,10 +449,7 @@ std::stringstream ListUserBidsCommunication::encodeRequest() {
     writeString(message, "LMB");
     writeSpace(message);
 
-    if (_uid.length() != 6 || !isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
-    writeString(message, _uid);
+    writeUid(message, _uid);
 
     writeDelimiter(message);
 
@@ -471,11 +461,7 @@ void ListUserBidsCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _uid = readString(message, 6);
-
-    if (!isNumeric(_uid)) {
-        throw ProtocolViolationException();
-    }
+    _uid = readUid(message);
 
     readDelimiter(message);
 }
@@ -659,11 +645,7 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 
     writeSpace(message);
 
-    if (!isNumeric(_hostUid) || _hostUid.size() != 6) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _hostUid);
+    writeUid(message, _hostUid);
 
     writeSpace(message);
 
@@ -700,11 +682,7 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 
         writeSpace(message);
 
-        if (!isNumeric(_bidderUids[i]) || _bidderUids[i].size() != 6) {
-            throw ProtocolViolationException();
-        }
-
-        writeString(message, _bidderUids[i]);
+        writeUid(message, _bidderUids[i]);
 
         writeSpace(message);
 
@@ -752,11 +730,7 @@ void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    _hostUid = readString(message, 6);
-
-    if (!isNumeric(_hostUid) || _hostUid.size() != 6) {
-        throw ProtocolViolationException();
-    }
+    _hostUid = readUid(message);
 
     readSpace(message);
 
@@ -798,12 +772,7 @@ void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
         readSpace(message);
 
         if (decider == 'B') {
-
-            std::string bidderUid = readString(message, 6);
-
-            if (!isNumeric(bidderUid) || bidderUid.size() != 6) {
-                throw ProtocolViolationException();
-            }
+            std::string bidderUid = readUid(message);
 
             _bidderUids.push_back(bidderUid);
 
@@ -845,11 +814,7 @@ std::stringstream OpenAuctionCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (!isNumeric(_uid) || _uid.length() != 6) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _uid);
+    writeUid(message, _uid);
 
     writeSpace(message);
 
@@ -897,15 +862,11 @@ void OpenAuctionCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _uid = readString(message, 6);
-
-    if (!isNumeric(_uid) || _uid.length() != 6) {
-        throw ProtocolViolationException();
-    }
+    _uid = readUid(message);
 
     readSpace(message);
 
-    _password = readString(message, 6);
+    _password = readString(message, 8);
 
     if (_password.length() != 8) {
         throw ProtocolViolationException();
@@ -989,11 +950,7 @@ std::stringstream CloseAuctionCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (!isNumeric(_uid) || _uid.length() != 6) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _uid);
+    writeUid(message, _uid);
 
     writeSpace(message);
 
@@ -1021,11 +978,7 @@ void CloseAuctionCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _uid = readString(message, 6);
-
-    if (!isNumeric(_uid) || _uid.length() != 6) {
-        throw ProtocolViolationException();
-    }
+    _uid = readUid(message);
 
     readSpace(message);
 
@@ -1180,11 +1133,7 @@ std::stringstream BidCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (!isNumeric(_uid) || _uid.size() != 6) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _uid);
+    writeUid(message, _uid);
 
     writeSpace(message);
 
@@ -1216,11 +1165,7 @@ void BidCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _uid = readString(message, 6);
-
-    if (!isNumeric(_uid) || _uid.length() != 6) {
-        throw ProtocolViolationException();
-    }
+    _uid = readUid(message);
 
     readSpace(message);
 
