@@ -47,6 +47,7 @@ class ProtocolCommunication {
     int readNumber(std::stringstream &message);
     std::time_t readDateTime(std::stringstream &message);
     std::string readUid(std::stringstream &message);
+    std::string readPassword(std::stringstream &message);
 
     void writeChar(std::stringstream &message, char c);
     void writeDelimiter(std::stringstream &message);
@@ -55,6 +56,7 @@ class ProtocolCommunication {
     void writeNumber(std::stringstream &message, int number);
     void writeDateTime(std::stringstream &message, std::time_t time);
     void writeUid(std::stringstream &message, std::string uid);
+    void writePassword(std::stringstream &message, std::string password);
 };
 
 class LoginCommunication : ProtocolCommunication {

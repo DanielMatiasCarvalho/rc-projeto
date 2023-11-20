@@ -5,4 +5,6 @@
 
 bool isNumeric(std::string string);
 
+bool isAlphaNumeric(std::string string);
+
 #endif
