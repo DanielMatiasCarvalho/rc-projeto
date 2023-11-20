@@ -149,15 +149,24 @@ std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
 }
 
 std::string ProtocolCommunication::readUid(std::stringstream &message) {
-    std::string uid;
-
-    uid = readString(message, PROTOCOL_UID_SIZE);
+    std::string uid = readString(message, PROTOCOL_UID_SIZE);
 
     if (!isNumeric(uid) || uid.length() != PROTOCOL_UID_SIZE) {
         throw ProtocolViolationException();
     }
 
     return uid;
+}
+
+std::string ProtocolCommunication::readPassword(std::stringstream &message) {
+    std::string password = readString(message, PROTOCOL_PASSWORD_SIZE);
+
+    if (!isAlphaNumeric(password) ||
+        password.length() != PROTOCOL_PASSWORD_SIZE) {
+        throw ProtocolViolationException();
+    }
+
+    return password;
 }
 
 void ProtocolCommunication::writeChar(std::stringstream &message, char c) {
@@ -206,6 +215,16 @@ void ProtocolCommunication::writeUid(std::stringstream &message,
     writeString(message, uid);
 }
 
+void ProtocolCommunication::writePassword(std::stringstream &message,
+                                          std::string password) {
+    if (!isAlphaNumeric(password) ||
+        password.length() != PROTOCOL_PASSWORD_SIZE) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, password);
+}
+
 std::stringstream LoginCommunication::encodeRequest() {
     std::stringstream message;
 
@@ -216,10 +235,7 @@ std::stringstream LoginCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (_password.length() != 8) {
-        throw ProtocolViolationException();
-    }
-    writeString(message, _password);
+    writePassword(message, _password);
 
     writeDelimiter(message);
 
@@ -235,7 +251,7 @@ void LoginCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _password = readString(message, 8);
+    _password = readPassword(message);
 
     readDelimiter(message);
 }
@@ -268,10 +284,7 @@ std::stringstream LogoutCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (_password.length() != 8) {
-        throw ProtocolViolationException();
-    }
-    writeString(message, _password);
+    writePassword(message, _password);
 
     writeDelimiter(message);
 
@@ -287,7 +300,7 @@ void LogoutCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _password = readString(message, 8);
+    _password = readPassword(message);
 
     readDelimiter(message);
 }
@@ -320,10 +333,7 @@ std::stringstream UnregisterCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (_password.length() != 8) {
-        throw ProtocolViolationException();
-    }
-    writeString(message, _password);
+    writePassword(message, _password);
 
     writeDelimiter(message);
 
@@ -339,7 +349,7 @@ void UnregisterCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _password = readString(message, 8);
+    _password = readPassword(message);
 
     readDelimiter(message);
 }
@@ -818,11 +828,7 @@ std::stringstream OpenAuctionCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (_password.length() != 8) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _password);
+    writePassword(message, _password);
 
     writeSpace(message);
 
@@ -866,11 +872,7 @@ void OpenAuctionCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _password = readString(message, 8);
-
-    if (_password.length() != 8) {
-        throw ProtocolViolationException();
-    }
+    _password = readPassword(message);
 
     readSpace(message);
 
@@ -954,11 +956,7 @@ std::stringstream CloseAuctionCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (_password.length() != 8) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _password);
+    writePassword(message, _password);
 
     writeSpace(message);
 
@@ -982,11 +980,7 @@ void CloseAuctionCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _password = readString(message, 8);
-
-    if (_password.length() != 8) {
-        throw ProtocolViolationException();
-    }
+    _password = readPassword(message);
 
     readSpace(message);
 
@@ -1137,11 +1131,7 @@ std::stringstream BidCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (_password.length() != 8) {
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _password);
+    writePassword(message, _password);
 
     writeSpace(message);
 
@@ -1169,11 +1159,7 @@ void BidCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
-    _password = readString(message, 8);
-
-    if (_password.length() != 8) {
-        throw ProtocolViolationException();
-    }
+    _password = readPassword(message);
 
     readSpace(message);
 
