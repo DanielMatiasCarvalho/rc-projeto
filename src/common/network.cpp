@@ -33,8 +33,8 @@ void UdpClient::send(std::stringstream &message) {
         throw SocketException();
     }
 
-    if (sendto(_fd, messageBuffer, (size_t) n, 0, _res->ai_addr, _res->ai_addrlen) !=
-        n) {
+    if (sendto(_fd, messageBuffer, (size_t)n, 0, _res->ai_addr,
+               _res->ai_addrlen) != n) {
         throw SocketException();
     }
 }

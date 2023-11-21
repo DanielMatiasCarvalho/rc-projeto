@@ -1,8 +1,8 @@
 #ifndef __CLIENT_HPP__
 #define __CLIENT_HPP__
 
-#include "protocol.hpp"
 #include "network.hpp"
+#include "protocol.hpp"
 #include <string>
 
 class Client {
