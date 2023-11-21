@@ -12,8 +12,7 @@
 
 class CommandHandler {
   public:
-    virtual void handle(std::vector<std::string> args,
-                        Client receiver) = 0;
+    virtual void handle(std::vector<std::string> args, Client receiver) = 0;
     std::string _name;
     std::string _description;
     std::string _usage;
