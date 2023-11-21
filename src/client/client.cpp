@@ -39,13 +39,9 @@ void User::logOut() {
     _password = "";
 }
 
-std::string User::getUsername() {
-    return _username;
-}
+std::string User::getUsername() { return _username; }
 
-std::string User::getPassword() {
-    return _password;
-}
+std::string User::getPassword() { return _password; }
 
 Client::Client(int argc, char **argv) {
     char c;

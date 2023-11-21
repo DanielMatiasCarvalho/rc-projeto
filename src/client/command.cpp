@@ -8,7 +8,7 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
     }
 }
 
-void CommandManager::readCommand(Client& reciever) {
+void CommandManager::readCommand(Client &reciever) {
     std::cout << "> ";
 
     std::string line;
@@ -54,7 +54,7 @@ void CommandManager::readCommand(Client& reciever) {
     handler->second->handle(args, reciever);
 }
 
-void LoginCommand::handle(std::vector<std::string> args, Client& reciever) {
+void LoginCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 2) {
         throw CommandArgumentException(_usage);
     }
@@ -77,8 +77,8 @@ void LoginCommand::handle(std::vector<std::string> args, Client& reciever) {
 
     try {
         reciever.processRequest(loginCommunication);
-    } catch(...) {
-        //Something
+    } catch (...) {
+        // Something
     }
 
     if (loginCommunication._status == "OK") {
@@ -89,11 +89,11 @@ void LoginCommand::handle(std::vector<std::string> args, Client& reciever) {
     } else if (loginCommunication._status == "REG") {
         std::cout << "User successfully registered" << std::endl;
         reciever._user.logIn(UID, password);
-    } 
+    }
 }
 
-void LogoutCommand::handle(std::vector<std::string> args, Client& reciever) {
-        if (args.size() != 0) {
+void LogoutCommand::handle(std::vector<std::string> args, Client &reciever) {
+    if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
@@ -108,8 +108,8 @@ void LogoutCommand::handle(std::vector<std::string> args, Client& reciever) {
 
     try {
         reciever.processRequest(logoutCommunication);
-    } catch(...) {
-        //Something
+    } catch (...) {
+        // Something
     }
 
     if (logoutCommunication._status == "OK") {
@@ -119,10 +119,11 @@ void LogoutCommand::handle(std::vector<std::string> args, Client& reciever) {
         std::cout << "User is not logged in" << std::endl;
     } else if (logoutCommunication._status == "UNR") {
         std::cout << "User is not registered" << std::endl;
-    } 
+    }
 }
 
-void UnregisterCommand::handle(std::vector<std::string> args, Client& reciever) {
+void UnregisterCommand::handle(std::vector<std::string> args,
+                               Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -138,8 +139,8 @@ void UnregisterCommand::handle(std::vector<std::string> args, Client& reciever) 
 
     try {
         reciever.processRequest(unregisterCommunication);
-    } catch(...) {
-        //Something
+    } catch (...) {
+        // Something
     }
 
     if (unregisterCommunication._status == "OK") {
@@ -149,10 +150,10 @@ void UnregisterCommand::handle(std::vector<std::string> args, Client& reciever) 
         std::cout << "User is not logged in" << std::endl;
     } else if (unregisterCommunication._status == "UNR") {
         std::cout << "User is not registered" << std::endl;
-    } 
+    }
 }
 
-void ExitCommand::handle(std::vector<std::string> args, Client& reciever) {
+void ExitCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -165,7 +166,7 @@ void ExitCommand::handle(std::vector<std::string> args, Client& reciever) {
     reciever._toExit = true;
 }
 
-void OpenCommand::handle(std::vector<std::string> args, Client& reciever) {
+void OpenCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 4) {
         throw CommandArgumentException(_usage);
     }
@@ -187,7 +188,7 @@ void OpenCommand::handle(std::vector<std::string> args, Client& reciever) {
     }
 }
 
-void CloseCommand::handle(std::vector<std::string> args, Client& reciever) {
+void CloseCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -206,7 +207,7 @@ void CloseCommand::handle(std::vector<std::string> args, Client& reciever) {
 }
 
 void ListUserAuctionsCommand::handle(std::vector<std::string> args,
-                                     Client& reciever) {
+                                     Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -214,7 +215,8 @@ void ListUserAuctionsCommand::handle(std::vector<std::string> args,
     (void)reciever;
 }
 
-void ListUserBidsCommand::handle(std::vector<std::string> args, Client& reciever) {
+void ListUserBidsCommand::handle(std::vector<std::string> args,
+                                 Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -223,7 +225,7 @@ void ListUserBidsCommand::handle(std::vector<std::string> args, Client& reciever
 }
 
 void ListAllAuctionsCommand::handle(std::vector<std::string> args,
-                                    Client& reciever) {
+                                    Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -231,7 +233,7 @@ void ListAllAuctionsCommand::handle(std::vector<std::string> args,
     (void)reciever;
 }
 
-void ShowAssetCommand::handle(std::vector<std::string> args, Client& reciever) {
+void ShowAssetCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -249,7 +251,7 @@ void ShowAssetCommand::handle(std::vector<std::string> args, Client& reciever) {
     }
 }
 
-void BidCommand::handle(std::vector<std::string> args, Client& reciever) {
+void BidCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 2) {
         throw CommandArgumentException(_usage);
     }
@@ -268,7 +270,8 @@ void BidCommand::handle(std::vector<std::string> args, Client& reciever) {
     }
 }
 
-void ShowRecordCommand::handle(std::vector<std::string> args, Client& reciever) {
+void ShowRecordCommand::handle(std::vector<std::string> args,
+                               Client &reciever) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }

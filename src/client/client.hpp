@@ -9,7 +9,7 @@ class User {
   private:
     std::string _username;
     std::string _password;
-  
+
   public:
     bool isLoggedIn();
     void logIn(std::string username, std::string password);
@@ -20,7 +20,7 @@ class User {
 
 class Client {
   private:
-    std::string _hostname = DEFAULT_HOSTNAME; 
+    std::string _hostname = DEFAULT_HOSTNAME;
     std::string _port = DEFAULT_PORT;
 
   public:
