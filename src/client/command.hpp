@@ -12,8 +12,7 @@
 
 class CommandHandler {
   public:
-    virtual void handle(std::vector<std::string> args,
-                        ClientState receiver) = 0;
+    virtual void handle(std::vector<std::string> args, Client receiver) = 0;
     std::string _name;
     std::string _description;
     std::string _usage;
@@ -33,12 +32,12 @@ class CommandManager {
 
   public:
     void registerCommand(std::shared_ptr<CommandHandler> handler);
-    void readCommand(ClientState state);
+    void readCommand(Client state);
 };
 
 class LoginCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     LoginCommand()
         : CommandHandler("login", "Logins into the server",
                          "login UID password", std::vector<std::string>({})){};
@@ -46,7 +45,7 @@ class LoginCommand : public CommandHandler {
 
 class LogoutCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     LogoutCommand()
         : CommandHandler("logout", "Logouts user from server", "logout",
                          std::vector<std::string>({})){};
@@ -54,7 +53,7 @@ class LogoutCommand : public CommandHandler {
 
 class UnregisterCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     UnregisterCommand()
         : CommandHandler("unregister",
                          "Unregisters current logged in user in server",
@@ -63,7 +62,7 @@ class UnregisterCommand : public CommandHandler {
 
 class ExitCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     ExitCommand()
         : CommandHandler("exit", "Unregisters current logged in user in server",
                          "exit", std::vector<std::string>({})){};
@@ -71,7 +70,7 @@ class ExitCommand : public CommandHandler {
 
 class OpenCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     OpenCommand()
         : CommandHandler("open", "Opens a new auction",
                          "open name asset_fname start_value timeactive",
@@ -80,7 +79,7 @@ class OpenCommand : public CommandHandler {
 
 class CloseCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     CloseCommand()
         : CommandHandler("close",
                          "Close an existing auction with AID identifier",
@@ -89,7 +88,7 @@ class CloseCommand : public CommandHandler {
 
 class ListUserAuctionsCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     ListUserAuctionsCommand()
         : CommandHandler("myauctions",
                          "List the auctions started by the logged in user",
@@ -98,7 +97,7 @@ class ListUserAuctionsCommand : public CommandHandler {
 
 class ListUserBidsCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     ListUserBidsCommand()
         : CommandHandler("mybids",
                          "List the bids started by the logged in user",
@@ -107,7 +106,7 @@ class ListUserBidsCommand : public CommandHandler {
 
 class ListAllAuctionsCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     ListAllAuctionsCommand()
         : CommandHandler("list", "List all the current active auctions", "list",
                          std::vector<std::string>({"l"})){};
@@ -115,7 +114,7 @@ class ListAllAuctionsCommand : public CommandHandler {
 
 class ShowAssetCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     ShowAssetCommand()
         : CommandHandler(
               "show_asset",
@@ -125,7 +124,7 @@ class ShowAssetCommand : public CommandHandler {
 
 class BidCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     BidCommand()
         : CommandHandler("bid",
                          "The user bids a certain value in a certain auction",
@@ -134,7 +133,7 @@ class BidCommand : public CommandHandler {
 
 class ShowRecordCommand : public CommandHandler {
   public:
-    void handle(std::vector<std::string> args, ClientState receiver);
+    void handle(std::vector<std::string> args, Client receiver);
     ShowRecordCommand()
         : CommandHandler("show_record", "Show all the auction details",
                          "show_record AID", std::vector<std::string>({"sr"})){};

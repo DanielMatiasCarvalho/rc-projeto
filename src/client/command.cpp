@@ -8,7 +8,7 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
     }
 }
 
-void CommandManager::readCommand(ClientState state) {
+void CommandManager::readCommand(Client state) {
     std::cout << "> ";
 
     std::string line;
@@ -54,7 +54,7 @@ void CommandManager::readCommand(ClientState state) {
     handler->second->handle(args, state);
 }
 
-void LoginCommand::handle(std::vector<std::string> args, ClientState state) {
+void LoginCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 2) {
         throw CommandArgumentException(_usage);
     }
@@ -73,7 +73,7 @@ void LoginCommand::handle(std::vector<std::string> args, ClientState state) {
     }
 }
 
-void LogoutCommand::handle(std::vector<std::string> args, ClientState state) {
+void LogoutCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -81,8 +81,7 @@ void LogoutCommand::handle(std::vector<std::string> args, ClientState state) {
     (void)state;
 }
 
-void UnregisterCommand::handle(std::vector<std::string> args,
-                               ClientState state) {
+void UnregisterCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -90,7 +89,7 @@ void UnregisterCommand::handle(std::vector<std::string> args,
     (void)state;
 }
 
-void ExitCommand::handle(std::vector<std::string> args, ClientState state) {
+void ExitCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -98,7 +97,7 @@ void ExitCommand::handle(std::vector<std::string> args, ClientState state) {
     (void)state;
 }
 
-void OpenCommand::handle(std::vector<std::string> args, ClientState state) {
+void OpenCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 4) {
         throw CommandArgumentException(_usage);
     }
@@ -120,7 +119,7 @@ void OpenCommand::handle(std::vector<std::string> args, ClientState state) {
     }
 }
 
-void CloseCommand::handle(std::vector<std::string> args, ClientState state) {
+void CloseCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -139,7 +138,7 @@ void CloseCommand::handle(std::vector<std::string> args, ClientState state) {
 }
 
 void ListUserAuctionsCommand::handle(std::vector<std::string> args,
-                                     ClientState state) {
+                                     Client state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -147,8 +146,7 @@ void ListUserAuctionsCommand::handle(std::vector<std::string> args,
     (void)state;
 }
 
-void ListUserBidsCommand::handle(std::vector<std::string> args,
-                                 ClientState state) {
+void ListUserBidsCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -157,7 +155,7 @@ void ListUserBidsCommand::handle(std::vector<std::string> args,
 }
 
 void ListAllAuctionsCommand::handle(std::vector<std::string> args,
-                                    ClientState state) {
+                                    Client state) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -165,8 +163,7 @@ void ListAllAuctionsCommand::handle(std::vector<std::string> args,
     (void)state;
 }
 
-void ShowAssetCommand::handle(std::vector<std::string> args,
-                              ClientState state) {
+void ShowAssetCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -184,7 +181,7 @@ void ShowAssetCommand::handle(std::vector<std::string> args,
     }
 }
 
-void BidCommand::handle(std::vector<std::string> args, ClientState state) {
+void BidCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 2) {
         throw CommandArgumentException(_usage);
     }
@@ -203,8 +200,7 @@ void BidCommand::handle(std::vector<std::string> args, ClientState state) {
     }
 }
 
-void ShowRecordCommand::handle(std::vector<std::string> args,
-                               ClientState state) {
+void ShowRecordCommand::handle(std::vector<std::string> args, Client state) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }

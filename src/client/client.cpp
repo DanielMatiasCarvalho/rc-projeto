@@ -6,14 +6,14 @@
 #include <unistd.h>
 
 int main(int argc, char **argv) {
-    ClientState state(argc, argv);
+    Client client(argc, argv);
     CommandManager manager;
 
     manager.registerCommand(std::make_shared<LoginCommand>());
 
     while (1) {
         try {
-            manager.readCommand(state);
+            manager.readCommand(client);
         } catch (CommandException const &e) {
             std::cout << e.what() << std::endl;
         }
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-ClientState::ClientState(int argc, char **argv) {
+Client::Client(int argc, char **argv) {
     char c;
 
     while ((c = (char)getopt(argc, argv, "n:p:")) != -1) {
@@ -39,7 +39,7 @@ ClientState::ClientState(int argc, char **argv) {
     }
 }
 
-void ClientState::ShowInfo() {
+void Client::ShowInfo() {
     std::cout << "Hostname: " << _hostname << std::endl
               << "Port: " << _port << std::endl;
 }
