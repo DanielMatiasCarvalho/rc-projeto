@@ -30,6 +30,21 @@ class UdpClient {
     std::stringstream receive();
 };
 
+class TcpClient {
+  private:
+    int _fd;
+    struct addrinfo _hints;
+    struct addrinfo *_res;
+    struct sockaddr_in _addr;
+
+  public:
+    TcpClient(std::string hostname, std::string port);
+    ~TcpClient();
+
+    void send(std::stringstream &message);
+    std::stringstream receive();
+};
+
 class SocketException : public std::runtime_error {
   public:
     SocketException() : std::runtime_error("A network error has occured."){};

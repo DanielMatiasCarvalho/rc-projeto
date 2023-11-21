@@ -55,3 +55,69 @@ std::stringstream UdpClient::receive() {
 
     return message;
 }
+
+TcpClient::TcpClient(std::string hostname, std::string port) {
+    _fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (_fd == -1) {
+        throw SocketException();
+    }
+
+    memset(&_hints, 0, sizeof(_hints));
+    _hints.ai_family = AF_INET;
+    _hints.ai_socktype = SOCK_STREAM;
+
+    int err = getaddrinfo(hostname.c_str(), port.c_str(), &_hints, &_res);
+
+    if (err != 0) {
+        throw SocketException();
+    }
+
+    err = connect(_fd, _res->ai_addr, _res->ai_addrlen);
+
+    if (err == -1) {
+        throw SocketException();
+    }
+}
+
+TcpClient::~TcpClient() {
+    freeaddrinfo(_res);
+    close(_fd);
+}
+
+void TcpClient::send(std::stringstream &message) {
+    char messageBuffer[SOCKETS_TCP_BUFFER_SIZE];
+
+    message.read(messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
+
+    ssize_t n = message.gcount();
+
+    while (n != 0) {
+        if (write(_fd, messageBuffer, (size_t)n) == -1) {
+            throw SocketException();
+        }
+        message.read(messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
+        n = message.gcount();
+    }
+}
+
+std::stringstream TcpClient::receive() {
+    char messageBuffer[SOCKETS_TCP_BUFFER_SIZE];
+    std::stringstream message;
+
+    ssize_t n = read(_fd, messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
+
+    if (n == -1) {
+        throw SocketException();
+    }
+
+    while (n != 0) {
+        message.write(messageBuffer, n);
+        n = read(_fd, messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
+
+        if (n == -1) {
+            throw SocketException();
+        }
+    }
+
+    return message;
+}
