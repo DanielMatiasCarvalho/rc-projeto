@@ -10,8 +10,11 @@ int main(int argc, char **argv) {
     CommandManager manager;
 
     manager.registerCommand(std::make_shared<LoginCommand>());
+    manager.registerCommand(std::make_shared<LogoutCommand>());
+    manager.registerCommand(std::make_shared<UnregisterCommand>());
+    manager.registerCommand(std::make_shared<ExitCommand>());
 
-    while (1) {
+    while (!client._toExit) {
         try {
             manager.readCommand(client);
         } catch (CommandException const &e) {
@@ -21,6 +24,24 @@ int main(int argc, char **argv) {
 
     return 0;
 }
+
+bool User::isLoggedIn() {
+    return ((_username.length() != 0) && (_password.length() != 0));
+}
+
+void User::logIn(std::string username, std::string password) {
+    _username = username;
+    _password = password;
+}
+
+void User::logOut() {
+    _username = "";
+    _password = "";
+}
+
+std::string User::getUsername() { return _username; }
+
+std::string User::getPassword() { return _password; }
 
 Client::Client(int argc, char **argv) {
     char c;
