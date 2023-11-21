@@ -46,7 +46,7 @@ void Client::ShowInfo() {
 
 void Client::processRequest(ProtocolCommunication &comm) {
     std::stringstream reqMessage = comm.encodeRequest(), resMessage;
-   
+
     if (comm.isTcp()) {
         TcpClient tcpClient(_hostname, _port);
         tcpClient.send(reqMessage);

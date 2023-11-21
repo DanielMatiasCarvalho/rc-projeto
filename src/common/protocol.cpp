@@ -179,7 +179,8 @@ std::string ProtocolCommunication::readAid(std::stringstream &message) {
     return aid;
 }
 
-void ProtocolCommunication::readIdentifier(std::stringstream &message, std::string identifier) {
+void ProtocolCommunication::readIdentifier(std::stringstream &message,
+                                           std::string identifier) {
     std::string identifierRecieved = readString(message, 3);
 
     if (identifierRecieved == PROTOCOL_ERROR_IDENTIFIER) {
