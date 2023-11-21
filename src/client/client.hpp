@@ -14,6 +14,7 @@ class Client {
   public:
     Client(int argc, char **argv);
     void ShowInfo();
+    void processRequest(ProtocolCommunication &comm);
 };
 
 #endif

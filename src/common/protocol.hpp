@@ -60,9 +60,11 @@ class ProtocolCommunication {
     void writeUid(std::stringstream &message, std::string uid);
     void writePassword(std::stringstream &message, std::string password);
     void writeAid(std::stringstream &message, std::string aid);
+
+    virtual bool isTcp() = 0;
 };
 
-class LoginCommunication : ProtocolCommunication {
+class LoginCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _uid;
@@ -75,9 +77,11 @@ class LoginCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return false; };
 };
 
-class LogoutCommunication : ProtocolCommunication {
+class LogoutCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _uid;
@@ -90,9 +94,11 @@ class LogoutCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return false; };
 };
 
-class UnregisterCommunication : ProtocolCommunication {
+class UnregisterCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _uid;
@@ -105,9 +111,11 @@ class UnregisterCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return false; };
 };
 
-class ListUserAuctionsCommunication : ProtocolCommunication {
+class ListUserAuctionsCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _uid;
@@ -120,9 +128,11 @@ class ListUserAuctionsCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return false; };
 };
 
-class ListUserBidsCommunication : ProtocolCommunication {
+class ListUserBidsCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _uid;
@@ -135,9 +145,11 @@ class ListUserBidsCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return false; };
 };
 
-class ListAllAuctionsCommunication : ProtocolCommunication {
+class ListAllAuctionsCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
 
@@ -149,9 +161,11 @@ class ListAllAuctionsCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return false; };
 };
 
-class ShowRecordCommunication : ProtocolCommunication {
+class ShowRecordCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _aid;
@@ -181,9 +195,11 @@ class ShowRecordCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return false; };
 };
 
-class OpenAuctionCommunication : ProtocolCommunication {
+class OpenAuctionCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _uid;
@@ -203,9 +219,11 @@ class OpenAuctionCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return true; };
 };
 
-class CloseAuctionCommunication : ProtocolCommunication {
+class CloseAuctionCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _uid;
@@ -219,9 +237,11 @@ class CloseAuctionCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return true; };
 };
 
-class ShowAssetCommunication : ProtocolCommunication {
+class ShowAssetCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _aid;
@@ -236,9 +256,11 @@ class ShowAssetCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return true; };
 };
 
-class BidCommunication : ProtocolCommunication {
+class BidCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
     std::string _uid;
@@ -253,6 +275,8 @@ class BidCommunication : ProtocolCommunication {
     void decodeRequest(std::stringstream &message);
     std::stringstream encodeResponse();
     void decodeResponse(std::stringstream &message);
+
+    bool isTcp() { return true; };
 };
 
 #endif
