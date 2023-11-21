@@ -35,7 +35,6 @@ class TcpClient {
     int _fd;
     struct addrinfo _hints;
     struct addrinfo *_res;
-    struct sockaddr_in _addr;
 
   public:
     TcpClient(std::string hostname, std::string port);
