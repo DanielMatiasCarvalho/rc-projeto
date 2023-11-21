@@ -179,6 +179,16 @@ std::string ProtocolCommunication::readAid(std::stringstream &message) {
     return aid;
 }
 
+void ProtocolCommunication::readIdentifier(std::stringstream &message, std::string identifier) {
+    std::string identifierRecieved = readString(message, 3);
+
+    if (identifierRecieved == PROTOCOL_ERROR_IDENTIFIER) {
+        throw ProtocolMessageErrorException();
+    } else if (identifierRecieved != identifier) {
+        throw ProtocolViolationException();
+    }
+}
+
 void ProtocolCommunication::writeChar(std::stringstream &message, char c) {
     message.put(c);
 
@@ -262,7 +272,7 @@ std::stringstream LoginCommunication::encodeRequest() {
 }
 
 void LoginCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "LIN");
+    // readIdentifier(message, "LIN");
 
     readSpace(message);
 
@@ -287,7 +297,7 @@ std::stringstream LoginCommunication::encodeResponse() {
 }
 
 void LoginCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RLI");
+    readIdentifier(message, "RLI");
     readSpace(message);
     _status = readString(message, {"OK", "NOK", "REG", "ERR"});
     readDelimiter(message);
@@ -311,7 +321,7 @@ std::stringstream LogoutCommunication::encodeRequest() {
 }
 
 void LogoutCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "LOU");
+    // readIdentifier(message, "LOU");
 
     readSpace(message);
 
@@ -336,7 +346,7 @@ std::stringstream LogoutCommunication::encodeResponse() {
 }
 
 void LogoutCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RLO");
+    readIdentifier(message, "RLO");
     readSpace(message);
     _status = readString(message, {"OK", "NOK", "REG", "ERR"});
     readDelimiter(message);
@@ -360,7 +370,7 @@ std::stringstream UnregisterCommunication::encodeRequest() {
 }
 
 void UnregisterCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "UNR");
+    // readIdentifier(message, "UNR");
 
     readSpace(message);
 
@@ -385,7 +395,7 @@ std::stringstream UnregisterCommunication::encodeResponse() {
 }
 
 void UnregisterCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RUR");
+    readIdentifier(message, "RUR");
     readSpace(message);
     _status = readString(message, {"OK", "NOK", "UNR", "ERR"});
     readDelimiter(message);
@@ -405,7 +415,7 @@ std::stringstream ListUserAuctionsCommunication::encodeRequest() {
 }
 
 void ListUserAuctionsCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "LMA");
+    // readIdentifier(message, "LMA");
 
     readSpace(message);
 
@@ -438,7 +448,7 @@ std::stringstream ListUserAuctionsCommunication::encodeResponse() {
 }
 
 void ListUserAuctionsCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RMA");
+    readIdentifier(message, "RMA");
 
     readSpace(message);
 
@@ -481,7 +491,7 @@ std::stringstream ListUserBidsCommunication::encodeRequest() {
 }
 
 void ListUserBidsCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "LMB");
+    // readIdentifier(message, "LMB");
 
     readSpace(message);
 
@@ -515,7 +525,7 @@ std::stringstream ListUserBidsCommunication::encodeResponse() {
 }
 
 void ListUserBidsCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RMB");
+    readIdentifier(message, "RMB");
 
     readSpace(message);
 
@@ -555,7 +565,7 @@ std::stringstream ListAllAuctionsCommunication::encodeRequest() {
 }
 
 void ListAllAuctionsCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "LST");
+    // readIdentifier(message, "LST");
 
     readDelimiter(message);
 }
@@ -584,7 +594,7 @@ std::stringstream ListAllAuctionsCommunication::encodeResponse() {
 }
 
 void ListAllAuctionsCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RLS");
+    readIdentifier(message, "RLS");
 
     readSpace(message);
 
@@ -627,7 +637,7 @@ std::stringstream ShowRecordCommunication::encodeRequest() {
 }
 
 void ShowRecordCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "SRC");
+    // readIdentifier(message, "SRC");
 
     readSpace(message);
 
@@ -724,7 +734,7 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 }
 
 void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RRC");
+    readIdentifier(message, "RRC");
 
     readSpace(message);
 
@@ -861,7 +871,7 @@ std::stringstream OpenAuctionCommunication::encodeRequest() {
 }
 
 void OpenAuctionCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "OPA");
+    // readIdentifier(message, "OPA");
 
     readSpace(message);
 
@@ -919,7 +929,7 @@ std::stringstream OpenAuctionCommunication::encodeResponse() {
 }
 
 void OpenAuctionCommunication::decodeResponse(std::stringstream &message) {
-    // readString(message, "ROA");
+    readIdentifier(message, "ROA");
 
     readSpace(message);
 
@@ -957,7 +967,7 @@ std::stringstream CloseAuctionCommunication::encodeRequest() {
 }
 
 void CloseAuctionCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "CLS");
+    // readIdentifier(message, "CLS");
 
     readSpace(message);
 
@@ -989,7 +999,7 @@ std::stringstream CloseAuctionCommunication::encodeResponse() {
 }
 
 void CloseAuctionCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RCL");
+    readIdentifier(message, "RCL");
 
     readSpace(message);
 
@@ -1013,7 +1023,7 @@ std::stringstream ShowAssetCommunication::encodeRequest() {
 }
 
 void ShowAssetCommunication::decodeRequest(std::stringstream &message) {
-    // readString(message, "SAS");
+    // readIdentifier(message, "SAS");
 
     readSpace(message);
 
@@ -1062,7 +1072,7 @@ std::stringstream ShowAssetCommunication::encodeResponse() {
 }
 
 void ShowAssetCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RSA");
+    readIdentifier(message, "RSA");
 
     readSpace(message);
 
@@ -1156,7 +1166,7 @@ std::stringstream BidCommunication::encodeResponse() {
 }
 
 void BidCommunication::decodeResponse(std::stringstream &message) {
-    readString(message, "RBD");
+    readIdentifier(message, "RBD");
 
     readSpace(message);
 

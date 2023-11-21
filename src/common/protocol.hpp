@@ -49,6 +49,7 @@ class ProtocolCommunication {
     std::string readUid(std::stringstream &message);
     std::string readPassword(std::stringstream &message);
     std::string readAid(std::stringstream &message);
+    void readIdentifier(std::stringstream &message, std::string identifier);
 
     void writeChar(std::stringstream &message, char c);
     void writeDelimiter(std::stringstream &message);
