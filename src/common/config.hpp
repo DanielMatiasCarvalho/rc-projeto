@@ -9,4 +9,6 @@
 #define DEFAULT_HOSTNAME "127.0.0.1"
 #define DEFAULT_PORT "58085"
 
+#define SOCKETS_MAX_DATAGRAM_SIZE 65527
+
 #endif

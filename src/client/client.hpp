@@ -2,6 +2,7 @@
 #define __CLIENT_HPP__
 
 #include "protocol.hpp"
+#include "network.hpp"
 #include <string>
 
 class Client {
