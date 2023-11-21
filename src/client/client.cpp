@@ -43,3 +43,19 @@ void Client::ShowInfo() {
     std::cout << "Hostname: " << _hostname << std::endl
               << "Port: " << _port << std::endl;
 }
+
+void Client::processRequest(ProtocolCommunication &comm) {
+    std::stringstream reqMessage = comm.encodeRequest(), resMessage;
+
+    if (comm.isTcp()) {
+        TcpClient tcpClient(_hostname, _port);
+        tcpClient.send(reqMessage);
+        resMessage = tcpClient.receive();
+    } else {
+        UdpClient udpClient(_hostname, _port);
+        udpClient.send(reqMessage);
+        resMessage = udpClient.receive();
+    }
+
+    comm.decodeResponse(resMessage);
+}
