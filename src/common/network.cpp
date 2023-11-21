@@ -92,7 +92,9 @@ void TcpClient::send(std::stringstream &message) {
     ssize_t n = message.gcount();
 
     while (n != 0) {
-        write(_fd, messageBuffer, (size_t)n);
+        if (write(_fd, messageBuffer, (size_t)n) == -1) {
+            throw SocketException();
+        }
         message.read(messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
         n = message.gcount();
     }
