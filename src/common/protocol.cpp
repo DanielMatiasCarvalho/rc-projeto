@@ -1004,7 +1004,7 @@ void CloseAuctionCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    readString(message, {"OK", "NLG", "EAU", "EOW", "END"});
+    _status = readString(message, {"OK", "NLG", "EAU", "EOW", "END"});
 
     readDelimiter(message);
 }
