@@ -13,6 +13,14 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<LogoutCommand>());
     manager.registerCommand(std::make_shared<UnregisterCommand>());
     manager.registerCommand(std::make_shared<ExitCommand>());
+    manager.registerCommand(std::make_shared<OpenCommand>());
+    manager.registerCommand(std::make_shared<CloseCommand>());
+    manager.registerCommand(std::make_shared<ListUserAuctionsCommand>());
+    manager.registerCommand(std::make_shared<ListUserBidsCommand>());
+    manager.registerCommand(std::make_shared<ListAllAuctionsCommand>());
+    manager.registerCommand(std::make_shared<ShowAssetCommand>());
+    manager.registerCommand(std::make_shared<BidCommand>());
+    manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
     while (!client._toExit) {
         try {
