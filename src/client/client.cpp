@@ -110,6 +110,28 @@ void Client::writeFile(std::string fName, std::stringstream &content) {
     file.close();
 }
 
+std::stringstream Client::readFile(std::string fName) {
+    std::stringstream content;
+    std::ifstream file(fName);
+
+    char buffer[512];
+
+    file.read(buffer, 512);
+
+    ssize_t n = file.gcount();
+
+    while (n != 0) {
+        content.write(buffer, n);
+
+        file.read(buffer, 512);
+        n = file.gcount();
+    }
+
+    file.close();
+
+    return content;
+}
+
 void Client::assureDirectory() {
     if (mkdir(_downloadPath.c_str(), 0777) == -1) {
         if (errno != EEXIST) {
