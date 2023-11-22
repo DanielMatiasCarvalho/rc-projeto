@@ -90,6 +90,8 @@ void Client::processRequest(ProtocolCommunication &comm) {
 }
 
 void Client::writeFile(std::string fName, std::stringstream &content) {
+    assureDirectory();
+
     std::ofstream file(_downloadPath + fName);
 
     char buffer[512];
@@ -106,4 +108,12 @@ void Client::writeFile(std::string fName, std::stringstream &content) {
     }
 
     file.close();
+}
+
+void Client::assureDirectory() {
+    if (mkdir(_downloadPath.c_str(), 0777) == -1) {
+        if (errno != EEXIST) {
+            throw std::runtime_error("Couldn't write file");
+        }
+    }
 }

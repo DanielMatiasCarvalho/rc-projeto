@@ -5,6 +5,7 @@
 #include "protocol.hpp"
 #include <fstream>
 #include <string>
+#include <sys/stat.h>
 
 class User {
   private:
@@ -33,6 +34,7 @@ class Client {
     void processRequest(ProtocolCommunication &comm);
     void writeFile(std::string fName, std::stringstream &content);
     std::stringstream readFile(std::string fName);
+    void assureDirectory();
 };
 
 #endif
