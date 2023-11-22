@@ -88,3 +88,22 @@ void Client::processRequest(ProtocolCommunication &comm) {
 
     comm.decodeResponse(resMessage);
 }
+
+void Client::writeFile(std::string fName, std::stringstream &content) {
+    std::ofstream file(_downloadPath + fName);
+
+    char buffer[512];
+
+    content.read(buffer, 512);
+
+    ssize_t n = content.gcount();
+
+    while (n != 0) {
+        file.write(buffer, n);
+
+        content.read(buffer, 512);
+        n = content.gcount();
+    }
+
+    file.close();
+}

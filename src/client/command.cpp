@@ -264,16 +264,28 @@ void ShowAssetCommand::handle(std::vector<std::string> args, Client &reciever) {
         throw CommandArgumentException(_usage);
     }
 
-    (void)reciever;
-
     std::string AID = args[0];
 
-    if (AID.length() != 3) {
+    if (AID.length() != 3 || !isNumeric(AID)) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!isNumeric(AID)) {
-        throw CommandArgumentException(_usage);
+    ShowAssetCommunication comm;
+    comm._aid = AID;
+
+    try {
+        reciever.processRequest(comm);
+    } catch (...) {
+        // Exception handling
+    }
+
+    if (comm._status == "OK") {
+        std::cout << "Downloaded file " << comm._fileName << " ("
+                  << comm._fileSize << " bytes)" << std::endl;
+        reciever.writeFile(comm._fileName, comm._fileData);
+    } else if (comm._status == "NOK") {
+        std::cout << "There was an error downloading the requested asset"
+                  << std::endl;
     }
 }
 

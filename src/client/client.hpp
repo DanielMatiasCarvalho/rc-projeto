@@ -3,6 +3,7 @@
 
 #include "network.hpp"
 #include "protocol.hpp"
+#include <fstream>
 #include <string>
 
 class User {
@@ -22,6 +23,7 @@ class Client {
   private:
     std::string _hostname = DEFAULT_HOSTNAME;
     std::string _port = DEFAULT_PORT;
+    std::string _downloadPath = "./auction_files/";
 
   public:
     User _user;
@@ -29,6 +31,8 @@ class Client {
     Client(int argc, char **argv);
     void ShowInfo();
     void processRequest(ProtocolCommunication &comm);
+    void writeFile(std::string fName, std::stringstream &content);
+    std::stringstream readFile(std::string fName);
 };
 
 #endif
