@@ -219,7 +219,7 @@ void ListUserAuctionsCommand::handle(std::vector<std::string> args,
 
     ListUserAuctionsCommunication listUserAuctionsCommunication;
     listUserAuctionsCommunication._uid = reciever._user.getUsername();
-    
+
     try {
         reciever.processRequest(listUserAuctionsCommunication);
     } catch (...) {
@@ -232,7 +232,7 @@ void ListUserAuctionsCommand::handle(std::vector<std::string> args,
     } else if (listUserAuctionsCommunication._status == "NLG") {
         std::cout << "User is not logged in" << std::endl;
     } else if (listUserAuctionsCommunication._status == "OK") {
-        for (auto auction: listUserAuctionsCommunication._auctions) {
+        for (auto auction : listUserAuctionsCommunication._auctions) {
             std::string state;
             if (auction.second == "0") {
                 state = " Status: Not active";
@@ -257,7 +257,7 @@ void ListUserBidsCommand::handle(std::vector<std::string> args,
 
     ListUserBidsCommunication listUserBidsCommunication;
     listUserBidsCommunication._uid = reciever._user.getUsername();
-    
+
     try {
         reciever.processRequest(listUserBidsCommunication);
     } catch (...) {
@@ -270,7 +270,7 @@ void ListUserBidsCommand::handle(std::vector<std::string> args,
     } else if (listUserBidsCommunication._status == "NLG") {
         std::cout << "User is not logged in" << std::endl;
     } else if (listUserBidsCommunication._status == "OK") {
-        for (auto bids: listUserBidsCommunication._bids) {
+        for (auto bids : listUserBidsCommunication._bids) {
             std::string state;
             if (bids.second == "0") {
                 state = " Status: Not active";
@@ -289,7 +289,7 @@ void ListAllAuctionsCommand::handle(std::vector<std::string> args,
     }
 
     ListAllAuctionsCommunication listAllAuctionsCommunication;
-    
+
     try {
         reciever.processRequest(listAllAuctionsCommunication);
     } catch (...) {
@@ -300,7 +300,7 @@ void ListAllAuctionsCommand::handle(std::vector<std::string> args,
         std::cout << "No auctions has been started" << std::endl;
         reciever._user.logOut();
     } else if (listAllAuctionsCommunication._status == "OK") {
-        for (auto auction: listAllAuctionsCommunication._auctions) {
+        for (auto auction : listAllAuctionsCommunication._auctions) {
             std::string state;
             if (auction.second == "0") {
                 state = " Status: Not active";
@@ -361,7 +361,7 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
         throw CommandArgumentException(_usage);
     }
 
-    ShowRecordCommunication showRecordCommunication;    
+    ShowRecordCommunication showRecordCommunication;
 
     try {
         reciever.processRequest(showRecordCommunication);
@@ -374,26 +374,33 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
         reciever._user.logOut();
     } else if (showRecordCommunication._status == "OK") {
         /*TODO: CHECK DATE AND TIME PRINTS*/
-        std:: cout << "Auction ID: " << showRecordCommunication._aid;
-        std:: cout << "Host ID: " << showRecordCommunication._hostUid;
-        std:: cout << "Auction Name: " << showRecordCommunication._auctionName;
-        std:: cout << "Asset File Name: " << showRecordCommunication._assetFname;
-        std:: cout << "Start Value: " << showRecordCommunication._startValue;
-        std:: cout << "Start Date and Time: " << showRecordCommunication._startDateTime;
-        std:: cout << "Time of activity: " << showRecordCommunication._timeActive << std::endl;
-        std:: cout << "Bids: " << std::endl;
+        std::cout << "Auction ID: " << showRecordCommunication._aid;
+        std::cout << "Host ID: " << showRecordCommunication._hostUid;
+        std::cout << "Auction Name: " << showRecordCommunication._auctionName;
+        std::cout << "Asset File Name: " << showRecordCommunication._assetFname;
+        std::cout << "Start Value: " << showRecordCommunication._startValue;
+        std::cout << "Start Date and Time: "
+                  << showRecordCommunication._startDateTime;
+        std::cout << "Time of activity: " << showRecordCommunication._timeActive
+                  << std::endl;
+        std::cout << "Bids: " << std::endl;
         long unsigned int size = showRecordCommunication._bidderUids.size();
         for (long unsigned int i = 0; i < size; i++) {
-            std:: cout << "Bidder ID: " << showRecordCommunication._bidderUids[i];
-            std:: cout << "Bid Value: " << showRecordCommunication._bidValues[i];
-            std:: cout << "Bid Date and Time: " << showRecordCommunication._bidDateTime[i];
-            std:: cout << "Bid Time after the opening of the auction: " << showRecordCommunication._bidSecTimes[i] << std::endl;
+            std::cout << "Bidder ID: "
+                      << showRecordCommunication._bidderUids[i];
+            std::cout << "Bid Value: " << showRecordCommunication._bidValues[i];
+            std::cout << "Bid Date and Time: "
+                      << showRecordCommunication._bidDateTime[i];
+            std::cout << "Bid Time after the opening of the auction: "
+                      << showRecordCommunication._bidSecTimes[i] << std::endl;
         }
 
         if (showRecordCommunication._hasEnded) {
-            std:: cout << "This auction has ended" << std::endl;
-            std:: cout << "End Date and Time: " << showRecordCommunication._endDateTime;
-            std:: cout << "Number of seconds the auction was opened: " << showRecordCommunication._endSecTime << std::endl;
+            std::cout << "This auction has ended" << std::endl;
+            std::cout << "End Date and Time: "
+                      << showRecordCommunication._endDateTime;
+            std::cout << "Number of seconds the auction was opened: "
+                      << showRecordCommunication._endSecTime << std::endl;
         }
     }
 }
