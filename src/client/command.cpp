@@ -212,7 +212,36 @@ void ListUserAuctionsCommand::handle(std::vector<std::string> args,
         throw CommandArgumentException(_usage);
     }
 
-    (void)reciever;
+    if (!reciever._user.isLoggedIn()) {
+        std::cout << "User is not logged in" << std::endl;
+        return;
+    }
+
+    ListUserAuctionsCommunication listUserAuctionsCommunication;
+    listUserAuctionsCommunication._uid = reciever._user.getUsername();
+    
+    try {
+        reciever.processRequest(listUserAuctionsCommunication);
+    } catch (...) {
+        // Something
+    }
+
+    if (listUserAuctionsCommunication._status == "NOK") {
+        std::cout << "User has not made an auction" << std::endl;
+        reciever._user.logOut();
+    } else if (listUserAuctionsCommunication._status == "NLG") {
+        std::cout << "User is not logged in" << std::endl;
+    } else if (listUserAuctionsCommunication._status == "OK") {
+        for (auto auction: listUserAuctionsCommunication._auctions) {
+            std::string state;
+            if (auction.second == "0") {
+                state = " Status: Not active";
+            } else {
+                state = " Status: Active";
+            }
+            std::cout << "Auction ID: " << auction.first << state << std::endl;
+        }
+    }
 }
 
 void ListUserBidsCommand::handle(std::vector<std::string> args,
@@ -221,7 +250,36 @@ void ListUserBidsCommand::handle(std::vector<std::string> args,
         throw CommandArgumentException(_usage);
     }
 
-    (void)reciever;
+    if (!reciever._user.isLoggedIn()) {
+        std::cout << "User is not logged in" << std::endl;
+        return;
+    }
+
+    ListUserBidsCommunication listUserBidsCommunication;
+    listUserBidsCommunication._uid = reciever._user.getUsername();
+    
+    try {
+        reciever.processRequest(listUserBidsCommunication);
+    } catch (...) {
+        // Something
+    }
+
+    if (listUserBidsCommunication._status == "NOK") {
+        std::cout << "User has not made an auction" << std::endl;
+        reciever._user.logOut();
+    } else if (listUserBidsCommunication._status == "NLG") {
+        std::cout << "User is not logged in" << std::endl;
+    } else if (listUserBidsCommunication._status == "OK") {
+        for (auto bids: listUserBidsCommunication._bids) {
+            std::string state;
+            if (bids.second == "0") {
+                state = " Status: Not active";
+            } else {
+                state = " Status: Active";
+            }
+            std::cout << "Auction ID: " << bids.first << state << std::endl;
+        }
+    }
 }
 
 void ListAllAuctionsCommand::handle(std::vector<std::string> args,
@@ -230,7 +288,28 @@ void ListAllAuctionsCommand::handle(std::vector<std::string> args,
         throw CommandArgumentException(_usage);
     }
 
-    (void)reciever;
+    ListAllAuctionsCommunication listAllAuctionsCommunication;
+    
+    try {
+        reciever.processRequest(listAllAuctionsCommunication);
+    } catch (...) {
+        // Something
+    }
+
+    if (listAllAuctionsCommunication._status == "NOK") {
+        std::cout << "No auctions has been started" << std::endl;
+        reciever._user.logOut();
+    } else if (listAllAuctionsCommunication._status == "OK") {
+        for (auto auction: listAllAuctionsCommunication._auctions) {
+            std::string state;
+            if (auction.second == "0") {
+                state = " Status: Not active";
+            } else {
+                state = " Status: Active";
+            }
+            std::cout << "Auction ID: " << auction.first << state << std::endl;
+        }
+    }
 }
 
 void ShowAssetCommand::handle(std::vector<std::string> args, Client &reciever) {
@@ -276,15 +355,45 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
         throw CommandArgumentException(_usage);
     }
 
-    (void)reciever;
-
     std::string AID = args[0];
 
-    if (AID.length() != 3) {
+    if (AID.length() != 3 && !isNumeric(AID)) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!isNumeric(AID)) {
-        throw CommandArgumentException(_usage);
+    ShowRecordCommunication showRecordCommunication;    
+
+    try {
+        reciever.processRequest(showRecordCommunication);
+    } catch (...) {
+        // Something
+    }
+
+    if (showRecordCommunication._status == "NOK") {
+        std::cout << "The auction you requested does not exist" << std::endl;
+        reciever._user.logOut();
+    } else if (showRecordCommunication._status == "OK") {
+        /*TODO: CHECK DATE AND TIME PRINTS*/
+        std:: cout << "Auction ID: " << showRecordCommunication._aid;
+        std:: cout << "Host ID: " << showRecordCommunication._hostUid;
+        std:: cout << "Auction Name: " << showRecordCommunication._auctionName;
+        std:: cout << "Asset File Name: " << showRecordCommunication._assetFname;
+        std:: cout << "Start Value: " << showRecordCommunication._startValue;
+        std:: cout << "Start Date and Time: " << showRecordCommunication._startDateTime;
+        std:: cout << "Time of activity: " << showRecordCommunication._timeActive << std::endl;
+        std:: cout << "Bids: " << std::endl;
+        long unsigned int size = showRecordCommunication._bidderUids.size();
+        for (long unsigned int i = 0; i < size; i++) {
+            std:: cout << "Bidder ID: " << showRecordCommunication._bidderUids[i];
+            std:: cout << "Bid Value: " << showRecordCommunication._bidValues[i];
+            std:: cout << "Bid Date and Time: " << showRecordCommunication._bidDateTime[i];
+            std:: cout << "Bid Time after the opening of the auction: " << showRecordCommunication._bidSecTimes[i] << std::endl;
+        }
+
+        if (showRecordCommunication._hasEnded) {
+            std:: cout << "This auction has ended" << std::endl;
+            std:: cout << "End Date and Time: " << showRecordCommunication._endDateTime;
+            std:: cout << "Number of seconds the auction was opened: " << showRecordCommunication._endSecTime << std::endl;
+        }
     }
 }
