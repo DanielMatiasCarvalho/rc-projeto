@@ -254,7 +254,6 @@ void ListUserAuctionsCommand::handle(std::vector<std::string> args,
 
     if (listUserAuctionsCommunication._status == "NOK") {
         std::cout << "User has not made an auction" << std::endl;
-        reciever._user.logOut();
     } else if (listUserAuctionsCommunication._status == "NLG") {
         std::cout << "User is not logged in" << std::endl;
     } else if (listUserAuctionsCommunication._status == "OK") {
@@ -291,8 +290,7 @@ void ListUserBidsCommand::handle(std::vector<std::string> args,
     }
 
     if (listUserBidsCommunication._status == "NOK") {
-        std::cout << "User has not made an auction" << std::endl;
-        reciever._user.logOut();
+        std::cout << "User has bid in any auction" << std::endl;
     } else if (listUserBidsCommunication._status == "NLG") {
         std::cout << "User is not logged in" << std::endl;
     } else if (listUserBidsCommunication._status == "OK") {
@@ -324,7 +322,6 @@ void ListAllAuctionsCommand::handle(std::vector<std::string> args,
 
     if (listAllAuctionsCommunication._status == "NOK") {
         std::cout << "No auctions has been started" << std::endl;
-        reciever._user.logOut();
     } else if (listAllAuctionsCommunication._status == "OK") {
         for (auto auction : listAllAuctionsCommunication._auctions) {
             std::string state;
@@ -409,7 +406,6 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
 
     if (showRecordCommunication._status == "NOK") {
         std::cout << "The auction you requested does not exist" << std::endl;
-        reciever._user.logOut();
     } else if (showRecordCommunication._status == "OK") {
         /*TODO: CHECK DATE AND TIME PRINTS*/
         std::cout << "Auction ID: " << showRecordCommunication._aid;
