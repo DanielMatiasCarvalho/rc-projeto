@@ -91,7 +91,7 @@ void Client::processRequest(ProtocolCommunication &comm) {
 
 void Client::writeFile(std::string fName, std::stringstream &content) {
     assureDirectory();
-    
+
     std::ofstream file(_downloadPath + fName);
 
     char buffer[512];
