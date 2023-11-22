@@ -300,7 +300,7 @@ std::stringstream LoginCommunication::encodeResponse() {
 void LoginCommunication::decodeResponse(std::stringstream &message) {
     readIdentifier(message, "RLI");
     readSpace(message);
-    _status = readString(message, {"OK", "NOK", "REG", "ERR"});
+    _status = readString(message, {"OK", "NOK", "REG"});
     readDelimiter(message);
 }
 
@@ -349,7 +349,7 @@ std::stringstream LogoutCommunication::encodeResponse() {
 void LogoutCommunication::decodeResponse(std::stringstream &message) {
     readIdentifier(message, "RLO");
     readSpace(message);
-    _status = readString(message, {"OK", "NOK", "REG", "ERR"});
+    _status = readString(message, {"OK", "NOK", "REG"});
     readDelimiter(message);
 }
 
@@ -398,7 +398,7 @@ std::stringstream UnregisterCommunication::encodeResponse() {
 void UnregisterCommunication::decodeResponse(std::stringstream &message) {
     readIdentifier(message, "RUR");
     readSpace(message);
-    _status = readString(message, {"OK", "NOK", "UNR", "ERR"});
+    _status = readString(message, {"OK", "NOK", "UNR"});
     readDelimiter(message);
 }
 
@@ -453,7 +453,7 @@ void ListUserAuctionsCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    _status = readString(message, {"OK", "NOK", "NLG", "ERR"});
+    _status = readString(message, {"OK", "NOK", "NLG"});
 
     if (_status != "OK") {
         readDelimiter(message);
@@ -530,7 +530,7 @@ void ListUserBidsCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    _status = readString(message, {"OK", "NOK", "NLG", "ERR"});
+    _status = readString(message, {"OK", "NOK", "NLG"});
 
     if (_status != "OK") {
         readDelimiter(message);
@@ -599,7 +599,7 @@ void ListAllAuctionsCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    _status = readString(message, {"OK", "NOK", "ERR"});
+    _status = readString(message, std::vector<std::string>({"OK", "NOK"}));
 
     if (_status != "OK") {
         readDelimiter(message);
@@ -739,7 +739,7 @@ void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    _status = readString(message, {"OK", "NOK", "ERR"});
+    _status = readString(message, std::vector<std::string>({"OK", "NOK"}));
 
     if (_status != "OK") {
         readDelimiter(message);
@@ -934,7 +934,7 @@ void OpenAuctionCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    _status = readString(message, {"OK", "NOK", "NLG", "ERR"});
+    _status = readString(message, {"OK", "NOK", "NLG"});
 
     if (_status == "OK") {
         readSpace(message);
@@ -1077,7 +1077,7 @@ void ShowAssetCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    _status = readString(message, {"OK", "NOK", "ERR"});
+    _status = readString(message, std::vector<std::string>({"OK", "NOK"}));
 
     if (_status != "OK") {
         readDelimiter(message);
