@@ -193,16 +193,42 @@ void CloseCommand::handle(std::vector<std::string> args, Client &reciever) {
         throw CommandArgumentException(_usage);
     }
 
-    (void)reciever;
-
     std::string AID = args[0];
 
-    if (AID.length() != 3) {
+    if (AID.length() != 3 || !isNumeric(AID)) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!isNumeric(AID)) {
-        throw CommandArgumentException(_usage);
+    if (!reciever._user.isLoggedIn()) {
+        std::cout << "You need to be logged out to close an auction"
+                  << std::endl;
+        return;
+    }
+
+    CloseAuctionCommunication comm;
+
+    comm._uid = reciever._user.getUsername();
+    comm._password = reciever._user.getPassword();
+    comm._aid = AID;
+
+    try {
+        reciever.processRequest(comm);
+    } catch (...) {
+        // exception handling
+    }
+
+    if (comm._status == "OK") {
+        std::cout << "Auction " << AID << " closed successfully" << std::endl;
+    } else if (comm._status == "NLG") {
+        std::cout << "You need to be logged out to close an auction"
+                  << std::endl;
+    } else if (comm._status == "EAU") {
+        std::cout << "Auction " << AID << " does not exist" << std::endl;
+    } else if (comm._status == "EOW") {
+        std::cout << "You need to be the owner of the auction to delete it"
+                  << std::endl;
+    } else if (comm._status == "END") {
+        std::cout << "Auction " << AID << " has already ended" << std::endl;
     }
 }
 
