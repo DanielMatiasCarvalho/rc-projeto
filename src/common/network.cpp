@@ -22,7 +22,7 @@ UdpClient::~UdpClient() {
     close(_fd);
 }
 
-void UdpClient::send(std::stringstream& message) {
+void UdpClient::send(std::stringstream &message) {
     char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE];
 
     message.read(messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE);
@@ -43,7 +43,7 @@ std::stringstream UdpClient::receive() {
     char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE];
     socklen_t addrlen = sizeof(_addr);
     ssize_t n = recvfrom(_fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE, 0,
-                         (struct sockaddr*)&_addr, &addrlen);
+                         (struct sockaddr *)&_addr, &addrlen);
 
     if (n == -1) {
         throw SocketException();
@@ -84,7 +84,7 @@ TcpClient::~TcpClient() {
     close(_fd);
 }
 
-void TcpClient::send(std::stringstream& message) {
+void TcpClient::send(std::stringstream &message) {
     char messageBuffer[SOCKETS_TCP_BUFFER_SIZE];
 
     message.read(messageBuffer, SOCKETS_TCP_BUFFER_SIZE);

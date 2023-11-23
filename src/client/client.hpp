@@ -30,10 +30,10 @@ class Client {
   public:
     User _user;
     bool _toExit = false;
-    Client(int argc, char** argv);
+    Client(int argc, char **argv);
     void ShowInfo();
-    void processRequest(ProtocolCommunication& comm);
-    void writeFile(std::string fName, std::stringstream& content);
+    void processRequest(ProtocolCommunication &comm);
+    void writeFile(std::string fName, std::stringstream &content);
     std::stringstream readFile(std::string fName);
     void assureDirectory();
     int getFileSize(std::string fName);

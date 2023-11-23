@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <iostream>
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     Client client(argc, argv);
     CommandManager manager;
 
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     while (!client._toExit) {
         try {
             manager.readCommand(client);
-        } catch (CommandException const& e) {
+        } catch (CommandException const &e) {
             std::cout << e.what() << std::endl;
         }
     }
@@ -55,7 +55,7 @@ std::string User::getPassword() {
     return _password;
 }
 
-Client::Client(int argc, char** argv) {
+Client::Client(int argc, char **argv) {
     char c;
 
     while ((c = (char)getopt(argc, argv, "n:p:")) != -1) {
@@ -77,7 +77,7 @@ void Client::ShowInfo() {
               << "Port: " << _port << std::endl;
 }
 
-void Client::processRequest(ProtocolCommunication& comm) {
+void Client::processRequest(ProtocolCommunication &comm) {
     std::stringstream reqMessage = comm.encodeRequest(), resMessage;
 
     if (comm.isTcp()) {
@@ -93,7 +93,7 @@ void Client::processRequest(ProtocolCommunication& comm) {
     comm.decodeResponse(resMessage);
 }
 
-void Client::writeFile(std::string fName, std::stringstream& content) {
+void Client::writeFile(std::string fName, std::stringstream &content) {
     assureDirectory();
 
     std::ofstream file(_downloadPath + fName);

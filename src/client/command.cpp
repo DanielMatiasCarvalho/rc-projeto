@@ -8,7 +8,7 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
     }
 }
 
-void CommandManager::readCommand(Client& reciever) {
+void CommandManager::readCommand(Client &reciever) {
     std::cout << "> ";
 
     std::string line;
@@ -54,7 +54,7 @@ void CommandManager::readCommand(Client& reciever) {
     handler->second->handle(args, reciever);
 }
 
-void LoginCommand::handle(std::vector<std::string> args, Client& reciever) {
+void LoginCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 2) {
         throw CommandArgumentException(_usage);
     }
@@ -92,7 +92,7 @@ void LoginCommand::handle(std::vector<std::string> args, Client& reciever) {
     }
 }
 
-void LogoutCommand::handle(std::vector<std::string> args, Client& reciever) {
+void LogoutCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -123,7 +123,7 @@ void LogoutCommand::handle(std::vector<std::string> args, Client& reciever) {
 }
 
 void UnregisterCommand::handle(std::vector<std::string> args,
-                               Client& reciever) {
+                               Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -153,7 +153,7 @@ void UnregisterCommand::handle(std::vector<std::string> args,
     }
 }
 
-void ExitCommand::handle(std::vector<std::string> args, Client& reciever) {
+void ExitCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -166,7 +166,7 @@ void ExitCommand::handle(std::vector<std::string> args, Client& reciever) {
     reciever._toExit = true;
 }
 
-void OpenCommand::handle(std::vector<std::string> args, Client& reciever) {
+void OpenCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 4) {
         throw CommandArgumentException(_usage);
     }
@@ -217,7 +217,7 @@ void OpenCommand::handle(std::vector<std::string> args, Client& reciever) {
     }
 }
 
-void CloseCommand::handle(std::vector<std::string> args, Client& reciever) {
+void CloseCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -262,7 +262,7 @@ void CloseCommand::handle(std::vector<std::string> args, Client& reciever) {
 }
 
 void ListUserAuctionsCommand::handle(std::vector<std::string> args,
-                                     Client& reciever) {
+                                     Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -299,7 +299,7 @@ void ListUserAuctionsCommand::handle(std::vector<std::string> args,
 }
 
 void ListUserBidsCommand::handle(std::vector<std::string> args,
-                                 Client& reciever) {
+                                 Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -336,7 +336,7 @@ void ListUserBidsCommand::handle(std::vector<std::string> args,
 }
 
 void ListAllAuctionsCommand::handle(std::vector<std::string> args,
-                                    Client& reciever) {
+                                    Client &reciever) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
@@ -364,7 +364,7 @@ void ListAllAuctionsCommand::handle(std::vector<std::string> args,
     }
 }
 
-void ShowAssetCommand::handle(std::vector<std::string> args, Client& reciever) {
+void ShowAssetCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -394,7 +394,7 @@ void ShowAssetCommand::handle(std::vector<std::string> args, Client& reciever) {
     }
 }
 
-void BidCommand::handle(std::vector<std::string> args, Client& reciever) {
+void BidCommand::handle(std::vector<std::string> args, Client &reciever) {
     if (args.size() != 2) {
         throw CommandArgumentException(_usage);
     }
@@ -414,7 +414,7 @@ void BidCommand::handle(std::vector<std::string> args, Client& reciever) {
 }
 
 void ShowRecordCommand::handle(std::vector<std::string> args,
-                               Client& reciever) {
+                               Client &reciever) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
