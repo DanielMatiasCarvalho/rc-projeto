@@ -404,8 +404,6 @@ void BidCommand::handle(std::vector<std::string> args, Client &reciever) {
         throw CommandArgumentException(_usage);
     }
 
-    (void)reciever;
-
     std::string AID = args[0];
     std::string value = args[0];
 
@@ -415,6 +413,38 @@ void BidCommand::handle(std::vector<std::string> args, Client &reciever) {
 
     if (!isNumeric(AID) || !isNumeric(value)) {
         throw CommandArgumentException(_usage);
+    }
+
+    if (!reciever._user.isLoggedIn()) {
+        std::cout << "You need to be logged in to bid" << std::endl;
+        return;
+    }
+
+    BidCommunication comm;
+
+    comm._uid = reciever._user.getUsername();
+    comm._password = reciever._user.getPassword();
+    comm._aid = AID;
+    comm._value = atoi(value.c_str());
+
+    try {
+        reciever.processRequest(comm);
+    } catch (...) {
+        // handling
+    }
+
+    if (comm._status == "NLG") {
+        std::cout << "You need to be logged in to bid" << std::endl;
+    } else if (comm._status == "NOK") {
+        std::cout << "Auction " << AID << " is not active" << std::endl;
+    } else if (comm._status == "ACC") {
+        std::cout << "Successfully bid " << value << " on auction " << AID
+                  << std::endl;
+    } else if (comm._status == "REF") {
+        std::cout << "Someone has already bid a higher ammount on this auction"
+                  << std::endl;
+    } else if (comm._status == "ILG") {
+        std::cout << "You can't bid on your own auction" << std::endl;
     }
 }
 
