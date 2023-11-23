@@ -21,8 +21,10 @@ class CommandHandler {
   protected:
     CommandHandler(std::string name, std::string description, std::string usage,
                    std::vector<std::string> alias)
-        : _name{name}, _description{description}, _usage{usage}, _alias{alias} {
-    }
+        : _name{name},
+          _description{description},
+          _usage{usage},
+          _alias{alias} {}
 };
 
 class CommandManager {

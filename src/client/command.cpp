@@ -171,8 +171,6 @@ void OpenCommand::handle(std::vector<std::string> args, Client &reciever) {
         throw CommandArgumentException(_usage);
     }
 
-    (void)reciever;
-
     std::string name = args[0];
     std::string asset_fname = args[1];
     std::string start_value = args[2];
@@ -185,6 +183,37 @@ void OpenCommand::handle(std::vector<std::string> args, Client &reciever) {
 
     if (!isNumeric(start_value) || !isNumeric(timeactive)) {
         throw CommandArgumentException(_usage);
+    }
+
+    if (!reciever._user.isLoggedIn()) {
+        std::cout << "You need to be logged in" << std::endl;
+        return;
+    }
+
+    OpenAuctionCommunication comm;
+
+    comm._uid = reciever._user.getUsername();
+    comm._password = reciever._user.getPassword();
+    comm._name = name;
+    comm._startValue = atoi(start_value.c_str());
+    comm._timeActive = atoi(timeactive.c_str());
+    comm._fileName = asset_fname;
+    comm._fileSize = reciever.getFileSize(asset_fname);
+    comm._fileData = reciever.readFile(asset_fname);
+
+    try {
+        reciever.processRequest(comm);
+    } catch (...) {
+        // Handling
+    }
+
+    if (comm._status == "OK") {
+        std::cout << "Auction successfully created. AID: " << comm._aid
+                  << std::endl;
+    } else if (comm._status == "NLG") {
+        std::cout << "You need to be logged in" << std::endl;
+    } else if (comm._status == "NOK") {
+        std::cout << "Auction was not able to be created" << std::endl;
     }
 }
 
@@ -398,6 +427,8 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
 
     ShowRecordCommunication showRecordCommunication;
 
+    showRecordCommunication._aid = AID;
+
     try {
         reciever.processRequest(showRecordCommunication);
     } catch (...) {
@@ -408,27 +439,35 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
         std::cout << "The auction you requested does not exist" << std::endl;
     } else if (showRecordCommunication._status == "OK") {
         /*TODO: CHECK DATE AND TIME PRINTS*/
-        std::cout << "Auction ID: " << showRecordCommunication._aid;
-        std::cout << "Host ID: " << showRecordCommunication._hostUid;
-        std::cout << "Auction Name: " << showRecordCommunication._auctionName;
-        std::cout << "Asset File Name: " << showRecordCommunication._assetFname;
-        std::cout << "Start Value: " << showRecordCommunication._startValue;
+        std::cout << "Auction ID: " << showRecordCommunication._aid
+                  << std::endl;
+        std::cout << "Host ID: " << showRecordCommunication._hostUid
+                  << std::endl;
+        std::cout << "Auction Name: " << showRecordCommunication._auctionName
+                  << std::endl;
+        std::cout << "Asset File Name: " << showRecordCommunication._assetFname
+                  << std::endl;
+        std::cout << "Start Value: " << showRecordCommunication._startValue
+                  << std::endl;
         std::cout << "Start Date and Time: "
-                  << showRecordCommunication._startDateTime;
+                  << showRecordCommunication._startDateTime << std::endl;
         std::cout << "Time of activity: " << showRecordCommunication._timeActive
                   << std::endl;
+        std::cout << "---------------------" << std::endl;
         std::cout << "Bids: " << std::endl;
+        std::cout << "---------------------" << std::endl;
         long unsigned int size = showRecordCommunication._bidderUids.size();
         for (long unsigned int i = 0; i < size; i++) {
-            std::cout << "Bidder ID: "
-                      << showRecordCommunication._bidderUids[i];
-            std::cout << "Bid Value: " << showRecordCommunication._bidValues[i];
-            std::cout << "Bid Date and Time: "
-                      << showRecordCommunication._bidDateTime[i];
-            std::cout << "Bid Time after the opening of the auction: "
+            std::cout << "Bidder ID: " << showRecordCommunication._bidderUids[i]
+                      << std::endl;
+            std::cout << "\tBid Value: "
+                      << showRecordCommunication._bidValues[i] << std::endl;
+            std::cout << "\tBid Date and Time: "
+                      << showRecordCommunication._bidDateTime[i] << std::endl;
+            std::cout << "\tBid Time after the opening of the auction: "
                       << showRecordCommunication._bidSecTimes[i] << std::endl;
         }
-
+        std::cout << "---------------------" << std::endl;
         if (showRecordCommunication._hasEnded) {
             std::cout << "This auction has ended" << std::endl;
             std::cout << "End Date and Time: "

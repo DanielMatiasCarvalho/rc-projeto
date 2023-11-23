@@ -1,11 +1,12 @@
 #ifndef __CLIENT_HPP__
 #define __CLIENT_HPP__
 
-#include "network.hpp"
-#include "protocol.hpp"
+#include <sys/stat.h>
+#include <filesystem>
 #include <fstream>
 #include <string>
-#include <sys/stat.h>
+#include "network.hpp"
+#include "protocol.hpp"
 
 class User {
   private:
@@ -35,6 +36,7 @@ class Client {
     void writeFile(std::string fName, std::stringstream &content);
     std::stringstream readFile(std::string fName);
     void assureDirectory();
+    int getFileSize(std::string fName);
 };
 
 #endif

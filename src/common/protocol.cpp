@@ -73,9 +73,8 @@ void ProtocolCommunication::readString(std::stringstream &message,
     }
 }
 
-std::string
-ProtocolCommunication::readString(std::stringstream &message,
-                                  std::vector<std::string> options) {
+std::string ProtocolCommunication::readString(
+    std::stringstream &message, std::vector<std::string> options) {
     std::string string = readString(message);
 
     for (auto option : options) {
@@ -845,6 +844,14 @@ std::stringstream OpenAuctionCommunication::encodeRequest() {
     }
 
     writeString(message, _name);
+
+    writeSpace(message);
+
+    writeNumber(message, _startValue);
+
+    writeSpace(message);
+
+    writeNumber(message, _timeActive);
 
     writeSpace(message);
 

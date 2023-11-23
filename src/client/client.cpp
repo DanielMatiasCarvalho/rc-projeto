@@ -2,8 +2,8 @@
 #include "command.hpp"
 #include "protocol.hpp"
 
-#include <iostream>
 #include <unistd.h>
+#include <iostream>
 
 int main(int argc, char **argv) {
     Client client(argc, argv);
@@ -47,23 +47,27 @@ void User::logOut() {
     _password = "";
 }
 
-std::string User::getUsername() { return _username; }
+std::string User::getUsername() {
+    return _username;
+}
 
-std::string User::getPassword() { return _password; }
+std::string User::getPassword() {
+    return _password;
+}
 
 Client::Client(int argc, char **argv) {
     char c;
 
     while ((c = (char)getopt(argc, argv, "n:p:")) != -1) {
         switch (c) {
-        case 'n':
-            _hostname = optarg;
-            break;
-        case 'p':
-            _port = optarg;
-            break;
-        default:
-            break;
+            case 'n':
+                _hostname = optarg;
+                break;
+            case 'p':
+                _port = optarg;
+                break;
+            default:
+                break;
         }
     }
 }
@@ -138,4 +142,10 @@ void Client::assureDirectory() {
             throw std::runtime_error("Couldn't write file");
         }
     }
+}
+
+int Client::getFileSize(std::string fName) {
+    std::filesystem::path p(fName);
+
+    return (int)std::filesystem::file_size(p);
 }
