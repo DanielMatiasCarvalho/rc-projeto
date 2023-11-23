@@ -1178,7 +1178,7 @@ void BidCommunication::decodeResponse(std::stringstream &message) {
 
     readSpace(message);
 
-    readString(message, {"NLG", "NOK", "ACC", "ILG", "REF"});
+    _status = readString(message, {"NLG", "NOK", "ACC", "ILG", "REF"});
 
     readDelimiter(message);
 }
