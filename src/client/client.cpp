@@ -2,10 +2,10 @@
 #include "command.hpp"
 #include "protocol.hpp"
 
-#include <iostream>
 #include <unistd.h>
+#include <iostream>
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     Client client(argc, argv);
     CommandManager manager;
 
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     while (!client._toExit) {
         try {
             manager.readCommand(client);
-        } catch (CommandException const &e) {
+        } catch (CommandException const& e) {
             std::cout << e.what() << std::endl;
         }
     }
@@ -47,23 +47,27 @@ void User::logOut() {
     _password = "";
 }
 
-std::string User::getUsername() { return _username; }
+std::string User::getUsername() {
+    return _username;
+}
 
-std::string User::getPassword() { return _password; }
+std::string User::getPassword() {
+    return _password;
+}
 
-Client::Client(int argc, char **argv) {
+Client::Client(int argc, char** argv) {
     char c;
 
     while ((c = (char)getopt(argc, argv, "n:p:")) != -1) {
         switch (c) {
-        case 'n':
-            _hostname = optarg;
-            break;
-        case 'p':
-            _port = optarg;
-            break;
-        default:
-            break;
+            case 'n':
+                _hostname = optarg;
+                break;
+            case 'p':
+                _port = optarg;
+                break;
+            default:
+                break;
         }
     }
 }
@@ -73,7 +77,7 @@ void Client::ShowInfo() {
               << "Port: " << _port << std::endl;
 }
 
-void Client::processRequest(ProtocolCommunication &comm) {
+void Client::processRequest(ProtocolCommunication& comm) {
     std::stringstream reqMessage = comm.encodeRequest(), resMessage;
 
     if (comm.isTcp()) {
@@ -89,7 +93,7 @@ void Client::processRequest(ProtocolCommunication &comm) {
     comm.decodeResponse(resMessage);
 }
 
-void Client::writeFile(std::string fName, std::stringstream &content) {
+void Client::writeFile(std::string fName, std::stringstream& content) {
     assureDirectory();
 
     std::ofstream file(_downloadPath + fName);
@@ -138,4 +142,10 @@ void Client::assureDirectory() {
             throw std::runtime_error("Couldn't write file");
         }
     }
+}
+
+int Client::getFileSize(std::string fName) {
+    std::filesystem::path p(fName);
+
+    return (int)std::filesystem::file_size(p);
 }
