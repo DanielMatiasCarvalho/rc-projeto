@@ -201,6 +201,11 @@ void OpenCommand::handle(std::vector<std::string> args, Client &reciever) {
     comm._fileSize = reciever.getFileSize(asset_fname);
     comm._fileData = reciever.readFile(asset_fname);
 
+    if (comm._fileSize > PROTOCOL_MAX_FILE_SIZE) {
+        std::cout << "File too big" << std::endl;
+        return;
+    }
+
     try {
         reciever.processRequest(comm);
     } catch (...) {
