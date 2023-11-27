@@ -2,6 +2,7 @@
 
 UdpClient::UdpClient(std::string hostname, std::string port) {
     _fd = socket(AF_INET, SOCK_DGRAM, 0);
+
     if (_fd == -1) {
         throw SocketException();
     }
@@ -13,6 +14,15 @@ UdpClient::UdpClient(std::string hostname, std::string port) {
     int err = getaddrinfo(hostname.c_str(), port.c_str(), &_hints, &_res);
 
     if (err != 0) {
+        throw SocketException();
+    }
+
+    struct timeval timeout;
+    timeout.tv_sec = SOCKETS_UDP_TIMEOUT;
+    timeout.tv_usec = 0;
+
+    if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) <
+        0) {
         throw SocketException();
     }
 }
@@ -46,7 +56,7 @@ std::stringstream UdpClient::receive() {
                          (struct sockaddr *)&_addr, &addrlen);
 
     if (n == -1) {
-        throw SocketException();
+        throw TimeoutException();
     }
 
     std::stringstream message;
@@ -66,16 +76,16 @@ TcpClient::TcpClient(std::string hostname, std::string port) {
     _hints.ai_family = AF_INET;
     _hints.ai_socktype = SOCK_STREAM;
 
-    int err = getaddrinfo(hostname.c_str(), port.c_str(), &_hints, &_res);
+    int n = getaddrinfo(hostname.c_str(), port.c_str(), &_hints, &_res);
 
-    if (err != 0) {
+    if (n != 0) {
         throw SocketException();
     }
 
-    err = connect(_fd, _res->ai_addr, _res->ai_addrlen);
+    n = connect(_fd, _res->ai_addr, _res->ai_addrlen);
 
-    if (err == -1) {
-        throw SocketException();
+    if (n == -1) {
+        throw TimeoutException();
     }
 }
 

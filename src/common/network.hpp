@@ -49,4 +49,9 @@ class SocketException : public std::runtime_error {
     SocketException() : std::runtime_error("A network error has occured."){};
 };
 
+class TimeoutException : public std::runtime_error {
+  public:
+    TimeoutException() : std::runtime_error("Server has timed out."){};
+};
+
 #endif
