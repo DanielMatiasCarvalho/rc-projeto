@@ -8,8 +8,8 @@
 #include <vector>
 
 #include "client.hpp"
-#include "utils.hpp"
 #include "messages.hpp"
+#include "utils.hpp"
 
 class CommandHandler {
   public:

@@ -4,12 +4,12 @@
 #include <iostream>
 
 class Message {
-    public:
-        static void UserLoginSuccess();
-        static void WrongPassword();
-        static void UserRegisterSuccess();
-        static void UserNotLoggedIn();
-        static void UserAlreadyLoggedIn();
+  public:
+    static void UserLoginSuccess();
+    static void WrongPassword();
+    static void UserRegisterSuccess();
+    static void UserNotLoggedIn();
+    static void UserAlreadyLoggedIn();
 };
 
 #endif
