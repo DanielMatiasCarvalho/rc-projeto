@@ -777,51 +777,49 @@ void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
 
     _timeActive = readNumber(message);
 
+    char c;
+
     while (1) {
-        char c = readChar(message, {' ', PROTOCOL_MESSAGE_DELIMITER});
+        c = readChar(message, {' ', PROTOCOL_MESSAGE_DELIMITER});
 
         if (c == PROTOCOL_MESSAGE_DELIMITER) {
-            break;
+            return;
         }
 
-        char decider = readChar(message, {'B', 'E'});
+        c = readChar(message, {'B', 'E'});
 
         readSpace(message);
 
-        if (decider == 'B') {
-            std::string bidderUid = readUid(message);
-
-            _bidderUids.push_back(bidderUid);
+        if (c == 'B') {
+            _bidderUids.push_back(readUid(message));
 
             readSpace(message);
 
-            int bidValue = readNumber(message);
-
-            _bidValues.push_back(bidValue);
+            _bidValues.push_back(readNumber(message));
 
             readSpace(message);
 
-            std::time_t bidDateTime = readDateTime(message);
-
-            _bidDateTime.push_back(bidDateTime);
+            _bidDateTime.push_back(readDateTime(message));
 
             readSpace(message);
 
-            int bidSecTime = readNumber(message);
-
-            _bidSecTimes.push_back(bidSecTime);
+            _bidSecTimes.push_back(readNumber(message));
         }
 
-        if (decider == 'E') {
-            _hasEnded = true;
-
-            _endDateTime = readDateTime(message);
-
-            readSpace(message);
-
-            _endSecTime = readNumber(message);
+        if (c == 'E') {
+            break;
         }
     }
+
+    _hasEnded = true;
+
+    _endDateTime = readDateTime(message);
+
+    readSpace(message);
+
+    _endSecTime = readNumber(message);
+
+    readDelimiter(message);
 }
 
 std::stringstream OpenAuctionCommunication::encodeRequest() {
