@@ -444,10 +444,13 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
         std::cout << "The auction you requested does not exist" << std::endl;
     } else if (showRecordCommunication._status == "OK") {
         /*TODO: CHECK DATE AND TIME PRINTS*/
-        Message::ShowRecordHeader(showRecordCommunication._aid, showRecordCommunication._hostUid,
-                                   showRecordCommunication._auctionName,  showRecordCommunication._assetFname,
-                                   showRecordCommunication._startValue, showRecordCommunication._startDateTime,
-                                   showRecordCommunication._timeActive);
+        Message::ShowRecordHeader(showRecordCommunication._aid,
+                                  showRecordCommunication._hostUid,
+                                  showRecordCommunication._auctionName,
+                                  showRecordCommunication._assetFname,
+                                  showRecordCommunication._startValue,
+                                  showRecordCommunication._startDateTime,
+                                  showRecordCommunication._timeActive);
         long unsigned int size = showRecordCommunication._bidderUids.size();
         for (long unsigned int i = 0; i < size; i++) {
             std::cout << "Bidder ID: " << showRecordCommunication._bidderUids[i]
@@ -461,7 +464,7 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
         }
         std::cout << "---------------------" << std::endl;
         if (showRecordCommunication._hasEnded) {
-            Message::AuctionRecordEnded(showRecordCommunication._endDateTime, 
+            Message::AuctionRecordEnded(showRecordCommunication._endDateTime,
                                         showRecordCommunication._endSecTime);
         }
     }

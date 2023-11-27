@@ -1,9 +1,9 @@
 #ifndef __MESSAGES_HPP__
 #define __MESSAGES_HPP__
 
+#include <ctime>
 #include <iostream>
 #include <unordered_map>
-#include <ctime>
 
 class Message {
   public:
@@ -24,7 +24,8 @@ class Message {
     static void UserNotOwner();
     static void AuctionAlreadyEnded(std::string aid);
     static void UserNotMadeAuction();
-    static void ListAuctionsAndState(const std::unordered_map<std::string, std::string>& list);
+    static void ListAuctionsAndState(
+        const std::unordered_map<std::string, std::string> &list);
     static void UserHasNoBids();
     static void ShowUser(std::string uid);
     static void NoAuctionStarted();
@@ -34,7 +35,10 @@ class Message {
     static void HigherValueBid();
     static void BidOwnAuctions();
     static void AuctionRecordEnded(std::time_t endDateTime, int endSecTime);
-    static void ShowRecordHeader(std::string aid, std::string host, std::string auctionName, std::string assetFname, int startValue, std::time_t startDateTime, int timeActive);
+    static void ShowRecordHeader(std::string aid, std::string host,
+                                 std::string auctionName,
+                                 std::string assetFname, int startValue,
+                                 std::time_t startDateTime, int timeActive);
 };
 
 #endif

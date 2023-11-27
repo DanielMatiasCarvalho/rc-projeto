@@ -26,7 +26,7 @@ void Message::UserLogoutSucess() {
     cout << "User sucessfully logged out" << endl;
 }
 
-void Message::UserNotRegistered(){
+void Message::UserNotRegistered() {
     cout << "User is not registered" << endl;
 }
 
@@ -43,8 +43,7 @@ void Message::FileTooBig() {
 }
 
 void Message::AuctionCreated(string aid) {
-    cout << "Auction successfully created. AID: " << aid
-                  << endl;
+    cout << "Auction successfully created. AID: " << aid << endl;
 }
 
 void Message::AuctionNotCreated() {
@@ -60,8 +59,7 @@ void Message::AuctionNotExists(string aid) {
 }
 
 void Message::UserNotOwner() {
-    cout << "You need to be the owner of the auction to delete it"
-                  << endl;
+    cout << "You need to be the owner of the auction to delete it" << endl;
 }
 
 void Message::AuctionAlreadyEnded(string aid) {
@@ -76,16 +74,16 @@ void Message::ShowUser(string uid) {
     cout << "User " << uid;
 }
 
-void Message::ListAuctionsAndState(const unordered_map<string, string>& list) {
-            for (auto auction : list) {
-            string state;
-            if (auction.second == "0") {
-                state = " Status: Not active";
-            } else {
-                state = " Status: Active";
-            }
-            cout << "Auction ID: " << auction.first << state << endl;
+void Message::ListAuctionsAndState(const unordered_map<string, string> &list) {
+    for (auto auction : list) {
+        string state;
+        if (auction.second == "0") {
+            state = " Status: Not active";
+        } else {
+            state = " Status: Active";
         }
+        cout << "Auction ID: " << auction.first << state << endl;
+    }
 }
 
 void Message::UserHasNoBids() {
@@ -97,23 +95,19 @@ void Message::NoAuctionStarted() {
 }
 
 void Message::ErrorDownloadAsset() {
-    cout << "There was an error downloading the requested asset"
-                  << endl;
+    cout << "There was an error downloading the requested asset" << endl;
 }
 
 void Message::DownloadAsset(string name, int size) {
-    cout << "Downloaded file " << name << " ("
-                  << size << " bytes)" << endl;
+    cout << "Downloaded file " << name << " (" << size << " bytes)" << endl;
 }
 
 void Message::UserSucessfullyBid(string value, string aid) {
-    cout << "Successfully bid " << value << " on auction " << aid
-                  << endl;
+    cout << "Successfully bid " << value << " on auction " << aid << endl;
 }
 
 void Message::HigherValueBid() {
-    cout << "Someone has already bid a higher ammount on this auction"
-                  << endl;
+    cout << "Someone has already bid a higher ammount on this auction" << endl;
 }
 
 void Message::BidOwnAuctions() {
@@ -122,28 +116,22 @@ void Message::BidOwnAuctions() {
 
 void Message::AuctionRecordEnded(time_t endDateTime, int endSecTime) {
     std::cout << "This auction has ended" << std::endl;
-    std::cout << "End Date and Time: "
-                      << endDateTime;
-    std::cout << "Number of seconds the auction was opened: "
-                      << endSecTime << std::endl;
+    std::cout << "End Date and Time: " << endDateTime;
+    std::cout << "Number of seconds the auction was opened: " << endSecTime
+              << std::endl;
 }
 
-void Message::ShowRecordHeader(string aid, string host, string auctionName, string assetFname, int startValue, time_t startDateTime, int timeActive) {
-        cout << "Auction ID: " << aid
-                  << endl;
-        cout << "Host ID: " << host
-                  << endl;
-        cout << "Auction Name: " << auctionName
-                  << endl;
-        cout << "Asset File Name: " << assetFname
-                  << endl;
-        cout << "Start Value: " << startValue
-                  << endl;
-        cout << "Start Date and Time: "
-                  << startDateTime << endl;
-        cout << "Time of activity: " << timeActive
-                  << endl;
-        cout << "---------------------" << endl;
-        cout << "Bids: " << endl;
-        cout << "---------------------" << endl;
+void Message::ShowRecordHeader(string aid, string host, string auctionName,
+                               string assetFname, int startValue,
+                               time_t startDateTime, int timeActive) {
+    cout << "Auction ID: " << aid << endl;
+    cout << "Host ID: " << host << endl;
+    cout << "Auction Name: " << auctionName << endl;
+    cout << "Asset File Name: " << assetFname << endl;
+    cout << "Start Value: " << startValue << endl;
+    cout << "Start Date and Time: " << startDateTime << endl;
+    cout << "Time of activity: " << timeActive << endl;
+    cout << "---------------------" << endl;
+    cout << "Bids: " << endl;
+    cout << "---------------------" << endl;
 }
