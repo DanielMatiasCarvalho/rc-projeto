@@ -9,6 +9,7 @@
 
 #include "client.hpp"
 #include "utils.hpp"
+#include "messages.hpp"
 
 class CommandHandler {
   public:

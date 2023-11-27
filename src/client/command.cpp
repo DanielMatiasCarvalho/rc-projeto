@@ -67,7 +67,7 @@ void LoginCommand::handle(std::vector<std::string> args, Client &reciever) {
     }
 
     if (reciever._user.isLoggedIn()) {
-        std::cout << "User already logged in" << std::endl;
+        Message::UserAlreadyLoggedIn();
         return;
     }
 
@@ -82,12 +82,12 @@ void LoginCommand::handle(std::vector<std::string> args, Client &reciever) {
     }
 
     if (loginCommunication._status == "OK") {
-        std::cout << "User sucessfully logged in" << std::endl;
+        Message::UserLoginSuccess();
         reciever._user.logIn(UID, password);
     } else if (loginCommunication._status == "NOK") {
-        std::cout << "Wrong password" << std::endl;
+        Message::WrongPassword();
     } else if (loginCommunication._status == "REG") {
-        std::cout << "User successfully registered" << std::endl;
+        Message::UserRegisterSuccess();
         reciever._user.logIn(UID, password);
     }
 }
@@ -98,7 +98,7 @@ void LogoutCommand::handle(std::vector<std::string> args, Client &reciever) {
     }
 
     if (!reciever._user.isLoggedIn()) {
-        std::cout << "User is not logged in" << std::endl;
+        Message::UserNotLoggedIn();
         return;
     }
 
