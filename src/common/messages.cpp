@@ -74,7 +74,7 @@ void Message::ShowUser(string uid) {
     cout << "User " << uid;
 }
 
-void Message::ListAuctionsAndState(const unordered_map<string, string> &list) {
+void Message::ListAuctionsAndState(const map<string, string> &list) {
     for (auto auction : list) {
         string state;
         if (auction.second == "0") {

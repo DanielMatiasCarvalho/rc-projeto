@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 #include "config.hpp"
@@ -122,7 +122,7 @@ class ListUserAuctionsCommunication : public ProtocolCommunication {
 
     // Response parameters:
     std::string _status;
-    std::unordered_map<std::string, std::string> _auctions;
+    std::map<std::string, std::string> _auctions;
 
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);
@@ -139,7 +139,7 @@ class ListUserBidsCommunication : public ProtocolCommunication {
 
     // Response parameters:
     std::string _status;
-    std::unordered_map<std::string, std::string> _bids;
+    std::map<std::string, std::string> _bids;
 
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);
@@ -155,7 +155,7 @@ class ListAllAuctionsCommunication : public ProtocolCommunication {
 
     // Response parameters:
     std::string _status;
-    std::unordered_map<std::string, std::string> _auctions;
+    std::map<std::string, std::string> _auctions;
 
     std::stringstream encodeRequest();
     void decodeRequest(std::stringstream &message);
