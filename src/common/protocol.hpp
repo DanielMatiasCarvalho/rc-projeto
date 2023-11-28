@@ -4,9 +4,9 @@
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
 #include <vector>
 
 #include "config.hpp"
