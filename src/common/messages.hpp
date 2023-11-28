@@ -3,6 +3,7 @@
 
 #include <ctime>
 #include <iostream>
+#include <map>
 #include <unordered_map>
 #include <vector>
 #include "utils.hpp"
@@ -27,7 +28,7 @@ class Message {
     static void AuctionAlreadyEnded(std::string aid);
     static void UserNotMadeAuction();
     static void ListAuctionsAndState(
-        const std::unordered_map<std::string, std::string> &list);
+        const std::map<std::string, std::string> &list);
     static void UserHasNoBids();
     static void ShowUser(std::string uid);
     static void NoAuctionStarted();
