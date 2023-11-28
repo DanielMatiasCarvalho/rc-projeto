@@ -451,18 +451,10 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
                                   showRecordCommunication._startValue,
                                   showRecordCommunication._startDateTime,
                                   showRecordCommunication._timeActive);
-        long unsigned int size = showRecordCommunication._bidderUids.size();
-        for (long unsigned int i = 0; i < size; i++) {
-            std::cout << "Bidder ID: " << showRecordCommunication._bidderUids[i]
-                      << std::endl;
-            std::cout << "\tBid Value: "
-                      << showRecordCommunication._bidValues[i] << std::endl;
-            std::cout << "\tBid Date and Time: "
-                      << showRecordCommunication._bidDateTime[i] << std::endl;
-            std::cout << "\tBid Time after the opening of the auction: "
-                      << showRecordCommunication._bidSecTimes[i] << std::endl;
-        }
-        std::cout << "---------------------" << std::endl;
+        Message::ShowRecordBids(showRecordCommunication._bidderUids,
+                                showRecordCommunication._bidValues,
+                                showRecordCommunication._bidDateTime,
+                                showRecordCommunication._bidSecTimes);
         if (showRecordCommunication._hasEnded) {
             Message::AuctionRecordEnded(showRecordCommunication._endDateTime,
                                         showRecordCommunication._endSecTime);

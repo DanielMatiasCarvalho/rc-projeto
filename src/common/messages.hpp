@@ -4,6 +4,8 @@
 #include <ctime>
 #include <iostream>
 #include <unordered_map>
+#include <vector>
+#include "utils.hpp"
 
 class Message {
   public:
@@ -39,6 +41,10 @@ class Message {
                                  std::string auctionName,
                                  std::string assetFname, int startValue,
                                  std::time_t startDateTime, int timeActive);
+    static void ShowRecordBids(std::vector<std::string> bidderUids,
+                               std::vector<int> bidValues,
+                               std::vector<std::time_t> bidDateTime,
+                               std::vector<int> bidSecTimes);
 };
 
 #endif

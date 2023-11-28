@@ -116,7 +116,7 @@ void Message::BidOwnAuctions() {
 
 void Message::AuctionRecordEnded(time_t endDateTime, int endSecTime) {
     std::cout << "This auction has ended" << std::endl;
-    std::cout << "End Date and Time: " << endDateTime;
+    std::cout << "End Date and Time: " << DateTimeToString(endDateTime);
     std::cout << "Number of seconds the auction was opened: " << endSecTime
               << std::endl;
 }
@@ -129,9 +129,23 @@ void Message::ShowRecordHeader(string aid, string host, string auctionName,
     cout << "Auction Name: " << auctionName << endl;
     cout << "Asset File Name: " << assetFname << endl;
     cout << "Start Value: " << startValue << endl;
-    cout << "Start Date and Time: " << startDateTime << endl;
+    cout << "Start Date and Time: " << DateTimeToString(startDateTime) << endl;
     cout << "Time of activity: " << timeActive << endl;
     cout << "---------------------" << endl;
     cout << "Bids: " << endl;
     cout << "---------------------" << endl;
+}
+
+void Message::ShowRecordBids(vector<string> bidderUids, vector<int> bidValues,
+                             vector<time_t> bidDateTime,
+                             vector<int> bidSecTimes) {
+    long unsigned int size = bidderUids.size();
+    for (long unsigned int i = 0; i < size; i++) {
+        std::cout << "Bidder ID: " << bidderUids[i] << std::endl;
+        std::cout << "\tBid Value: " << bidValues[i] << std::endl;
+        std::cout << "\tBid Date and Time: " << DateTimeToString(bidDateTime[i]) << std::endl;
+        std::cout << "\tBid Time after the opening of the auction: "
+                  << bidSecTimes[i] << std::endl;
+    }
+    std::cout << "---------------------" << std::endl;
 }

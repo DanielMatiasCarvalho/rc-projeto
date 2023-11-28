@@ -20,3 +20,14 @@ bool isAlphaNumeric(std::string string) {
 
     return true;
 }
+
+std::string DateTimeToString(std::time_t time) {
+    std::tm tm = *(std::localtime(&time));
+    std::stringstream stream;
+    stream << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
+    std::string string;
+    stream >> string;
+    string.push_back(' ');
+    stream >> string;
+    return string;
+}
