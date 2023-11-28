@@ -25,9 +25,9 @@ std::string DateTimeToString(std::time_t time) {
     std::tm tm = *(std::localtime(&time));
     std::stringstream stream;
     stream << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
-    std::string string;
-    stream >> string;
-    string.push_back(' ');
-    stream >> string;
-    return string;
+    std::string string1, string2;
+    stream >> string1;
+    stream >> string2;
+    string1.push_back(' ');
+    return string1 + string2;
 }
