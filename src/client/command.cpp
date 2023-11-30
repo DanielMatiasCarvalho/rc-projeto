@@ -8,7 +8,7 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
     }
 }
 
-void CommandManager::readCommand(Client &reciever) {
+void CommandManager::readCommand(Client &receiver) {
     std::cout << "> ";
 
     std::string line;
@@ -51,10 +51,10 @@ void CommandManager::readCommand(Client &reciever) {
         throw UnknownCommandException();
     }
 
-    handler->second->handle(args, reciever);
+    handler->second->handle(args, receiver);
 }
 
-void LoginCommand::handle(std::vector<std::string> args, Client &reciever) {
+void LoginCommand::handle(std::vector<std::string> args, Client &receiver) {
     if (args.size() != 2) {
         throw CommandArgumentException(_usage);
     }
@@ -66,7 +66,7 @@ void LoginCommand::handle(std::vector<std::string> args, Client &reciever) {
         throw CommandArgumentException(_usage);
     }
 
-    if (reciever._user.isLoggedIn()) {
+    if (receiver._user.isLoggedIn()) {
         Message::UserAlreadyLoggedIn();
         return;
     }
@@ -75,46 +75,38 @@ void LoginCommand::handle(std::vector<std::string> args, Client &reciever) {
     loginCommunication._uid = UID;
     loginCommunication._password = password;
 
-    try {
-        reciever.processRequest(loginCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(loginCommunication);
 
     if (loginCommunication._status == "OK") {
         Message::UserLoginSuccess();
-        reciever._user.logIn(UID, password);
+        receiver._user.logIn(UID, password);
     } else if (loginCommunication._status == "NOK") {
         Message::WrongPassword();
     } else if (loginCommunication._status == "REG") {
         Message::UserRegisterSuccess();
-        reciever._user.logIn(UID, password);
+        receiver._user.logIn(UID, password);
     }
 }
 
-void LogoutCommand::handle(std::vector<std::string> args, Client &reciever) {
+void LogoutCommand::handle(std::vector<std::string> args, Client &receiver) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!reciever._user.isLoggedIn()) {
+    if (!receiver._user.isLoggedIn()) {
         Message::UserNotLoggedIn();
         return;
     }
 
     LogoutCommunication logoutCommunication;
-    logoutCommunication._uid = reciever._user.getUsername();
-    logoutCommunication._password = reciever._user.getPassword();
+    logoutCommunication._uid = receiver._user.getUsername();
+    logoutCommunication._password = receiver._user.getPassword();
 
-    try {
-        reciever.processRequest(logoutCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(logoutCommunication);
 
     if (logoutCommunication._status == "OK") {
         Message::UserLogoutSucess();
-        reciever._user.logOut();
+        receiver._user.logOut();
     } else if (logoutCommunication._status == "NOK") {
         Message::UserNotLoggedIn();
     } else if (logoutCommunication._status == "UNR") {
@@ -123,29 +115,25 @@ void LogoutCommand::handle(std::vector<std::string> args, Client &reciever) {
 }
 
 void UnregisterCommand::handle(std::vector<std::string> args,
-                               Client &reciever) {
+                               Client &receiver) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!reciever._user.isLoggedIn()) {
+    if (!receiver._user.isLoggedIn()) {
         Message::UserNotLoggedIn();
         return;
     }
 
     UnregisterCommunication unregisterCommunication;
-    unregisterCommunication._uid = reciever._user.getUsername();
-    unregisterCommunication._password = reciever._user.getPassword();
+    unregisterCommunication._uid = receiver._user.getUsername();
+    unregisterCommunication._password = receiver._user.getPassword();
 
-    try {
-        reciever.processRequest(unregisterCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(unregisterCommunication);
 
     if (unregisterCommunication._status == "OK") {
         Message::UserUnregisterSucess();
-        reciever._user.logOut();
+        receiver._user.logOut();
     } else if (unregisterCommunication._status == "NOK") {
         Message::UserNotLoggedIn();
     } else if (unregisterCommunication._status == "UNR") {
@@ -153,20 +141,20 @@ void UnregisterCommand::handle(std::vector<std::string> args,
     }
 }
 
-void ExitCommand::handle(std::vector<std::string> args, Client &reciever) {
+void ExitCommand::handle(std::vector<std::string> args, Client &receiver) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
-    if (reciever._user.isLoggedIn()) {
+    if (receiver._user.isLoggedIn()) {
         std::cout << "User is logged in" << std::endl;
         return;
     }
 
-    reciever._toExit = true;
+    receiver._toExit = true;
 }
 
-void OpenCommand::handle(std::vector<std::string> args, Client &reciever) {
+void OpenCommand::handle(std::vector<std::string> args, Client &receiver) {
     if (args.size() != 4) {
         throw CommandArgumentException(_usage);
     }
@@ -185,32 +173,28 @@ void OpenCommand::handle(std::vector<std::string> args, Client &reciever) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!reciever._user.isLoggedIn()) {
+    if (!receiver._user.isLoggedIn()) {
         Message::UserNotLoggedIn();
         return;
     }
 
     OpenAuctionCommunication comm;
 
-    comm._uid = reciever._user.getUsername();
-    comm._password = reciever._user.getPassword();
+    comm._uid = receiver._user.getUsername();
+    comm._password = receiver._user.getPassword();
     comm._name = name;
     comm._startValue = atoi(start_value.c_str());
     comm._timeActive = atoi(timeactive.c_str());
     comm._fileName = asset_fname;
-    comm._fileSize = reciever.getFileSize(asset_fname);
-    comm._fileData = reciever.readFile(asset_fname);
+    comm._fileSize = receiver.getFileSize(asset_fname);
+    comm._fileData = receiver.readFile(asset_fname);
 
     if (comm._fileSize > PROTOCOL_MAX_FILE_SIZE) {
         std::cout << "File too big" << std::endl;
         return;
     }
 
-    try {
-        reciever.processRequest(comm);
-    } catch (...) {
-        // Handling
-    }
+    receiver.processRequest(comm);
 
     if (comm._status == "OK") {
         Message::AuctionCreated(comm._aid);
@@ -221,7 +205,7 @@ void OpenCommand::handle(std::vector<std::string> args, Client &reciever) {
     }
 }
 
-void CloseCommand::handle(std::vector<std::string> args, Client &reciever) {
+void CloseCommand::handle(std::vector<std::string> args, Client &receiver) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -232,22 +216,18 @@ void CloseCommand::handle(std::vector<std::string> args, Client &reciever) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!reciever._user.isLoggedIn()) {
+    if (!receiver._user.isLoggedIn()) {
         Message::UserNotLoggedIn();
         return;
     }
 
     CloseAuctionCommunication comm;
 
-    comm._uid = reciever._user.getUsername();
-    comm._password = reciever._user.getPassword();
+    comm._uid = receiver._user.getUsername();
+    comm._password = receiver._user.getPassword();
     comm._aid = AID;
 
-    try {
-        reciever.processRequest(comm);
-    } catch (...) {
-        // exception handling
-    }
+    receiver.processRequest(comm);
 
     if (comm._status == "OK") {
         Message::AuctionClosedSucessfully(AID);
@@ -263,24 +243,20 @@ void CloseCommand::handle(std::vector<std::string> args, Client &reciever) {
 }
 
 void ListUserAuctionsCommand::handle(std::vector<std::string> args,
-                                     Client &reciever) {
+                                     Client &receiver) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!reciever._user.isLoggedIn()) {
+    if (!receiver._user.isLoggedIn()) {
         Message::UserNotLoggedIn();
         return;
     }
 
     ListUserAuctionsCommunication listUserAuctionsCommunication;
-    listUserAuctionsCommunication._uid = reciever._user.getUsername();
+    listUserAuctionsCommunication._uid = receiver._user.getUsername();
 
-    try {
-        reciever.processRequest(listUserAuctionsCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(listUserAuctionsCommunication);
 
     if (listUserAuctionsCommunication._status == "NOK") {
         Message::UserNotMadeAuction();
@@ -293,24 +269,20 @@ void ListUserAuctionsCommand::handle(std::vector<std::string> args,
 }
 
 void ListUserBidsCommand::handle(std::vector<std::string> args,
-                                 Client &reciever) {
+                                 Client &receiver) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!reciever._user.isLoggedIn()) {
+    if (!receiver._user.isLoggedIn()) {
         Message::UserNotLoggedIn();
         return;
     }
 
     ListUserBidsCommunication listUserBidsCommunication;
-    listUserBidsCommunication._uid = reciever._user.getUsername();
+    listUserBidsCommunication._uid = receiver._user.getUsername();
 
-    try {
-        reciever.processRequest(listUserBidsCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(listUserBidsCommunication);
 
     if (listUserBidsCommunication._status == "NOK") {
         Message::UserHasNoBids();
@@ -323,18 +295,14 @@ void ListUserBidsCommand::handle(std::vector<std::string> args,
 }
 
 void ListAllAuctionsCommand::handle(std::vector<std::string> args,
-                                    Client &reciever) {
+                                    Client &receiver) {
     if (args.size() != 0) {
         throw CommandArgumentException(_usage);
     }
 
     ListAllAuctionsCommunication listAllAuctionsCommunication;
 
-    try {
-        reciever.processRequest(listAllAuctionsCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(listAllAuctionsCommunication);
 
     if (listAllAuctionsCommunication._status == "NOK") {
         Message::NoAuctionStarted();
@@ -343,7 +311,7 @@ void ListAllAuctionsCommand::handle(std::vector<std::string> args,
     }
 }
 
-void ShowAssetCommand::handle(std::vector<std::string> args, Client &reciever) {
+void ShowAssetCommand::handle(std::vector<std::string> args, Client &receiver) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -357,21 +325,17 @@ void ShowAssetCommand::handle(std::vector<std::string> args, Client &reciever) {
     ShowAssetCommunication comm;
     comm._aid = AID;
 
-    try {
-        reciever.processRequest(comm);
-    } catch (...) {
-        // Exception handling
-    }
+    receiver.processRequest(comm);
 
     if (comm._status == "OK") {
         Message::DownloadAsset(comm._fileName, comm._fileSize);
-        reciever.writeFile(comm._fileName, comm._fileData);
+        receiver.writeFile(comm._fileName, comm._fileData);
     } else if (comm._status == "NOK") {
         Message::ErrorDownloadAsset();
     }
 }
 
-void BidCommand::handle(std::vector<std::string> args, Client &reciever) {
+void BidCommand::handle(std::vector<std::string> args, Client &receiver) {
     if (args.size() != 2) {
         throw CommandArgumentException(_usage);
     }
@@ -387,23 +351,19 @@ void BidCommand::handle(std::vector<std::string> args, Client &reciever) {
         throw CommandArgumentException(_usage);
     }
 
-    if (!reciever._user.isLoggedIn()) {
+    if (!receiver._user.isLoggedIn()) {
         Message::UserNotLoggedIn();
         return;
     }
 
     BidCommunication comm;
 
-    comm._uid = reciever._user.getUsername();
-    comm._password = reciever._user.getPassword();
+    comm._uid = receiver._user.getUsername();
+    comm._password = receiver._user.getPassword();
     comm._aid = AID;
     comm._value = atoi(value.c_str());
 
-    try {
-        reciever.processRequest(comm);
-    } catch (...) {
-        // handling
-    }
+    receiver.processRequest(comm);
 
     if (comm._status == "NLG") {
         Message::UserNotLoggedIn();
@@ -419,7 +379,7 @@ void BidCommand::handle(std::vector<std::string> args, Client &reciever) {
 }
 
 void ShowRecordCommand::handle(std::vector<std::string> args,
-                               Client &reciever) {
+                               Client &receiver) {
     if (args.size() != 1) {
         throw CommandArgumentException(_usage);
     }
@@ -434,11 +394,7 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
 
     showRecordCommunication._aid = AID;
 
-    try {
-        reciever.processRequest(showRecordCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(showRecordCommunication);
 
     if (showRecordCommunication._status == "NOK") {
         std::cout << "The auction you requested does not exist" << std::endl;
