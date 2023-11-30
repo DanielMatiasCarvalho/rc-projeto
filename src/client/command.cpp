@@ -75,11 +75,7 @@ void LoginCommand::handle(std::vector<std::string> args, Client &receiver) {
     loginCommunication._uid = UID;
     loginCommunication._password = password;
 
-    try {
-        receiver.processRequest(loginCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(loginCommunication);
 
     if (loginCommunication._status == "OK") {
         Message::UserLoginSuccess();
@@ -106,11 +102,7 @@ void LogoutCommand::handle(std::vector<std::string> args, Client &receiver) {
     logoutCommunication._uid = receiver._user.getUsername();
     logoutCommunication._password = receiver._user.getPassword();
 
-    try {
-        receiver.processRequest(logoutCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(logoutCommunication);
 
     if (logoutCommunication._status == "OK") {
         Message::UserLogoutSucess();
@@ -137,11 +129,7 @@ void UnregisterCommand::handle(std::vector<std::string> args,
     unregisterCommunication._uid = receiver._user.getUsername();
     unregisterCommunication._password = receiver._user.getPassword();
 
-    try {
-        receiver.processRequest(unregisterCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(unregisterCommunication);
 
     if (unregisterCommunication._status == "OK") {
         Message::UserUnregisterSucess();
@@ -206,11 +194,7 @@ void OpenCommand::handle(std::vector<std::string> args, Client &receiver) {
         return;
     }
 
-    try {
-        receiver.processRequest(comm);
-    } catch (...) {
-        // Handling
-    }
+    receiver.processRequest(comm);
 
     if (comm._status == "OK") {
         Message::AuctionCreated(comm._aid);
@@ -243,11 +227,7 @@ void CloseCommand::handle(std::vector<std::string> args, Client &receiver) {
     comm._password = receiver._user.getPassword();
     comm._aid = AID;
 
-    try {
-        receiver.processRequest(comm);
-    } catch (...) {
-        // exception handling
-    }
+    receiver.processRequest(comm);
 
     if (comm._status == "OK") {
         Message::AuctionClosedSucessfully(AID);
@@ -276,11 +256,7 @@ void ListUserAuctionsCommand::handle(std::vector<std::string> args,
     ListUserAuctionsCommunication listUserAuctionsCommunication;
     listUserAuctionsCommunication._uid = receiver._user.getUsername();
 
-    try {
-        receiver.processRequest(listUserAuctionsCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(listUserAuctionsCommunication);
 
     if (listUserAuctionsCommunication._status == "NOK") {
         Message::UserNotMadeAuction();
@@ -306,11 +282,7 @@ void ListUserBidsCommand::handle(std::vector<std::string> args,
     ListUserBidsCommunication listUserBidsCommunication;
     listUserBidsCommunication._uid = receiver._user.getUsername();
 
-    try {
-        receiver.processRequest(listUserBidsCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(listUserBidsCommunication);
 
     if (listUserBidsCommunication._status == "NOK") {
         Message::UserHasNoBids();
@@ -330,11 +302,7 @@ void ListAllAuctionsCommand::handle(std::vector<std::string> args,
 
     ListAllAuctionsCommunication listAllAuctionsCommunication;
 
-    try {
-        receiver.processRequest(listAllAuctionsCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(listAllAuctionsCommunication);
 
     if (listAllAuctionsCommunication._status == "NOK") {
         Message::NoAuctionStarted();
@@ -357,11 +325,7 @@ void ShowAssetCommand::handle(std::vector<std::string> args, Client &receiver) {
     ShowAssetCommunication comm;
     comm._aid = AID;
 
-    try {
-        receiver.processRequest(comm);
-    } catch (...) {
-        // Exception handling
-    }
+    receiver.processRequest(comm);
 
     if (comm._status == "OK") {
         Message::DownloadAsset(comm._fileName, comm._fileSize);
@@ -399,11 +363,7 @@ void BidCommand::handle(std::vector<std::string> args, Client &receiver) {
     comm._aid = AID;
     comm._value = atoi(value.c_str());
 
-    try {
-        receiver.processRequest(comm);
-    } catch (...) {
-        // handling
-    }
+    receiver.processRequest(comm);
 
     if (comm._status == "NLG") {
         Message::UserNotLoggedIn();
@@ -434,11 +394,7 @@ void ShowRecordCommand::handle(std::vector<std::string> args,
 
     showRecordCommunication._aid = AID;
 
-    try {
-        receiver.processRequest(showRecordCommunication);
-    } catch (...) {
-        // Something
-    }
+    receiver.processRequest(showRecordCommunication);
 
     if (showRecordCommunication._status == "NOK") {
         std::cout << "The auction you requested does not exist" << std::endl;
