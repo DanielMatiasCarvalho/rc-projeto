@@ -27,6 +27,14 @@ int main(int argc, char **argv) {
             manager.readCommand(client);
         } catch (CommandException const &e) {
             std::cout << e.what() << std::endl;
+        } catch (ProtocolViolationException const &e) {
+            std::cout << e.what() << std::endl;
+        } catch (ProtocolMessageErrorException const &e) {
+            std::cout << e.what() << std::endl;
+        } catch (TimeoutException const &e) {
+            std::cout << e.what() << std::endl;
+        } catch (SocketException const &e) {
+            std::cout << e.what() << std::endl;
         }
     }
 
