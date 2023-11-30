@@ -12,6 +12,11 @@
 #include "config.hpp"
 #include "utils.hpp"
 
+/**
+ * @brief Exception class for protocol-related errors.
+ * 
+ * This exception is thrown when there is an error while communicating with the server.
+ */
 class ProtocolException : public std::runtime_error {
   public:
     ProtocolException()
@@ -19,10 +24,28 @@ class ProtocolException : public std::runtime_error {
               "There was an error while communicating with the server."){};
 };
 
+/**
+ * @brief Exception thrown when a protocol violation occurs.
+ * 
+ * This exception is thrown when a violation of the protocol occurs during communication.
+ * It is derived from the base class ProtocolException.
+ */
 class ProtocolViolationException : public ProtocolException {};
 
+/**
+ * @brief Exception class for protocol message errors.
+ * 
+ * This exception is thrown when there is an error related to protocol messages.
+ * It is derived from the ProtocolException class.
+ */
 class ProtocolMessageErrorException : public ProtocolException {};
 
+/**
+ * @brief The ProtocolCommunication class is an abstract base class that defines the interface for communication protocols.
+ * 
+ * This class provides methods for encoding and decoding message content, as well as general purpose methods for parsing and encoding.
+ * Subclasses should implement their own members and override the virtual methods to define the specific behavior of the protocol.
+ */
 class ProtocolCommunication {
   public:
     // Each subclass should implement their information as members.
@@ -64,20 +87,54 @@ class ProtocolCommunication {
     virtual bool isTcp() = 0;
 };
 
+/**
+ * @brief Represents a communication protocol for login functionality.
+ * 
+ * This class extends the ProtocolCommunication class and provides
+ * request and response parameters for login communication.
+ */
 class LoginCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
-    std::string _uid;
-    std::string _password;
+    std::string _uid;      /**< The user ID for login request. */
+    std::string _password; /**< The password for login request. */
 
     // Response parameters:
-    std::string _status;
+    std::string _status; /**< The status of the login response. */
 
+    /**
+     * @brief Encodes the login request into a stringstream.
+     * 
+     * @return The encoded login request as a stringstream.
+     */
     std::stringstream encodeRequest();
+
+    /**
+     * @brief Decodes the login request from a stringstream.
+     * 
+     * @param message The stringstream containing the login request.
+     */
     void decodeRequest(std::stringstream &message);
+
+    /**
+     * @brief Encodes the login response into a stringstream.
+     * 
+     * @return The encoded login response as a stringstream.
+     */
     std::stringstream encodeResponse();
+
+    /**
+     * @brief Decodes the login response from a stringstream.
+     * 
+     * @param message The stringstream containing the login response.
+     */
     void decodeResponse(std::stringstream &message);
 
+    /**
+     * @brief Checks if the communication is using TCP.
+     * 
+     * @return True if the communication is using TCP, false otherwise.
+     */
     bool isTcp() { return false; };
 };
 
