@@ -33,28 +33,58 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+/**
+ * @brief Checks if the user is logged in.
+ * 
+ * @return true if the user is logged in, false otherwise.
+ */
 bool User::isLoggedIn() {
     return ((_username.length() != 0) && (_password.length() != 0));
 }
 
+/**
+ * Logs in the user with the given username and password.
+ * 
+ * @param username The username of the user.
+ * @param password The password of the user.
+ */
 void User::logIn(std::string username, std::string password) {
     _username = username;
     _password = password;
 }
 
+/**
+ * @brief Logs out the user.
+ */
 void User::logOut() {
     _username = "";
     _password = "";
 }
 
+/**
+ * @brief Get the username of the user.
+ * 
+ * @return The username of the user as a string.
+ */
 std::string User::getUsername() {
     return _username;
 }
 
+/**
+ * @brief Retrieves the password of the user.
+ * 
+ * @return The password of the user as a string.
+ */
 std::string User::getPassword() {
     return _password;
 }
 
+/**
+ * @brief Constructor for the Client class.
+ * 
+ * @param argc The number of command-line arguments.
+ * @param argv An array of command-line arguments.
+ */
 Client::Client(int argc, char **argv) {
     char c;
 
@@ -72,11 +102,19 @@ Client::Client(int argc, char **argv) {
     }
 }
 
+/**
+ * @brief Displays information about the client.
+ */
 void Client::ShowInfo() {
     std::cout << "Hostname: " << _hostname << std::endl
               << "Port: " << _port << std::endl;
 }
 
+/**
+ * Process the request using the given communication protocol.
+ *
+ * @param comm The communication protocol to use.
+ */
 void Client::processRequest(ProtocolCommunication &comm) {
     std::stringstream reqMessage = comm.encodeRequest(), resMessage;
 
@@ -93,6 +131,12 @@ void Client::processRequest(ProtocolCommunication &comm) {
     comm.decodeResponse(resMessage);
 }
 
+/**
+ * Writes the content of a stringstream to a file.
+ * 
+ * @param fName The name of the file to write to.
+ * @param content The stringstream containing the content to write.
+ */
 void Client::writeFile(std::string fName, std::stringstream &content) {
     assureDirectory();
 
@@ -114,6 +158,12 @@ void Client::writeFile(std::string fName, std::stringstream &content) {
     file.close();
 }
 
+/**
+ * @brief Reads the contents of a file and returns it as a stringstream.
+ * 
+ * @param fName The name of the file to be read.
+ * @return The contents of the file as a stringstream.
+ */
 std::stringstream Client::readFile(std::string fName) {
     std::stringstream content;
     std::ifstream file(fName);
@@ -136,6 +186,9 @@ std::stringstream Client::readFile(std::string fName) {
     return content;
 }
 
+/**
+ * @brief Assures the existence of the directory for the client.
+ */
 void Client::assureDirectory() {
     if (mkdir(_downloadPath.c_str(), 0777) == -1) {
         if (errno != EEXIST) {
@@ -144,6 +197,12 @@ void Client::assureDirectory() {
     }
 }
 
+/**
+ * @brief Get the size of a file.
+ * 
+ * @param fName The name of the file.
+ * @return The size of the file in bytes.
+ */
 int Client::getFileSize(std::string fName) {
     std::filesystem::path p(fName);
 
