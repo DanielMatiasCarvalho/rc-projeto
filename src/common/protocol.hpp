@@ -96,7 +96,7 @@ class ProtocolCommunication {
 class LoginCommunication : public ProtocolCommunication {
   public:
     // Request parameters:
-    std::string _uid; /**< The user ID for login request. */
+    std::string _uid;      /**< The user ID for login request. */
     std::string _password; /**< The password for login request. */
 
     // Response parameters:
