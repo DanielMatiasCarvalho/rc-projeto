@@ -17,13 +17,13 @@ int main() {
  */
 Server::Server(int argc, char **argv) {
     char c;
-
+    //Parse command line arguments
     while ((c = (char)getopt(argc, argv, "p:v")) != -1) {
         switch (c) {
-            case 'p':
+            case 'p':  //Sets the port
                 _port = optarg;
                 break;
-            case 'v':
+            case 'v':  //Sets the verbosity
                 _verbose = true;
                 break;
             default:
