@@ -35,8 +35,7 @@ class CommandHandler {
      * 
      * @param code The code associated with the command.
      */
-    CommandHandler(std::string code)
-        : _code{code} {}
+    CommandHandler(std::string code) : _code{code} {}
 };
 
 /**

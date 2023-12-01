@@ -21,16 +21,20 @@ void CommandManager::registerHandler(std::shared_ptr<CommandHandler> handler) {
  */
 void CommandManager::readCommand(std::stringstream message, Server &receiver) {
     std::string code;
-    for (size_t i = 0; i < 3; i++) { //Reads the 3 digit code from the message
+    for (size_t i = 0; i < 3; i++) {  //Reads the 3 digit code from the message
         char c = (char)message.get();
         code.push_back(c);
     }
 
-    auto handler = this->_handlers.find(code); //Finds the correct handler for the command
-    if (handler == this->_handlers.end()) { //If the handler is not found, the command is not valid
+    auto handler =
+        this->_handlers.find(code);  //Finds the correct handler for the command
+    if (handler ==
+        this->_handlers
+            .end()) {  //If the handler is not found, the command is not valid
         std::cout << "Command not found" << std::endl;
         return;
     }
 
-    handler->second->handle(message, receiver); //Executes the command on the correct handler
+    handler->second->handle(
+        message, receiver);  //Executes the command on the correct handler
 }
