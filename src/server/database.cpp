@@ -29,7 +29,8 @@ void Database::guaranteeStructure() {
     fs::path auctionsPath = *_path / "auctions";
     if (fs::exists(auctionsPath)) {
         if (!fs::is_directory(auctionsPath)) {
-            throw std::runtime_error("Database auctions path is not a directory");
+            throw std::runtime_error(
+                "Database auctions path is not a directory");
         }
     } else {
         fs::create_directory(auctionsPath);
