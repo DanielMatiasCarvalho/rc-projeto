@@ -1,8 +1,7 @@
 #include "server.hpp"
 
 int main() {
-    std::cout << "Not implemented" << std::endl;
-
+    // TODO: Implement the server
     return 1;
 }
 

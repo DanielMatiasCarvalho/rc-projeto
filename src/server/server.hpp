@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "config.hpp"
+#include "database.hpp"
 
 /**
  * @class Server
