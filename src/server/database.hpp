@@ -7,6 +7,7 @@
 #include <string>
 
 #include <semaphore.h>
+#include <fcntl.h>
 
 namespace fs = std::filesystem;
 
