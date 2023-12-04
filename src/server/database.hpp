@@ -6,8 +6,8 @@
 #include <memory>
 #include <string>
 
-#include <semaphore.h>
 #include <fcntl.h>
+#include <semaphore.h>
 
 namespace fs = std::filesystem;
 
