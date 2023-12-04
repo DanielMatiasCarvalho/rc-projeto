@@ -1,7 +1,7 @@
 #include "server.hpp"
 
 int main() {
-    Database db("database");
+    DatabaseCore db("database");
     db.wipe();
     db.createUser("100293", "12345678");
     db.setLoggedIn("100293");

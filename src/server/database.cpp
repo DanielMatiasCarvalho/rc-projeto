@@ -1,6 +1,6 @@
 #include "database.hpp"
 
-Database::Database(std::string path) {
+DatabaseCore::DatabaseCore(std::string path) {
     _path = std::make_unique<fs::path>(path);
 
     *_path = fs::absolute(*_path);
@@ -10,7 +10,7 @@ Database::Database(std::string path) {
     guaranteeBaseStructure();
 }
 
-void Database::guaranteeBaseStructure() {
+void DatabaseCore::guaranteeBaseStructure() {
     if (fs::exists(*_path)) {
         if (!fs::is_directory(*_path)) {
             throw std::runtime_error("Database path is not a directory");
@@ -40,7 +40,7 @@ void Database::guaranteeBaseStructure() {
     }
 }
 
-void Database::guaranteeUserStructure(std::string uid) {
+void DatabaseCore::guaranteeUserStructure(std::string uid) {
     guaranteeBaseStructure();
 
     fs::path userPath = *_path / "USERS" / uid;
@@ -74,7 +74,7 @@ void Database::guaranteeUserStructure(std::string uid) {
     }
 }
 
-void Database::guaranteeAuctionStructure(std::string aid) {
+void DatabaseCore::guaranteeAuctionStructure(std::string aid) {
     guaranteeBaseStructure();
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -98,21 +98,21 @@ void Database::guaranteeAuctionStructure(std::string aid) {
     }
 }
 
-void Database::wipe() {
+void DatabaseCore::wipe() {
     if (fs::exists(*_path)) {
         fs::remove_all(*_path);
     }
 }
 
-void Database::lock() {
+void DatabaseCore::lock() {
     _lock->lock();
 }
 
-void Database::unlock() {
+void DatabaseCore::unlock() {
     _lock->unlock();
 }
 
-void Database::createUser(std::string uid, std::string password) {
+void DatabaseCore::createUser(std::string uid, std::string password) {
     lock();
     guaranteeBaseStructure();
 
@@ -141,7 +141,7 @@ void Database::createUser(std::string uid, std::string password) {
     unlock();
 }
 
-bool Database::userExists(std::string uid) {
+bool DatabaseCore::userExists(std::string uid) {
     lock();
     guaranteeBaseStructure();
 
@@ -154,7 +154,7 @@ bool Database::userExists(std::string uid) {
     return exists;
 }
 
-bool Database::isUserRegistered(std::string uid) {
+bool DatabaseCore::isUserRegistered(std::string uid) {
     lock();
     guaranteeBaseStructure();
 
@@ -174,7 +174,7 @@ bool Database::isUserRegistered(std::string uid) {
     return exists;
 }
 
-void Database::setLoggedIn(std::string uid) {
+void DatabaseCore::setLoggedIn(std::string uid) {
     lock();
     guaranteeBaseStructure();
 
@@ -194,7 +194,7 @@ void Database::setLoggedIn(std::string uid) {
     unlock();
 }
 
-bool Database::isUserLoggedIn(std::string uid) {
+bool DatabaseCore::isUserLoggedIn(std::string uid) {
     lock();
     guaranteeBaseStructure();
 
@@ -214,7 +214,7 @@ bool Database::isUserLoggedIn(std::string uid) {
     return exists;
 }
 
-std::string Database::getUserPassword(std::string uid) {
+std::string DatabaseCore::getUserPassword(std::string uid) {
     lock();
     guaranteeBaseStructure();
 
@@ -242,7 +242,7 @@ std::string Database::getUserPassword(std::string uid) {
     return password;
 }
 
-void Database::unregisterUser(std::string uid) {
+void DatabaseCore::unregisterUser(std::string uid) {
     lock();
     guaranteeBaseStructure();
 
@@ -268,7 +268,7 @@ void Database::unregisterUser(std::string uid) {
     unlock();
 }
 
-void Database::addUserHostedAuction(std::string uid, std::string aid) {
+void DatabaseCore::addUserHostedAuction(std::string uid, std::string aid) {
     lock();
     guaranteeUserStructure(uid);
     guaranteeAuctionStructure(aid);
@@ -286,7 +286,7 @@ void Database::addUserHostedAuction(std::string uid, std::string aid) {
     unlock();
 }
 
-void Database::addUserBid(std::string uid, std::string aid) {
+void DatabaseCore::addUserBid(std::string uid, std::string aid) {
     lock();
     guaranteeUserStructure(uid);
     guaranteeAuctionStructure(aid);

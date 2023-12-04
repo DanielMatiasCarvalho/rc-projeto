@@ -49,13 +49,13 @@ class DatabaseLock {
     void unlock();
 };
 
-class Database {
+class DatabaseCore {
   private:
     std::unique_ptr<fs::path> _path;
     std::unique_ptr<DatabaseLock> _lock;
 
   public:
-    Database(std::string path);
+    DatabaseCore(std::string path);
     void guaranteeBaseStructure();
     void guaranteeUserStructure(std::string uid);
     void guaranteeAuctionStructure(std::string aid);
