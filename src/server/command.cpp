@@ -5,7 +5,7 @@
  *
  * @param handler The command handler to register.
  */
-void CommandManager::registerHandler(std::shared_ptr<CommandHandler> handler) {
+void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
     this->_handlers.insert({handler->_code, handler});
 }
 
@@ -19,7 +19,7 @@ void CommandManager::registerHandler(std::shared_ptr<CommandHandler> handler) {
  * @param message The stringstream containing the command message.
  * @param receiver The Server object that receives the command.
  */
-void CommandManager::readCommand(std::stringstream message, Server &receiver) {
+void CommandManager::readCommand(std::stringstream &message, Server &receiver) {
     std::string code;
     for (size_t i = 0; i < 3; i++) {  //Reads the 3 digit code from the message
         char c = (char)message.get();
@@ -37,4 +37,61 @@ void CommandManager::readCommand(std::stringstream message, Server &receiver) {
 
     handler->second->handle(
         message, receiver);  //Executes the command on the correct handler
+}
+
+void LoginCommand::handle(std::stringstream &message, Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void LogoutCommand::handle(std::stringstream &message, Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void UnregisterCommand::handle(std::stringstream &message, Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void ListUserAuctionsCommand::handle(std::stringstream &message,
+                                     Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void ListUserBidsCommand::handle(std::stringstream &message, Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void ListAllAuctionsCommand::handle(std::stringstream &message,
+                                    Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void ShowRecordCommand::handle(std::stringstream &message, Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void OpenCommand::handle(std::stringstream &message, Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void CloseCommand::handle(std::stringstream &message, Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void ShowAssetCommand::handle(std::stringstream &message, Server &receiver) {
+    (void)receiver;
+    (void)message;
+}
+
+void BidCommand::handle(std::stringstream &message, Server &receiver) {
+    (void)receiver;
+    (void)message;
 }
