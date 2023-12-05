@@ -6,6 +6,7 @@
 
 #include "command.hpp"
 #include "config.hpp"
+#include "database.hpp"
 
 /**
  * @class Server

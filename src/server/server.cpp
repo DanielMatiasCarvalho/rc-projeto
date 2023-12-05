@@ -16,7 +16,13 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<BidCommand>());
     manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
-    std::cout << "Not implemented" << std::endl;
+    DatabaseCore db("database");
+    db.wipe();
+    db.createUser("100293", "12345678");
+    db.setLoggedIn("100293");
+    std::cout << db.getUserPassword("100293");
+    db.addUserHostedAuction("100293", "001");
+    db.addUserBid("100293", "001");
 
     return 1;
 }
