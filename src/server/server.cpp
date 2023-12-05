@@ -18,11 +18,14 @@ int main(int argc, char **argv) {
 
     DatabaseCore db("database");
     db.wipe();
-    db.createUser("100293", "12345678");
-    db.setLoggedIn("100293");
-    std::cout << db.getUserPassword("100293");
-    db.addUserHostedAuction("100293", "001");
-    db.addUserBid("100293", "001");
+    db.createAuction("001", "asd");
+    db.createAuction("002", "asd");
+    db.createAuction("003", "asd");
+    db.createAuction("004", "asd");
+    db.createAuction("005", "asd");
+
+    for (auto auction : db.getAllAuctions())
+        std::cout << auction << std::endl;
 
     return 1;
 }

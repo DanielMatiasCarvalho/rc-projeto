@@ -96,6 +96,16 @@ void DatabaseCore::guaranteeAuctionStructure(std::string aid) {
     } else {
         fs::create_directory(bidsPath);
     }
+
+    fs::path filePath = auctionPath / "FILE";
+
+    if (fs::exists(filePath)) {
+        if (!fs::is_directory(filePath)) {
+            throw std::runtime_error("File path is not a directory");
+        }
+    } else {
+        fs::create_directory(filePath);
+    }
 }
 
 void DatabaseCore::wipe() {
@@ -286,6 +296,23 @@ void DatabaseCore::addUserHostedAuction(std::string uid, std::string aid) {
     unlock();
 }
 
+std::vector<std::string> DatabaseCore::getUserHostedAuctions(std::string uid) {
+    lock();
+    guaranteeUserStructure(uid);
+
+    fs::path userPath = *_path / "USERS" / uid / "HOSTED";
+
+    std::vector<std::string> auctions;
+
+    for (auto &auction : fs::directory_iterator(userPath)) {
+        auctions.push_back(auction.path().filename().string());
+    }
+
+    unlock();
+    std::sort(auctions.begin(), auctions.end());
+    return auctions;
+}
+
 void DatabaseCore::addUserBid(std::string uid, std::string aid) {
     lock();
     guaranteeUserStructure(uid);
@@ -302,6 +329,176 @@ void DatabaseCore::addUserBid(std::string uid, std::string aid) {
     fs::create_symlink(auctionPath, userHostedPath);
 
     unlock();
+}
+
+std::vector<std::string> DatabaseCore::getUserBids(std::string uid) {
+    lock();
+    guaranteeUserStructure(uid);
+
+    fs::path userPath = *_path / "USERS" / uid / "BIDDED";
+
+    std::vector<std::string> bids;
+
+    for (auto &bid : fs::directory_iterator(userPath)) {
+        bids.push_back(bid.path().filename().string());
+    }
+
+    unlock();
+    std::sort(bids.begin(), bids.end());
+    return bids;
+}
+
+void DatabaseCore::createAuction(std::string aid, std::string startInfo) {
+    lock();
+    guaranteeBaseStructure();
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    if (fs::exists(auctionPath)) {
+        unlock();
+        throw DatabaseException("Auction already exists");
+    }
+
+    fs::create_directory(auctionPath);
+
+    fs::path bidsPath = auctionPath / "BIDS";
+
+    fs::create_directory(bidsPath);
+
+    fs::path filePath = auctionPath / "FILE";
+
+    fs::create_directory(filePath);
+
+    fs::path fileStartedPath = filePath / ("START_" + aid);
+
+    std::ofstream fileStarted(fileStartedPath);
+
+    fileStarted << startInfo;
+
+    unlock();
+}
+
+bool DatabaseCore::auctionExists(std::string aid) {
+    lock();
+    guaranteeBaseStructure();
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    bool exists = fs::exists(auctionPath);
+
+    unlock();
+
+    return exists;
+}
+
+std::string DatabaseCore::getAuctionStartInfo(std::string aid) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path fileStartedPath = auctionPath / ("START_" + aid);
+
+    if (!fs::exists(fileStartedPath)) {
+        unlock();
+        throw DatabaseException("Auction has not started");
+    }
+
+    std::ifstream fileStarted(fileStartedPath);
+
+    std::string startInfo;
+
+    std::getline(fileStarted, startInfo);
+
+    unlock();
+    return startInfo;
+}
+
+void DatabaseCore::endAuction(std::string aid, std::string endInfo) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path endAuctionPath = auctionPath / ("END_" + aid);
+
+    if (fs::exists(endAuctionPath)) {
+        unlock();
+        throw DatabaseException("Auction already ended");
+    }
+
+    std::ofstream endAuctionFile(endAuctionPath);
+
+    endAuctionFile << endInfo;
+
+    unlock();
+}
+
+bool DatabaseCore::hasAuctionEnded(std::string aid) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path endAuctionPath = auctionPath / ("END_" + aid);
+
+    bool exists = fs::exists(endAuctionPath);
+
+    unlock();
+
+    return exists;
+}
+
+std::string DatabaseCore::getAuctionEndInfo(std::string aid) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path fileEndedPath = auctionPath / ("END_" + aid);
+
+    if (!fs::exists(fileEndedPath)) {
+        unlock();
+        throw DatabaseException("Auction has not started");
+    }
+
+    std::ifstream fileEnded(fileEndedPath);
+
+    std::string endInfo;
+
+    std::getline(fileEnded, endInfo);
+
+    unlock();
+    return endInfo;
+}
+
+fs::path DatabaseCore::getAuctionFilePath(std::string aid) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path filePath = auctionPath / "FILE";
+
+    unlock();
+    return filePath;
+}
+
+std::vector<std::string> DatabaseCore::getAllAuctions() {
+    lock();
+    guaranteeBaseStructure();
+
+    fs::path auctionPath = *_path / "AUCTIONS";
+
+    std::vector<std::string> auctions;
+
+    for (auto &auction : fs::directory_iterator(auctionPath)) {
+        auctions.push_back(auction.path().filename().string());
+    }
+
+    unlock();
+    std::sort(auctions.begin(), auctions.end());
+    return auctions;
 }
 
 DatabaseLock::DatabaseLock(std::string name) {

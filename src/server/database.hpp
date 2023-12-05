@@ -1,10 +1,12 @@
 #ifndef __DATABASE_HPP__
 #define __DATABASE_HPP__
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <fcntl.h>
 #include <semaphore.h>
@@ -72,7 +74,19 @@ class DatabaseCore {
     std::string getUserPassword(std::string uid);
     void unregisterUser(std::string uid);
     void addUserBid(std::string uid, std::string aid);
+    std::vector<std::string> getUserBids(std::string uid);
     void addUserHostedAuction(std::string uid, std::string aid);
+    std::vector<std::string> getUserHostedAuctions(std::string uid);
+
+    void createAuction(std::string aid, std::string startInfo);
+    bool auctionExists(std::string aid);
+    std::string getAuctionStartInfo(std::string aid);
+    void endAuction(std::string aid, std::string endInfo);
+    bool hasAuctionEnded(std::string aid);
+    std::string getAuctionEndInfo(std::string aid);
+    fs::path getAuctionFilePath(std::string aid);
+
+    std::vector<std::string> getAllAuctions();
 };
 
 class DatabaseException : public std::runtime_error {
