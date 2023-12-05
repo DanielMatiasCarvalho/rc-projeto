@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <map>
 
 #include <fcntl.h>
 #include <semaphore.h>
@@ -54,7 +55,6 @@ class DatabaseLock {
 class DatabaseCore {
   private:
     std::unique_ptr<fs::path> _path;
-    std::unique_ptr<DatabaseLock> _lock;
 
   public:
     DatabaseCore(std::string path);
@@ -62,9 +62,6 @@ class DatabaseCore {
     void guaranteeUserStructure(std::string uid);
     void guaranteeAuctionStructure(std::string aid);
     void wipe();
-
-    void lock();
-    void unlock();
 
     void createUser(std::string uid, std::string password);
     bool userExists(std::string uid);
@@ -87,6 +84,22 @@ class DatabaseCore {
     fs::path getAuctionFilePath(std::string aid);
 
     std::vector<std::string> getAllAuctions();
+};
+
+class Database {
+  private:
+    std::unique_ptr<DatabaseCore> _core;
+    std::unique_ptr<DatabaseLock> _lock;
+
+  public:
+    Database(std::string path);
+
+    void lock();
+    void unlock();
+
+
+    bool loginUser(std::string uid, std::string password);
+    std::map<std::string, bool> getAllAuctions();
 };
 
 class DatabaseException : public std::runtime_error {
