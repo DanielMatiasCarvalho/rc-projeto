@@ -17,11 +17,10 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
     TcpServer tcpServer(server.getPort());
-    while(1) {
+    while (1) {
         TcpSession session(tcpServer.acceptConnection());
-        if (fork()==0) {
+        if (fork() == 0) {
             std::stringstream message = session.receive();
-            std::cout << "pasuffw" << std::endl;
             session.send(message);
             break;
         }

@@ -47,9 +47,10 @@ void UdpServer::send(std::stringstream &message) {
 
 std::stringstream UdpServer::receive() {
     char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1];
-    ssize_t n = recvfrom(_fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1, 0,
-                         _client->ai_addr, &(_client->ai_addrlen));
-    
+    ssize_t n =
+        recvfrom(_fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1, 0,
+                 _client->ai_addr, &(_client->ai_addrlen));
+
     if (n > SOCKETS_MAX_DATAGRAM_SIZE_SERVER) {
         throw SocketException();
     }

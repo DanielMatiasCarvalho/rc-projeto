@@ -1,6 +1,7 @@
 #ifndef __CLIENT_HPP__
 #define __CLIENT_HPP__
 
+#include <signal.h>
 #include <unistd.h>
 #include <iostream>
 
@@ -39,7 +40,7 @@ class Server {
          */
     void showMessage(std::string message);
 
-/**
+    /**
  * @brief Get the port number.
  * 
  * @return std::string The port number.

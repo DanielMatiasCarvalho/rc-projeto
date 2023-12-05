@@ -52,8 +52,9 @@ void UdpClient::send(std::stringstream &message) {
 std::stringstream UdpClient::receive() {
     char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_CLIENT + 1];
     socklen_t addrlen = sizeof(_addr);
-    ssize_t n = recvfrom(_fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_CLIENT + 1, 0,
-                         (struct sockaddr *)&_addr, &addrlen);
+    ssize_t n =
+        recvfrom(_fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_CLIENT + 1, 0,
+                 (struct sockaddr *)&_addr, &addrlen);
 
     if (n == -1) {
         throw TimeoutException();

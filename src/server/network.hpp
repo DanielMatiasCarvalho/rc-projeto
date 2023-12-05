@@ -102,7 +102,7 @@ class TcpSession {
      * @param _hints The address info hints.
      * @param _res The address info res.
      */
-    TcpSession(int fd): _fd(fd) {};
+    TcpSession(int fd) : _fd(fd){};
 
     /**
      * @brief Destroys the TcpSession object and closes the socket.
