@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<BidCommand>());
     manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
+    /*
     TcpServer tcpServer(server.getPort());
     while (1) {
         TcpSession session(tcpServer.acceptConnection());
@@ -25,6 +26,7 @@ int main(int argc, char **argv) {
             break;
         }
     }
+    */
 
     return 1;
 }
@@ -53,6 +55,8 @@ Server::Server(int argc, char **argv) {
                 break;
         }
     }
+
+    _database = std::make_unique<Database>("database");
 }
 
 /**

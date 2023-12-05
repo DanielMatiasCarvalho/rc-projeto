@@ -20,8 +20,8 @@ class Server {
     std::string _port = DEFAULT_PORT; /**< The port number. */
     bool _verbose =
         false; /**< Flag indicating whether to display verbose output. */
-
   public:
+    std::unique_ptr<Database> _database; /**< The database. */
     /**
          * @brief Constructs a Server object.
          * @param argc The number of command-line arguments.
