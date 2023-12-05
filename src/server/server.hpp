@@ -7,6 +7,7 @@
 #include "command.hpp"
 #include "config.hpp"
 #include "database.hpp"
+#include "network.hpp"
 
 /**
  * @class Server
@@ -37,6 +38,13 @@ class Server {
          * @param message The message to display.
          */
     void showMessage(std::string message);
+
+/**
+ * @brief Get the port number.
+ * 
+ * @return std::string The port number.
+ */
+    std::string getPort() { return _port; }
 };
 
 #endif
