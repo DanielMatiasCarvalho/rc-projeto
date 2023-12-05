@@ -1,11 +1,38 @@
 #include "database.hpp"
 
+Database::Database(std::string path) {
+    _core = std::make_unique<DatabaseCore>(path);
+    _lock = std::make_unique<DatabaseLock>(path);
+}
+
+std::map<std::string, bool> Database::getAllAuctions() {
+    lock();
+
+    std::vector<std::string> auctions = _core->getAllAuctions();
+
+    std::map<std::string, bool> auctionsMap;
+
+    for (auto &auction : auctions) {
+        auctionsMap[auction] = _core->hasAuctionEnded(auction);
+    }
+
+    unlock();
+
+    return auctionsMap;
+}
+
+void Database::lock() {
+    _lock->lock();
+}
+
+void Database::unlock() {
+    _lock->unlock();
+}
+
 DatabaseCore::DatabaseCore(std::string path) {
     _path = std::make_unique<fs::path>(path);
 
     *_path = fs::absolute(*_path);
-
-    _lock = std::make_unique<DatabaseLock>(path);
 
     guaranteeBaseStructure();
 }
@@ -114,16 +141,7 @@ void DatabaseCore::wipe() {
     }
 }
 
-void DatabaseCore::lock() {
-    _lock->lock();
-}
-
-void DatabaseCore::unlock() {
-    _lock->unlock();
-}
-
 void DatabaseCore::createUser(std::string uid, std::string password) {
-    lock();
     guaranteeBaseStructure();
 
     fs::path userPath = *_path / "USERS" / uid;
@@ -147,31 +165,24 @@ void DatabaseCore::createUser(std::string uid, std::string password) {
     fs::path biddedPath = userPath / "BIDDED";
 
     fs::create_directory(biddedPath);
-
-    unlock();
 }
 
 bool DatabaseCore::userExists(std::string uid) {
-    lock();
     guaranteeBaseStructure();
 
     fs::path userPath = *_path / "USERS" / uid;
 
     bool exists = fs::exists(userPath);
 
-    unlock();
-
     return exists;
 }
 
 bool DatabaseCore::isUserRegistered(std::string uid) {
-    lock();
     guaranteeBaseStructure();
 
     fs::path userPath = *_path / "USERS" / uid;
 
     if (!fs::exists(userPath)) {
-        unlock();
         return false;
     }
 
@@ -179,19 +190,15 @@ bool DatabaseCore::isUserRegistered(std::string uid) {
 
     bool exists = fs::exists(passwordPath);
 
-    unlock();
-
     return exists;
 }
 
 void DatabaseCore::setLoggedIn(std::string uid) {
-    lock();
     guaranteeBaseStructure();
 
     fs::path userPath = *_path / "USERS" / uid;
 
     if (!fs::exists(userPath)) {
-        unlock();
         throw DatabaseException("User does not exist");
     }
 
@@ -200,18 +207,14 @@ void DatabaseCore::setLoggedIn(std::string uid) {
     std::ofstream loggedInFile(loggedInPath);
 
     loggedInFile << "1";
-
-    unlock();
 }
 
 bool DatabaseCore::isUserLoggedIn(std::string uid) {
-    lock();
     guaranteeBaseStructure();
 
     fs::path userPath = *_path / "USERS" / uid;
 
     if (!fs::exists(userPath)) {
-        unlock();
         throw DatabaseException("User does not exist");
     }
 
@@ -219,26 +222,21 @@ bool DatabaseCore::isUserLoggedIn(std::string uid) {
 
     bool exists = fs::exists(loggedInPath);
 
-    unlock();
-
     return exists;
 }
 
 std::string DatabaseCore::getUserPassword(std::string uid) {
-    lock();
     guaranteeBaseStructure();
 
     fs::path userPath = *_path / "USERS" / uid;
 
     if (!fs::exists(userPath)) {
-        unlock();
         throw DatabaseException("User does not exist");
     }
 
     fs::path passwordPath = userPath / (uid + "_pass");
 
     if (!fs::exists(passwordPath)) {
-        unlock();
         throw DatabaseException("User is not registered");
     }
 
@@ -248,18 +246,15 @@ std::string DatabaseCore::getUserPassword(std::string uid) {
 
     passwordFile >> password;
 
-    unlock();
     return password;
 }
 
 void DatabaseCore::unregisterUser(std::string uid) {
-    lock();
     guaranteeBaseStructure();
 
     fs::path userPath = *_path / "USERS" / uid;
 
     if (!fs::exists(userPath)) {
-        unlock();
         throw DatabaseException("User does not exist");
     }
 
@@ -274,12 +269,9 @@ void DatabaseCore::unregisterUser(std::string uid) {
     if (fs::exists(passwordPath)) {
         fs::remove(passwordPath);
     }
-
-    unlock();
 }
 
 void DatabaseCore::addUserHostedAuction(std::string uid, std::string aid) {
-    lock();
     guaranteeUserStructure(uid);
     guaranteeAuctionStructure(aid);
 
@@ -287,17 +279,13 @@ void DatabaseCore::addUserHostedAuction(std::string uid, std::string aid) {
     fs::path userHostedPath = *_path / "USERS" / uid / "HOSTED" / aid;
 
     if (fs::exists(userHostedPath)) {
-        unlock();
         throw DatabaseException("Auction is already registered on user.");
     }
 
     fs::create_symlink(auctionPath, userHostedPath);
-
-    unlock();
 }
 
 std::vector<std::string> DatabaseCore::getUserHostedAuctions(std::string uid) {
-    lock();
     guaranteeUserStructure(uid);
 
     fs::path userPath = *_path / "USERS" / uid / "HOSTED";
@@ -308,13 +296,11 @@ std::vector<std::string> DatabaseCore::getUserHostedAuctions(std::string uid) {
         auctions.push_back(auction.path().filename().string());
     }
 
-    unlock();
     std::sort(auctions.begin(), auctions.end());
     return auctions;
 }
 
 void DatabaseCore::addUserBid(std::string uid, std::string aid) {
-    lock();
     guaranteeUserStructure(uid);
     guaranteeAuctionStructure(aid);
 
@@ -322,17 +308,13 @@ void DatabaseCore::addUserBid(std::string uid, std::string aid) {
     fs::path userHostedPath = *_path / "USERS" / uid / "BIDDED" / aid;
 
     if (fs::exists(userHostedPath)) {
-        unlock();
         throw DatabaseException("Bid is already registered on user.");
     }
 
     fs::create_symlink(auctionPath, userHostedPath);
-
-    unlock();
 }
 
 std::vector<std::string> DatabaseCore::getUserBids(std::string uid) {
-    lock();
     guaranteeUserStructure(uid);
 
     fs::path userPath = *_path / "USERS" / uid / "BIDDED";
@@ -343,19 +325,16 @@ std::vector<std::string> DatabaseCore::getUserBids(std::string uid) {
         bids.push_back(bid.path().filename().string());
     }
 
-    unlock();
     std::sort(bids.begin(), bids.end());
     return bids;
 }
 
 void DatabaseCore::createAuction(std::string aid, std::string startInfo) {
-    lock();
     guaranteeBaseStructure();
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
 
     if (fs::exists(auctionPath)) {
-        unlock();
         throw DatabaseException("Auction already exists");
     }
 
@@ -374,25 +353,19 @@ void DatabaseCore::createAuction(std::string aid, std::string startInfo) {
     std::ofstream fileStarted(fileStartedPath);
 
     fileStarted << startInfo;
-
-    unlock();
 }
 
 bool DatabaseCore::auctionExists(std::string aid) {
-    lock();
     guaranteeBaseStructure();
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
 
     bool exists = fs::exists(auctionPath);
 
-    unlock();
-
     return exists;
 }
 
 std::string DatabaseCore::getAuctionStartInfo(std::string aid) {
-    lock();
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -400,7 +373,6 @@ std::string DatabaseCore::getAuctionStartInfo(std::string aid) {
     fs::path fileStartedPath = auctionPath / ("START_" + aid);
 
     if (!fs::exists(fileStartedPath)) {
-        unlock();
         throw DatabaseException("Auction has not started");
     }
 
@@ -410,12 +382,10 @@ std::string DatabaseCore::getAuctionStartInfo(std::string aid) {
 
     std::getline(fileStarted, startInfo);
 
-    unlock();
     return startInfo;
 }
 
 void DatabaseCore::endAuction(std::string aid, std::string endInfo) {
-    lock();
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -423,19 +393,15 @@ void DatabaseCore::endAuction(std::string aid, std::string endInfo) {
     fs::path endAuctionPath = auctionPath / ("END_" + aid);
 
     if (fs::exists(endAuctionPath)) {
-        unlock();
         throw DatabaseException("Auction already ended");
     }
 
     std::ofstream endAuctionFile(endAuctionPath);
 
     endAuctionFile << endInfo;
-
-    unlock();
 }
 
 bool DatabaseCore::hasAuctionEnded(std::string aid) {
-    lock();
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -444,13 +410,10 @@ bool DatabaseCore::hasAuctionEnded(std::string aid) {
 
     bool exists = fs::exists(endAuctionPath);
 
-    unlock();
-
     return exists;
 }
 
 std::string DatabaseCore::getAuctionEndInfo(std::string aid) {
-    lock();
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -458,7 +421,6 @@ std::string DatabaseCore::getAuctionEndInfo(std::string aid) {
     fs::path fileEndedPath = auctionPath / ("END_" + aid);
 
     if (!fs::exists(fileEndedPath)) {
-        unlock();
         throw DatabaseException("Auction has not started");
     }
 
@@ -468,24 +430,20 @@ std::string DatabaseCore::getAuctionEndInfo(std::string aid) {
 
     std::getline(fileEnded, endInfo);
 
-    unlock();
     return endInfo;
 }
 
 fs::path DatabaseCore::getAuctionFilePath(std::string aid) {
-    lock();
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
 
     fs::path filePath = auctionPath / "FILE";
 
-    unlock();
     return filePath;
 }
 
 std::vector<std::string> DatabaseCore::getAllAuctions() {
-    lock();
     guaranteeBaseStructure();
 
     fs::path auctionPath = *_path / "AUCTIONS";
@@ -496,7 +454,6 @@ std::vector<std::string> DatabaseCore::getAllAuctions() {
         auctions.push_back(auction.path().filename().string());
     }
 
-    unlock();
     std::sort(auctions.begin(), auctions.end());
     return auctions;
 }
