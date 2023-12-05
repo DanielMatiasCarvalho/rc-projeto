@@ -73,6 +73,11 @@ class DatabaseCore {
     void unregisterUser(std::string uid);
     void addUserBid(std::string uid, std::string aid);
     void addUserHostedAuction(std::string uid, std::string aid);
+
+    void createAuction(std::string aid, std::string startInfo);
+    bool auctionExists(std::string aid);
+    void endAuction(std::string aid, std::string endInfo);
+    bool hasAuctionEnded(std::string aid);
 };
 
 class DatabaseException : public std::runtime_error {

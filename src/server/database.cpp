@@ -96,6 +96,16 @@ void DatabaseCore::guaranteeAuctionStructure(std::string aid) {
     } else {
         fs::create_directory(bidsPath);
     }
+
+    fs::path filePath = auctionPath / "FILE";
+
+    if (fs::exists(filePath)) {
+        if (!fs::is_directory(filePath)) {
+            throw std::runtime_error("File path is not a directory");
+        }
+    } else {
+        fs::create_directory(filePath);
+    }
 }
 
 void DatabaseCore::wipe() {
@@ -302,6 +312,84 @@ void DatabaseCore::addUserBid(std::string uid, std::string aid) {
     fs::create_symlink(auctionPath, userHostedPath);
 
     unlock();
+}
+
+void DatabaseCore::createAuction(std::string aid, std::string startInfo) {
+    lock();
+    guaranteeBaseStructure();
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    if (fs::exists(auctionPath)) {
+        unlock();
+        throw DatabaseException("Auction already exists");
+    }
+
+    fs::create_directory(auctionPath);
+
+    fs::path bidsPath = auctionPath / "BIDS";
+
+    fs::create_directory(bidsPath);
+
+    fs::path filePath = auctionPath / "FILE";
+
+    fs::create_directory(filePath);
+
+    fs::path fileStartedPath = filePath / ("START_" + aid);
+
+    std::ofstream fileStarted(fileStartedPath);
+
+    fileStarted << startInfo;
+
+    unlock();
+}
+
+bool DatabaseCore::auctionExists(std::string aid) {
+    lock();
+    guaranteeBaseStructure();
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    bool exists = fs::exists(auctionPath);
+
+    unlock();
+
+    return exists;
+}
+
+void DatabaseCore::endAuction(std::string aid, std::string endInfo) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path endAuctionPath = auctionPath / ("END_" + aid);
+
+    if (fs::exists(endAuctionPath)) {
+        unlock();
+        throw DatabaseException("Auction already ended");
+    }
+
+    std::ofstream endAuctionFile(endAuctionPath);
+
+    endAuctionFile << endInfo;
+
+    unlock();
+}
+
+bool DatabaseCore::hasAuctionEnded(std::string aid) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path endAuctionPath = auctionPath / ("END_" + aid);
+
+    bool exists = fs::exists(endAuctionPath);
+
+    unlock();
+
+    return exists;
 }
 
 DatabaseLock::DatabaseLock(std::string name) {
