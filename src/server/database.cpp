@@ -296,6 +296,23 @@ void DatabaseCore::addUserHostedAuction(std::string uid, std::string aid) {
     unlock();
 }
 
+std::vector<std::string> DatabaseCore::getUserHostedAuctions(std::string uid) {
+    lock();
+    guaranteeUserStructure(uid);
+
+    fs::path userPath = *_path / "USERS" / uid / "HOSTED";
+
+    std::vector<std::string> auctions;
+
+    for (auto& auction : fs::directory_iterator(userPath)) {
+        auctions.push_back(auction.path().filename().string());
+    }
+
+    unlock();
+    std::sort(auctions.begin(), auctions.end());
+    return auctions;
+}
+
 void DatabaseCore::addUserBid(std::string uid, std::string aid) {
     lock();
     guaranteeUserStructure(uid);
@@ -312,6 +329,23 @@ void DatabaseCore::addUserBid(std::string uid, std::string aid) {
     fs::create_symlink(auctionPath, userHostedPath);
 
     unlock();
+}
+
+std::vector<std::string> DatabaseCore::getUserBids(std::string uid) {
+    lock();
+    guaranteeUserStructure(uid);
+
+    fs::path userPath = *_path / "USERS" / uid / "BIDDED";
+
+    std::vector<std::string> bids;
+
+    for (auto& bid : fs::directory_iterator(userPath)) {
+        bids.push_back(bid.path().filename().string());
+    }
+
+    unlock();
+    std::sort(bids.begin(), bids.end());
+    return bids;
 }
 
 void DatabaseCore::createAuction(std::string aid, std::string startInfo) {
@@ -463,6 +497,7 @@ std::vector<std::string> DatabaseCore::getAllAuctions() {
     }
 
     unlock();
+    std::sort(auctions.begin(), auctions.end());
     return auctions;
 }
 

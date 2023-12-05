@@ -5,10 +5,11 @@
 #include <fstream>
 #include <memory>
 #include <string>
+#include <vector>
+#include <algorithm>
 
 #include <fcntl.h>
 #include <semaphore.h>
-#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -73,7 +74,9 @@ class DatabaseCore {
     std::string getUserPassword(std::string uid);
     void unregisterUser(std::string uid);
     void addUserBid(std::string uid, std::string aid);
+    std::vector<std::string> getUserBids(std::string uid);
     void addUserHostedAuction(std::string uid, std::string aid);
+    std::vector<std::string> getUserHostedAuctions(std::string uid);
 
     void createAuction(std::string aid, std::string startInfo);
     bool auctionExists(std::string aid);
