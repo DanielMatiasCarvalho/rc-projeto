@@ -4,10 +4,10 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
 
 #include <fcntl.h>
 #include <semaphore.h>
@@ -96,7 +96,6 @@ class Database {
 
     void lock();
     void unlock();
-
 
     bool loginUser(std::string uid, std::string password);
     std::map<std::string, bool> getAllAuctions();
