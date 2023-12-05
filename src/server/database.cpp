@@ -357,6 +357,29 @@ bool DatabaseCore::auctionExists(std::string aid) {
     return exists;
 }
 
+std::string DatabaseCore::getAuctionStartInfo(std::string aid) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path fileStartedPath = auctionPath / ("START_" + aid);
+
+    if (!fs::exists(fileStartedPath)) {
+        unlock();
+        throw DatabaseException("Auction has not started");
+    }
+
+    std::ifstream fileStarted(fileStartedPath);
+
+    std::string startInfo;
+
+    std::getline(fileStarted, startInfo);
+
+    unlock();
+    return startInfo;
+}
+
 void DatabaseCore::endAuction(std::string aid, std::string endInfo) {
     lock();
     guaranteeAuctionStructure(aid);
@@ -390,6 +413,57 @@ bool DatabaseCore::hasAuctionEnded(std::string aid) {
     unlock();
 
     return exists;
+}
+
+std::string DatabaseCore::getAuctionEndInfo(std::string aid) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path fileEndedPath = auctionPath / ("END_" + aid);
+
+    if (!fs::exists(fileEndedPath)) {
+        unlock();
+        throw DatabaseException("Auction has not started");
+    }
+
+    std::ifstream fileEnded(fileEndedPath);
+
+    std::string endInfo;
+
+    std::getline(fileEnded, endInfo);
+
+    unlock();
+    return endInfo;
+}
+
+fs::path DatabaseCore::getAuctionFilePath(std::string aid) {
+    lock();
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path filePath = auctionPath / "FILE";
+
+    unlock();
+    return filePath;
+}
+
+std::vector<std::string> DatabaseCore::getAllAuctions() {
+    lock();
+    guaranteeBaseStructure();
+
+    fs::path auctionPath = *_path / "AUCTIONS";
+
+    std::vector<std::string> auctions;
+
+    for (auto& auction : fs::directory_iterator(auctionPath)) {
+        auctions.push_back(auction.path().filename().string());
+    }
+
+    unlock();
+    return auctions;
 }
 
 DatabaseLock::DatabaseLock(std::string name) {
