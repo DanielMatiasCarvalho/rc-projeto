@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <iostream>
 
+#include "command.hpp"
 #include "config.hpp"
 
 /**

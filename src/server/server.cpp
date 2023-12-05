@@ -1,6 +1,21 @@
 #include "server.hpp"
 
-int main() {
+int main(int argc, char **argv) {
+    Server server(argc, argv);
+    CommandManager manager;
+
+    manager.registerCommand(std::make_shared<LoginCommand>());
+    manager.registerCommand(std::make_shared<LogoutCommand>());
+    manager.registerCommand(std::make_shared<UnregisterCommand>());
+    manager.registerCommand(std::make_shared<OpenCommand>());
+    manager.registerCommand(std::make_shared<CloseCommand>());
+    manager.registerCommand(std::make_shared<ListUserAuctionsCommand>());
+    manager.registerCommand(std::make_shared<ListUserBidsCommand>());
+    manager.registerCommand(std::make_shared<ListAllAuctionsCommand>());
+    manager.registerCommand(std::make_shared<ShowAssetCommand>());
+    manager.registerCommand(std::make_shared<BidCommand>());
+    manager.registerCommand(std::make_shared<ShowRecordCommand>());
+
     std::cout << "Not implemented" << std::endl;
 
     return 1;
