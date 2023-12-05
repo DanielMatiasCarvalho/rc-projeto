@@ -16,16 +16,15 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<BidCommand>());
     manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
-    DatabaseCore db("database");
-    db.wipe();
-    db.createAuction("001", "asd");
-    db.createAuction("002", "asd");
-    db.createAuction("003", "asd");
-    db.createAuction("004", "asd");
-    db.createAuction("005", "asd");
-
-    for (auto auction : db.getAllAuctions())
-        std::cout << auction << std::endl;
+    TcpServer tcpServer(server.getPort());
+    while (1) {
+        TcpSession session(tcpServer.acceptConnection());
+        if (fork() == 0) {
+            std::stringstream message = session.receive();
+            session.send(message);
+            break;
+        }
+    }
 
     return 1;
 }

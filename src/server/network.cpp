@@ -1,6 +1,6 @@
 #include "network.hpp"
 
-UdpClient::UdpClient(std::string hostname, std::string port) {
+UdpServer::UdpServer(std::string port) {
     _fd = socket(AF_INET, SOCK_DGRAM, 0);
 
     if (_fd == -1) {
@@ -10,32 +10,28 @@ UdpClient::UdpClient(std::string hostname, std::string port) {
     memset(&_hints, 0, sizeof(_hints));
     _hints.ai_family = AF_INET;
     _hints.ai_socktype = SOCK_DGRAM;
+    _hints.ai_flags = AI_PASSIVE;
 
-    int err = getaddrinfo(hostname.c_str(), port.c_str(), &_hints, &_res);
+    int err = getaddrinfo(NULL, port.c_str(), &_hints, &_res);
 
     if (err != 0) {
         throw SocketException();
     }
 
-    struct timeval timeout;
-    timeout.tv_sec = SOCKETS_UDP_TIMEOUT;
-    timeout.tv_usec = 0;
-
-    if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) <
-        0) {
+    if (bind(_fd, _res->ai_addr, _res->ai_addrlen) == -1) {
         throw SocketException();
     }
 }
 
-UdpClient::~UdpClient() {
+UdpServer::~UdpServer() {
     freeaddrinfo(_res);
     close(_fd);
 }
 
-void UdpClient::send(std::stringstream &message) {
-    char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_CLIENT];
+void UdpServer::send(std::stringstream &message) {
+    char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_SERVER];
 
-    message.read(messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_CLIENT);
+    message.read(messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_SERVER);
 
     std::streamsize n = message.gcount();
 
@@ -43,23 +39,19 @@ void UdpClient::send(std::stringstream &message) {
         throw SocketException();
     }
 
-    if (sendto(_fd, messageBuffer, (size_t)n, 0, _res->ai_addr,
-               _res->ai_addrlen) != n) {
+    if (sendto(_fd, messageBuffer, (size_t)n, 0, _client->ai_addr,
+               _client->ai_addrlen) != n) {
         throw SocketException();
     }
 }
 
-std::stringstream UdpClient::receive() {
-    char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_CLIENT + 1];
-    socklen_t addrlen = sizeof(_addr);
+std::stringstream UdpServer::receive() {
+    char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1];
     ssize_t n =
-        recvfrom(_fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_CLIENT + 1, 0,
-                 (struct sockaddr *)&_addr, &addrlen);
+        recvfrom(_fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1, 0,
+                 _client->ai_addr, &(_client->ai_addrlen));
 
-    if (n == -1) {
-        throw TimeoutException();
-    }
-    if (n > SOCKETS_MAX_DATAGRAM_SIZE_CLIENT) {
+    if (n > SOCKETS_MAX_DATAGRAM_SIZE_SERVER) {
         throw SocketException();
     }
 
@@ -70,7 +62,7 @@ std::stringstream UdpClient::receive() {
     return message;
 }
 
-TcpClient::TcpClient(std::string hostname, std::string port) {
+TcpServer::TcpServer(std::string port) {
     _fd = socket(AF_INET, SOCK_STREAM, 0);
     if (_fd == -1) {
         throw SocketException();
@@ -79,26 +71,39 @@ TcpClient::TcpClient(std::string hostname, std::string port) {
     memset(&_hints, 0, sizeof(_hints));
     _hints.ai_family = AF_INET;
     _hints.ai_socktype = SOCK_STREAM;
+    _hints.ai_flags = AI_PASSIVE;
 
-    int n = getaddrinfo(hostname.c_str(), port.c_str(), &_hints, &_res);
+    int n = getaddrinfo(NULL, port.c_str(), &_hints, &_res);
 
     if (n != 0) {
         throw SocketException();
     }
 
-    n = connect(_fd, _res->ai_addr, _res->ai_addrlen);
+    if (bind(_fd, _res->ai_addr, _res->ai_addrlen) == -1) {
+        throw SocketException();
+    }
 
-    if (n == -1) {
-        throw TimeoutException();
+    if (listen(_fd, 20) == -1) {
+        throw SocketException();
     }
 }
 
-TcpClient::~TcpClient() {
+TcpServer::~TcpServer() {
     freeaddrinfo(_res);
     close(_fd);
 }
 
-void TcpClient::send(std::stringstream &message) {
+int TcpServer::acceptConnection() {
+    int clientFd = accept(_fd, NULL, NULL);
+
+    if (clientFd == -1) {
+        throw SocketException();
+    }
+
+    return clientFd;
+}
+
+void TcpSession::send(std::stringstream &message) {
     char messageBuffer[SOCKETS_TCP_BUFFER_SIZE];
 
     message.read(messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
@@ -114,7 +119,7 @@ void TcpClient::send(std::stringstream &message) {
     }
 }
 
-std::stringstream TcpClient::receive() {
+std::stringstream TcpSession::receive() {
     char messageBuffer[SOCKETS_TCP_BUFFER_SIZE];
     std::stringstream message;
 
@@ -134,4 +139,8 @@ std::stringstream TcpClient::receive() {
     }
 
     return message;
+}
+
+TcpSession::~TcpSession() {
+    close(_fd);
 }
