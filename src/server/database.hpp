@@ -1,12 +1,12 @@
 #ifndef __DATABASE_HPP__
 #define __DATABASE_HPP__
 
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #include <fcntl.h>
 #include <semaphore.h>

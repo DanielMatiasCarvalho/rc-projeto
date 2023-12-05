@@ -304,7 +304,7 @@ std::vector<std::string> DatabaseCore::getUserHostedAuctions(std::string uid) {
 
     std::vector<std::string> auctions;
 
-    for (auto& auction : fs::directory_iterator(userPath)) {
+    for (auto &auction : fs::directory_iterator(userPath)) {
         auctions.push_back(auction.path().filename().string());
     }
 
@@ -339,7 +339,7 @@ std::vector<std::string> DatabaseCore::getUserBids(std::string uid) {
 
     std::vector<std::string> bids;
 
-    for (auto& bid : fs::directory_iterator(userPath)) {
+    for (auto &bid : fs::directory_iterator(userPath)) {
         bids.push_back(bid.path().filename().string());
     }
 
@@ -492,7 +492,7 @@ std::vector<std::string> DatabaseCore::getAllAuctions() {
 
     std::vector<std::string> auctions;
 
-    for (auto& auction : fs::directory_iterator(auctionPath)) {
+    for (auto &auction : fs::directory_iterator(auctionPath)) {
         auctions.push_back(auction.path().filename().string());
     }
 
