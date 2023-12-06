@@ -19,7 +19,9 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
  * @param message The stringstream containing the command message.
  * @param receiver The Server object that receives the command.
  */
-void CommandManager::readCommand(std::stringstream &message, Server &receiver) {
+void CommandManager::readCommand(std::stringstream &message,
+                                 std::stringstream &response,
+                                 Server &receiver) {
     std::string code;
     for (size_t i = 0; i < 3; i++) {  //Reads the 3 digit code from the message
         char c = (char)message.get();
@@ -36,62 +38,86 @@ void CommandManager::readCommand(std::stringstream &message, Server &receiver) {
     }
 
     handler->second->handle(
-        message, receiver);  //Executes the command on the correct handler
+        message, response,
+        receiver);  //Executes the command on the correct handler
 }
 
-void LoginCommand::handle(std::stringstream &message, Server &receiver) {
+void LoginCommand::handle(std::stringstream &message,
+                          std::stringstream &response, Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
-void LogoutCommand::handle(std::stringstream &message, Server &receiver) {
+void LogoutCommand::handle(std::stringstream &message,
+                           std::stringstream &response, Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
-void UnregisterCommand::handle(std::stringstream &message, Server &receiver) {
+void UnregisterCommand::handle(std::stringstream &message,
+                               std::stringstream &response, Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
 void ListUserAuctionsCommand::handle(std::stringstream &message,
+                                     std::stringstream &response,
                                      Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
-void ListUserBidsCommand::handle(std::stringstream &message, Server &receiver) {
+void ListUserBidsCommand::handle(std::stringstream &message,
+                                 std::stringstream &response,
+                                 Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
 void ListAllAuctionsCommand::handle(std::stringstream &message,
+                                    std::stringstream &response,
                                     Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
-void ShowRecordCommand::handle(std::stringstream &message, Server &receiver) {
+void ShowRecordCommand::handle(std::stringstream &message,
+                               std::stringstream &response, Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
-void OpenCommand::handle(std::stringstream &message, Server &receiver) {
+void OpenCommand::handle(std::stringstream &message,
+                         std::stringstream &response, Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
-void CloseCommand::handle(std::stringstream &message, Server &receiver) {
+void CloseCommand::handle(std::stringstream &message,
+                          std::stringstream &response, Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
-void ShowAssetCommand::handle(std::stringstream &message, Server &receiver) {
+void ShowAssetCommand::handle(std::stringstream &message,
+                              std::stringstream &response, Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }
 
-void BidCommand::handle(std::stringstream &message, Server &receiver) {
+void BidCommand::handle(std::stringstream &message, std::stringstream &response,
+                        Server &receiver) {
     (void)receiver;
     (void)message;
+    (void)response;
 }

@@ -46,6 +46,20 @@ class Server {
  * @return std::string The port number.
  */
     std::string getPort() { return _port; }
+
+    /**
+ * @brief Starts and runs the UDP server.
+ * 
+ * This function initializes and runs the UDP server.
+ */
+    void UDPServer();
+
+    /**
+ * @brief Starts and runs the TCP server.
+ * 
+ * This function initializes and runs the TCP server.
+ */
+    void TCPServer();
 };
 
 #endif
