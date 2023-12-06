@@ -5,29 +5,30 @@ Database::Database(std::string path) {
     _lock = std::make_unique<DatabaseLock>(path);
 }
 
-int Database::loginUser(std::string uid, std::string password) {
+bool Database::loginUser(std::string uid, std::string password) {
     lock();
 
     if (!_core->userExists(uid)) {
+        _core->createUser(uid, password);
         unlock();
-        return -1;
+        return true;
     }
 
     if (!_core->isUserRegistered(uid)) {
         _core->registerUser(uid, password);
         unlock();
-        return 1;
+        return true;
     }
 
     if (_core->getUserPassword(uid) != password) {
         unlock();
-        return -1;
+        throw LoginException();
     }
 
     _core->setLoggedIn(uid);
     unlock();
 
-    return 0;
+    return false;
 }
 
 bool Database::checkLoggedIn(std::string uid, std::string password) {

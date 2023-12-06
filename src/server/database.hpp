@@ -98,7 +98,7 @@ class Database {
     void lock();
     void unlock();
 
-    int loginUser(std::string uid, std::string password);
+    bool loginUser(std::string uid, std::string password);
     bool checkLoggedIn(std::string uid, std::string password);
 
     std::map<std::string, bool> getAllAuctions();
