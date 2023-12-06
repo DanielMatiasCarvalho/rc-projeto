@@ -3,6 +3,13 @@
 int main(int argc, char **argv) {
     Server server(argc, argv);
     CommandManager manager;
+    struct sigaction act;
+    pid_t pid;
+
+    act.sa_handler = SIG_IGN;
+    if (sigaction(SIGCHLD, &act, NULL) == -1) {
+        exit(1);
+    }
 
     manager.registerCommand(std::make_shared<LoginCommand>());
     manager.registerCommand(std::make_shared<LogoutCommand>());
@@ -16,18 +23,14 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<BidCommand>());
     manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
-    /*
-    TcpServer tcpServer(server.getPort());
-    while (1) {
-        TcpSession session(tcpServer.acceptConnection());
-        if (fork() == 0) {
-            std::stringstream message = session.receive();
-            session.send(message);
-            break;
-        }
+    if ((pid = fork()) == -1) {
+        exit(1);
+    } else if (pid == 0) {
+        server.UDPServer();
+    } else {
+        server.TCPServer();
     }
-    */
-
+    
     return 1;
 }
 
@@ -77,4 +80,33 @@ void Server::ShowInfo() {
 void Server::showMessage(std::string message) {
     if (_verbose)
         std::cout << message << std::endl;
+}
+
+void Server::UDPServer() {
+    UdpServer server(_port);
+    CommandManager manager;
+    while (1) {
+        std::stringstream message = server.receive();
+        std::stringstream response;
+        manager.readCommand(message, response, *this);
+        server.send(response);
+    }
+}
+
+void Server::TCPServer() {
+    TcpServer server(_port);
+    CommandManager manager;
+    while (1) {
+        TcpSession session(server.acceptConnection());
+        pid_t pid;
+        if ((pid = fork()) == -1) {
+            exit(1);
+        } else if (pid == 0) {
+            std::stringstream message = session.receive();
+            std::stringstream response;
+            manager.readCommand(message, response, *this);
+            session.send(response);
+            exit(0);
+        }
+    }
 }
