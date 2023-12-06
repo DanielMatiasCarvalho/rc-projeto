@@ -37,16 +37,41 @@ void CommandManager::readCommand(std::stringstream &message,
         return;
     }
 
-    handler->second->handle(
-        message, response,
-        receiver);  //Executes the command on the correct handler
+    try {
+        handler->second->handle(
+            message, response,
+            receiver);  //Executes the command on the correct handler
+    } catch (ProtocolException const &e) {
+        std::string str = PROTOCOL_ERROR_IDENTIFIER;
+        for (auto c : str) {
+            response.put(c);
+        }
+        response.put('\n');
+    }
 }
 
 void LoginCommand::handle(std::stringstream &message,
                           std::stringstream &response, Server &receiver) {
-    (void)receiver;
-    (void)message;
-    (void)response;
+
+    LoginCommunication loginCommunication;
+    try {
+        loginCommunication.decodeRequest(message);
+        if (receiver._database->checkLoggedIn(loginCommunication._uid,
+                                              loginCommunication._password)) {
+            //O pdf não menciona, mas meti que se já tiver logged in, devolve OK
+            loginCommunication._status = "OK";
+        } else {
+            if (!receiver._database->loginUser(loginCommunication._uid,
+                                               loginCommunication._password)) {
+                loginCommunication._status = "OK";
+            } else {
+                loginCommunication._status = "REG";
+            }
+        }
+    } catch (LoginException const &e) {
+        loginCommunication._status = "NOK";
+    }
+    response = loginCommunication.encodeResponse();
 }
 
 void LogoutCommand::handle(std::stringstream &message,
@@ -82,6 +107,9 @@ void ListUserBidsCommand::handle(std::stringstream &message,
 void ListAllAuctionsCommand::handle(std::stringstream &message,
                                     std::stringstream &response,
                                     Server &receiver) {
+    ListAllAuctionsCommunication listAllAuctionsCommunication;
+    listAllAuctionsCommunication.decodeRequest(message);
+
     (void)receiver;
     (void)message;
     (void)response;

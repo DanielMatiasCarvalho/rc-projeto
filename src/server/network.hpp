@@ -29,7 +29,8 @@ class UdpServer {
     int _fd;
     struct addrinfo _hints;
     struct addrinfo *_res;
-    struct addrinfo *_client;
+    struct sockaddr_in *_client;
+    socklen_t _clientSize = sizeof(_client);
 
   public:
     /**

@@ -8,8 +8,7 @@
 
 #include "config.hpp"
 #include "protocol.hpp"
-
-class Server;
+#include "server.hpp"
 
 /**
  * @brief The base class for command handlers.

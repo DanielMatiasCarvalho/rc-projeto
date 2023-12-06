@@ -1,4 +1,19 @@
 #include "server.hpp"
+#include "command.hpp"
+
+/**
+ * @brief Starts and runs the UDP server.
+ * 
+ * This function initializes and runs the UDP server.
+ */
+void UDPServer(CommandManager &manager, Server &server);
+
+/**
+ * @brief Starts and runs the TCP server.
+ * 
+ * This function initializes and runs the TCP server.
+ */
+void TCPServer(CommandManager &manager, Server &server);
 
 int main(int argc, char **argv) {
     Server server(argc, argv);
@@ -26,9 +41,9 @@ int main(int argc, char **argv) {
     if ((pid = fork()) == -1) {
         exit(1);
     } else if (pid == 0) {
-        server.UDPServer();
+        UDPServer(manager, server);
     } else {
-        server.TCPServer();
+        TCPServer(manager, server);
     }
 
     return 1;
@@ -82,29 +97,28 @@ void Server::showMessage(std::string message) {
         std::cout << message << std::endl;
 }
 
-void Server::UDPServer() {
-    UdpServer server(_port);
-    CommandManager manager;
+void UDPServer(CommandManager &manager, Server &server) {
+    UdpServer UDPserver(server.getPort());
     while (1) {
-        std::stringstream message = server.receive();
+        std::stringstream message = UDPserver.receive();
+        std::cout << "UDP server received message" << std::flush << std::endl;
         std::stringstream response;
-        manager.readCommand(message, response, *this);
-        server.send(response);
+        manager.readCommand(message, response, server);
+        UDPserver.send(response);
     }
 }
 
-void Server::TCPServer() {
-    TcpServer server(_port);
-    CommandManager manager;
+void TCPServer(CommandManager &manager, Server &server) {
+    TcpServer TCPserver(server.getPort());
     while (1) {
-        TcpSession session(server.acceptConnection());
+        TcpSession session(TCPserver.acceptConnection());
         pid_t pid;
         if ((pid = fork()) == -1) {
             exit(1);
         } else if (pid == 0) {
             std::stringstream message = session.receive();
             std::stringstream response;
-            manager.readCommand(message, response, *this);
+            manager.readCommand(message, response, server);
             session.send(response);
             exit(0);
         }
