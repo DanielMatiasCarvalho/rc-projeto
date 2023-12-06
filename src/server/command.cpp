@@ -91,17 +91,42 @@ void UnregisterCommand::handle(std::stringstream &message,
 void ListUserAuctionsCommand::handle(std::stringstream &message,
                                      std::stringstream &response,
                                      Server &receiver) {
-    (void)receiver;
-    (void)message;
-    (void)response;
+
+    ListUserAuctionsCommunication listUserAuctionsCommunication;
+    try {
+        listUserAuctionsCommunication.decodeRequest(message);
+        listUserAuctionsCommunication._auctions =
+            receiver._database->getUserAuctions(
+                listUserAuctionsCommunication._uid);
+        if (listUserAuctionsCommunication._auctions.empty()) {
+            listUserAuctionsCommunication._status = "NOK";
+        } else {
+            listUserAuctionsCommunication._status = "OK";
+        }
+    } catch (LoginException const &e) {
+        listUserAuctionsCommunication._status = "NLG";
+    }
+    response = listUserAuctionsCommunication.encodeResponse();
 }
 
 void ListUserBidsCommand::handle(std::stringstream &message,
                                  std::stringstream &response,
                                  Server &receiver) {
-    (void)receiver;
-    (void)message;
-    (void)response;
+
+    ListUserBidsCommunication listUserBidsCommunication;
+    try {
+        listUserBidsCommunication.decodeRequest(message);
+        listUserBidsCommunication._bids =
+            receiver._database->getUserBids(listUserBidsCommunication._uid);
+        if (listUserBidsCommunication._bids.empty()) {
+            listUserBidsCommunication._status = "NOK";
+        } else {
+            listUserBidsCommunication._status = "OK";
+        }
+    } catch (LoginException const &e) {
+        listUserBidsCommunication._status = "NLG";
+    }
+    response = listUserBidsCommunication.encodeResponse();
 }
 
 void ListAllAuctionsCommand::handle(std::stringstream &message,
@@ -109,10 +134,14 @@ void ListAllAuctionsCommand::handle(std::stringstream &message,
                                     Server &receiver) {
     ListAllAuctionsCommunication listAllAuctionsCommunication;
     listAllAuctionsCommunication.decodeRequest(message);
-
-    (void)receiver;
-    (void)message;
-    (void)response;
+    listAllAuctionsCommunication._auctions =
+        receiver._database->getAllAuctions();
+    if (listAllAuctionsCommunication._auctions.empty()) {
+        listAllAuctionsCommunication._status = "NOK";
+    } else {
+        listAllAuctionsCommunication._status = "OK";
+    }
+    response = listAllAuctionsCommunication.encodeResponse();
 }
 
 void ShowRecordCommand::handle(std::stringstream &message,
