@@ -33,17 +33,14 @@ bool Database::loginUser(std::string uid, std::string password) {
 
 bool Database::checkLoggedIn(std::string uid, std::string password) {
     if (!_core->userExists(uid)) {
-        unlock();
         return false;
     }
 
     if (!_core->isUserRegistered(uid)) {
-        unlock();
         return false;
     }
 
     if (_core->getUserPassword(uid) != password) {
-        unlock();
         return false;
     }
 
@@ -68,11 +65,10 @@ std::map<std::string, std::string> Database::getAllAuctions() {
     return auctionsMap;
 }
 
-std::map<std::string, std::string> Database::getUserAuctions(
-    std::string uid, std::string password) {
+std::map<std::string, std::string> Database::getUserAuctions(std::string uid) {
     lock();
 
-    if (!checkLoggedIn(uid, password)) {
+    if (!_core->userExists(uid) || !_core->isUserLoggedIn(uid)) {
         unlock();
         throw LoginException();
     }
@@ -90,11 +86,10 @@ std::map<std::string, std::string> Database::getUserAuctions(
     return auctionsMap;
 }
 
-std::map<std::string, std::string> Database::getUserBids(std::string uid,
-                                                         std::string password) {
+std::map<std::string, std::string> Database::getUserBids(std::string uid) {
     lock();
 
-    if (!checkLoggedIn(uid, password)) {
+    if (!_core->userExists(uid) || !_core->isUserLoggedIn(uid)) {
         unlock();
         throw LoginException();
     }
