@@ -48,21 +48,22 @@ void LoginCommand::handle(std::stringstream &message,
     LoginCommunication loginCommunication;
     try {
         loginCommunication.decodeRequest(message);
-        if (receiver._database->checkLoggedIn(loginCommunication._uid, loginCommunication._password)) {
+        if (receiver._database->checkLoggedIn(loginCommunication._uid,
+                                              loginCommunication._password)) {
             //O pdf não menciona, mas meti que se já tiver logged in, devolve OK
-            loginCommunication._status="OK";
+            loginCommunication._status = "OK";
         } else {
-            if (!receiver._database->loginUser(loginCommunication._uid, loginCommunication._password)) {
-                loginCommunication._status="OK";
+            if (!receiver._database->loginUser(loginCommunication._uid,
+                                               loginCommunication._password)) {
+                loginCommunication._status = "OK";
             } else {
-                loginCommunication._status="REG";
+                loginCommunication._status = "REG";
             }
         }
-    } 
-    catch (LoginException e) {
-        loginCommunication._status="NOK";
-    } 
-    response=loginCommunication.encodeResponse();
+    } catch (LoginException const &e) {
+        loginCommunication._status = "NOK";
+    }
+    response = loginCommunication.encodeResponse();
 }
 
 void LogoutCommand::handle(std::stringstream &message,
@@ -101,10 +102,8 @@ void ListAllAuctionsCommand::handle(std::stringstream &message,
     ListAllAuctionsCommunication listAllAuctionsCommunication;
     try {
         listAllAuctionsCommunication.decodeRequest(message);
-        
-    } catch (...) {
 
-    }
+    } catch (...) {}
     (void)receiver;
     (void)message;
     (void)response;
