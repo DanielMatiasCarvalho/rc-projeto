@@ -99,7 +99,11 @@ class Database {
     void unlock();
 
     bool loginUser(std::string uid, std::string password);
+    void logoutUser(std::string uid, std::string password);
+    void unregisterUser(std::string uid, std::string password);
+
     bool checkLoggedIn(std::string uid, std::string password);
+    bool checkUserRegistered(std::string uid);
 
     std::map<std::string, std::string> getAllAuctions();
     std::map<std::string, std::string> getUserAuctions(std::string uid);
@@ -114,6 +118,11 @@ class DatabaseException : public std::runtime_error {
 class LoginException : public DatabaseException {
   public:
     LoginException() : DatabaseException("User is not logged in") {}
+};
+
+class UnregisteredException : public DatabaseException {
+  public:
+    UnregisteredException() : DatabaseException("User is not registered") {}
 };
 
 #endif

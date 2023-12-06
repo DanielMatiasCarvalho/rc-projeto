@@ -41,12 +41,14 @@ int main(int argc, char **argv) {
     if ((pid = fork()) == -1) {
         exit(1);
     } else if (pid == 0) {
+        std::cout << "UDP server started" << std::endl;
         UDPServer(manager, server);
     } else {
+        std::cout << "TCP server started" << std::endl;
         TCPServer(manager, server);
     }
 
-    return 1;
+    return 0;
 }
 
 /**
@@ -101,7 +103,7 @@ void UDPServer(CommandManager &manager, Server &server) {
     UdpServer UDPserver(server.getPort());
     while (1) {
         std::stringstream message = UDPserver.receive();
-        std::cout << "UDP server received message" << std::flush << std::endl;
+        std::cout << "UDP server received message" << std::endl;
         std::stringstream response;
         manager.readCommand(message, response, server);
         UDPserver.send(response);
