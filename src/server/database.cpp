@@ -31,12 +31,54 @@ bool Database::loginUser(std::string uid, std::string password) {
     return false;
 }
 
-bool Database::checkLoggedIn(std::string uid, std::string password) {
+void Database::logoutUser(std::string uid, std::string password) {
+    lock();
+
+    if (!checkUserRegistered(uid)) {
+        unlock();
+        throw UnregisteredException();
+    }
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    unlock();
+}
+
+void Database::unregisterUser(std::string uid, std::string password) {
+    lock();
+
+    if (!checkUserRegistered(uid)) {
+        unlock();
+        throw UnregisteredException();
+    }
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    _core->unregisterUser(uid);
+
+    unlock();
+}
+
+bool Database::checkUserRegistered(std::string uid) {
     if (!_core->userExists(uid)) {
         return false;
     }
 
     if (!_core->isUserRegistered(uid)) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Database::checkLoggedIn(std::string uid, std::string password) {
+    if (!checkUserRegistered(uid)) {
         return false;
     }
 
