@@ -69,9 +69,8 @@ TcpServer::TcpServer(std::string port) {
     }
 
     int reuse_addr = 1;
-    
-    setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr));
 
+    setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr));
 
     memset(&_hints, 0, sizeof(_hints));
     _hints.ai_family = AF_INET;

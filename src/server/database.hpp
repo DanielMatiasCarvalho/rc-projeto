@@ -122,7 +122,7 @@ class LoginException : public DatabaseException {
 
 class UnregisteredException : public DatabaseException {
   public:
-  UnregisteredException() : DatabaseException("User is not registered") {}
+    UnregisteredException() : DatabaseException("User is not registered") {}
 };
 
 #endif
