@@ -5,10 +5,101 @@ Database::Database(std::string path) {
     _lock = std::make_unique<DatabaseLock>(path);
 }
 
+bool Database::loginUser(std::string uid, std::string password) {
+    lock();
+
+    if (!_core->userExists(uid)) {
+        _core->createUser(uid, password);
+        unlock();
+        return true;
+    }
+
+    if (!_core->isUserRegistered(uid)) {
+        _core->registerUser(uid, password);
+        unlock();
+        return true;
+    }
+
+    if (_core->getUserPassword(uid) != password) {
+        unlock();
+        throw LoginException();
+    }
+
+    _core->setLoggedIn(uid);
+    unlock();
+
+    return false;
+}
+
+bool Database::checkLoggedIn(std::string uid, std::string password) {
+    if (!_core->userExists(uid)) {
+        unlock();
+        return false;
+    }
+
+    if (!_core->isUserRegistered(uid)) {
+        unlock();
+        return false;
+    }
+
+    if (_core->getUserPassword(uid) != password) {
+        unlock();
+        return false;
+    }
+
+    bool loggedIn = _core->isUserLoggedIn(uid);
+
+    return loggedIn;
+}
+
 std::map<std::string, bool> Database::getAllAuctions() {
     lock();
 
     std::vector<std::string> auctions = _core->getAllAuctions();
+
+    std::map<std::string, bool> auctionsMap;
+
+    for (auto &auction : auctions) {
+        auctionsMap[auction] = _core->hasAuctionEnded(auction);
+    }
+
+    unlock();
+
+    return auctionsMap;
+}
+
+std::map<std::string, bool> Database::getUserAuctions(std::string uid,
+                                                      std::string password) {
+    lock();
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    std::vector<std::string> auctions = _core->getUserHostedAuctions(uid);
+
+    std::map<std::string, bool> auctionsMap;
+
+    for (auto &auction : auctions) {
+        auctionsMap[auction] = _core->hasAuctionEnded(auction);
+    }
+
+    unlock();
+
+    return auctionsMap;
+}
+
+std::map<std::string, bool> Database::getUserBids(std::string uid,
+                                                  std::string password) {
+    lock();
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    std::vector<std::string> auctions = _core->getUserBids(uid);
 
     std::map<std::string, bool> auctionsMap;
 
@@ -223,6 +314,26 @@ bool DatabaseCore::isUserLoggedIn(std::string uid) {
     bool exists = fs::exists(loggedInPath);
 
     return exists;
+}
+
+void DatabaseCore::registerUser(std::string uid, std::string password) {
+    guaranteeBaseStructure();
+
+    fs::path userPath = *_path / "USERS" / uid;
+
+    if (!fs::exists(userPath)) {
+        throw DatabaseException("User does not exist");
+    }
+
+    fs::path passwordPath = userPath / (uid + "_pass");
+
+    if (fs::exists(passwordPath)) {
+        throw DatabaseException("User is already registered");
+    }
+
+    std::ofstream passwordFile(passwordPath);
+
+    passwordFile << password;
 }
 
 std::string DatabaseCore::getUserPassword(std::string uid) {
