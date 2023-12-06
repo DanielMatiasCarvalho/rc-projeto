@@ -68,6 +68,7 @@ class DatabaseCore {
     bool isUserRegistered(std::string uid);
     void setLoggedIn(std::string uid);
     bool isUserLoggedIn(std::string uid);
+    void registerUser(std::string uid, std::string password);
     std::string getUserPassword(std::string uid);
     void unregisterUser(std::string uid);
     void addUserBid(std::string uid, std::string aid);
@@ -97,13 +98,22 @@ class Database {
     void lock();
     void unlock();
 
-    bool loginUser(std::string uid, std::string password);
+    int loginUser(std::string uid, std::string password);
+    bool checkLoggedIn(std::string uid, std::string password);
+
     std::map<std::string, bool> getAllAuctions();
+    std::map<std::string, bool> getUserAuctions(std::string uid, std::string password);
+    std::map<std::string, bool> getUserBids(std::string uid, std::string password);
 };
 
 class DatabaseException : public std::runtime_error {
   public:
     DatabaseException(std::string message) : std::runtime_error(message) {}
+};
+
+class LoginException : public DatabaseException {
+  public:
+    LoginException() : DatabaseException("User is not logged in") {}
 };
 
 #endif
