@@ -67,7 +67,8 @@ std::map<std::string, bool> Database::getAllAuctions() {
     return auctionsMap;
 }
 
-std::map<std::string, bool> Database::getUserAuctions(std::string uid, std::string password) {
+std::map<std::string, bool> Database::getUserAuctions(std::string uid,
+                                                      std::string password) {
     lock();
 
     if (!checkLoggedIn(uid, password)) {
@@ -88,7 +89,8 @@ std::map<std::string, bool> Database::getUserAuctions(std::string uid, std::stri
     return auctionsMap;
 }
 
-std::map<std::string, bool> Database::getUserBids(std::string uid, std::string password) {
+std::map<std::string, bool> Database::getUserBids(std::string uid,
+                                                  std::string password) {
     lock();
 
     if (!checkLoggedIn(uid, password)) {
