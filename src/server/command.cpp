@@ -37,9 +37,16 @@ void CommandManager::readCommand(std::stringstream &message,
         return;
     }
 
-    handler->second->handle(
+    try {handler->second->handle(
         message, response,
         receiver);  //Executes the command on the correct handler
+    } catch (ProtocolException const &e) {
+        std::string str = PROTOCOL_ERROR_IDENTIFIER;
+        for (auto c: str) {
+            response.put(c);
+        }
+        response.put('\n');
+    }
 }
 
 void LoginCommand::handle(std::stringstream &message,

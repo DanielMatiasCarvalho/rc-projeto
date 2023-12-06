@@ -101,6 +101,7 @@ void UDPServer(CommandManager &manager, Server &server) {
     UdpServer UDPserver(server.getPort());
     while (1) {
         std::stringstream message = UDPserver.receive();
+        std::cout<<"UDP server received message"<<std::flush<<std::endl;
         std::stringstream response;
         manager.readCommand(message, response, server);
         UDPserver.send(response);
