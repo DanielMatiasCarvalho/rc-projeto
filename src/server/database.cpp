@@ -52,15 +52,15 @@ bool Database::checkLoggedIn(std::string uid, std::string password) {
     return loggedIn;
 }
 
-std::map<std::string, bool> Database::getAllAuctions() {
+std::map<std::string, std::string> Database::getAllAuctions() {
     lock();
 
     std::vector<std::string> auctions = _core->getAllAuctions();
 
-    std::map<std::string, bool> auctionsMap;
+    std::map<std::string, std::string> auctionsMap;
 
     for (auto &auction : auctions) {
-        auctionsMap[auction] = _core->hasAuctionEnded(auction);
+        auctionsMap[auction] = (_core->hasAuctionEnded(auction) ? "0" : "1");
     }
 
     unlock();
@@ -68,8 +68,8 @@ std::map<std::string, bool> Database::getAllAuctions() {
     return auctionsMap;
 }
 
-std::map<std::string, bool> Database::getUserAuctions(std::string uid,
-                                                      std::string password) {
+std::map<std::string, std::string> Database::getUserAuctions(
+    std::string uid, std::string password) {
     lock();
 
     if (!checkLoggedIn(uid, password)) {
@@ -79,10 +79,10 @@ std::map<std::string, bool> Database::getUserAuctions(std::string uid,
 
     std::vector<std::string> auctions = _core->getUserHostedAuctions(uid);
 
-    std::map<std::string, bool> auctionsMap;
+    std::map<std::string, std::string> auctionsMap;
 
     for (auto &auction : auctions) {
-        auctionsMap[auction] = _core->hasAuctionEnded(auction);
+        auctionsMap[auction] = (_core->hasAuctionEnded(auction) ? "0" : "1");
     }
 
     unlock();
@@ -90,8 +90,8 @@ std::map<std::string, bool> Database::getUserAuctions(std::string uid,
     return auctionsMap;
 }
 
-std::map<std::string, bool> Database::getUserBids(std::string uid,
-                                                  std::string password) {
+std::map<std::string, std::string> Database::getUserBids(std::string uid,
+                                                         std::string password) {
     lock();
 
     if (!checkLoggedIn(uid, password)) {
@@ -101,10 +101,10 @@ std::map<std::string, bool> Database::getUserBids(std::string uid,
 
     std::vector<std::string> auctions = _core->getUserBids(uid);
 
-    std::map<std::string, bool> auctionsMap;
+    std::map<std::string, std::string> auctionsMap;
 
     for (auto &auction : auctions) {
-        auctionsMap[auction] = _core->hasAuctionEnded(auction);
+        auctionsMap[auction] = (_core->hasAuctionEnded(auction) ? "0" : "1");
     }
 
     unlock();

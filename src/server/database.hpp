@@ -101,11 +101,11 @@ class Database {
     bool loginUser(std::string uid, std::string password);
     bool checkLoggedIn(std::string uid, std::string password);
 
-    std::map<std::string, bool> getAllAuctions();
-    std::map<std::string, bool> getUserAuctions(std::string uid,
-                                                std::string password);
-    std::map<std::string, bool> getUserBids(std::string uid,
-                                            std::string password);
+    std::map<std::string, std::string> getAllAuctions();
+    std::map<std::string, std::string> getUserAuctions(std::string uid,
+                                                       std::string password);
+    std::map<std::string, std::string> getUserBids(std::string uid,
+                                                   std::string password);
 };
 
 class DatabaseException : public std::runtime_error {
