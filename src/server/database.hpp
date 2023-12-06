@@ -102,10 +102,8 @@ class Database {
     bool checkLoggedIn(std::string uid, std::string password);
 
     std::map<std::string, std::string> getAllAuctions();
-    std::map<std::string, std::string> getUserAuctions(std::string uid,
-                                                       std::string password);
-    std::map<std::string, std::string> getUserBids(std::string uid,
-                                                   std::string password);
+    std::map<std::string, std::string> getUserAuctions(std::string uid);
+    std::map<std::string, std::string> getUserBids(std::string uid);
 };
 
 class DatabaseException : public std::runtime_error {
