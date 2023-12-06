@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     } else {
         server.TCPServer();
     }
-    
+
     return 1;
 }
 
