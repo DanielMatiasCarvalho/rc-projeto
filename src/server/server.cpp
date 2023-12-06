@@ -30,6 +30,7 @@ int main(int argc, char **argv) {
     } else {
         server.TCPServer();
     }
+    
     return 1;
 }
 
@@ -57,6 +58,8 @@ Server::Server(int argc, char **argv) {
                 break;
         }
     }
+
+    _database = std::make_unique<Database>("database");
 }
 
 /**
