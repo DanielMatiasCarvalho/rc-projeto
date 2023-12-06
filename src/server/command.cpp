@@ -37,12 +37,13 @@ void CommandManager::readCommand(std::stringstream &message,
         return;
     }
 
-    try {handler->second->handle(
-        message, response,
-        receiver);  //Executes the command on the correct handler
+    try {
+        handler->second->handle(
+            message, response,
+            receiver);  //Executes the command on the correct handler
     } catch (ProtocolException const &e) {
         std::string str = PROTOCOL_ERROR_IDENTIFIER;
-        for (auto c: str) {
+        for (auto c : str) {
             response.put(c);
         }
         response.put('\n');
@@ -107,10 +108,8 @@ void ListAllAuctionsCommand::handle(std::stringstream &message,
                                     std::stringstream &response,
                                     Server &receiver) {
     ListAllAuctionsCommunication listAllAuctionsCommunication;
-    try {
-        listAllAuctionsCommunication.decodeRequest(message);
+    listAllAuctionsCommunication.decodeRequest(message);
 
-    } catch (...) {}
     (void)receiver;
     (void)message;
     (void)response;
