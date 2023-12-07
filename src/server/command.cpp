@@ -33,21 +33,17 @@ void CommandManager::readCommand(std::stringstream &message,
     if (handler ==
         this->_handlers
             .end()) {  //If the handler is not found, the command is not valid
-        std::cout << "Command not found" << std::endl;
-        return;
-    }
-
-    try {
-        handler->second->handle(
-            message, response,
-            receiver);  //Executes the command on the correct handler
-    } catch (ProtocolException const &e) {
         std::string str = PROTOCOL_ERROR_IDENTIFIER;
         for (auto c : str) {
             response.put(c);
         }
         response.put('\n');
+        return;
     }
+
+    handler->second->handle(
+        message, response,
+        receiver);  //Executes the command on the correct handler
 }
 
 void LoginCommand::handle(std::stringstream &message,
@@ -58,7 +54,6 @@ void LoginCommand::handle(std::stringstream &message,
         loginCommunication.decodeRequest(message);
         if (receiver._database->checkLoggedIn(loginCommunication._uid,
                                               loginCommunication._password)) {
-            //O pdf não menciona, mas meti que se já tiver logged in, devolve OK
             loginCommunication._status = "OK";
         } else {
             if (!receiver._database->loginUser(loginCommunication._uid,
@@ -70,22 +65,46 @@ void LoginCommand::handle(std::stringstream &message,
         }
     } catch (LoginException const &e) {
         loginCommunication._status = "NOK";
+    } catch (ProtocolException const &e) {
+        loginCommunication._status = "ERR";
     }
     response = loginCommunication.encodeResponse();
 }
 
 void LogoutCommand::handle(std::stringstream &message,
                            std::stringstream &response, Server &receiver) {
-    (void)receiver;
-    (void)message;
-    (void)response;
+    LogoutCommunication logoutCommunication;
+    try {
+        logoutCommunication.decodeRequest(message);
+        receiver._database->logoutUser(logoutCommunication._uid,
+                                       logoutCommunication._password);
+        logoutCommunication._status = "OK";
+    } catch (LoginException const &e) {
+        logoutCommunication._status = "NOK";
+    } catch (UnregisteredException const &e) {
+        logoutCommunication._status = "UNR";
+    } catch (ProtocolException const &e) {
+        logoutCommunication._status = "ERR";
+    }
+    response = logoutCommunication.encodeResponse();
 }
 
 void UnregisterCommand::handle(std::stringstream &message,
                                std::stringstream &response, Server &receiver) {
-    (void)receiver;
-    (void)message;
-    (void)response;
+    UnregisterCommunication unregisterCommunication;
+    try {
+        unregisterCommunication.decodeRequest(message);
+        receiver._database->logoutUser(unregisterCommunication._uid,
+                                       unregisterCommunication._password);
+        unregisterCommunication._status = "OK";
+    } catch (LoginException const &e) {
+        unregisterCommunication._status = "NOK";
+    } catch (UnregisteredException const &e) {
+        unregisterCommunication._status = "UNR";
+    } catch (ProtocolException const &e) {
+        unregisterCommunication._status = "ERR";
+    }
+    response = unregisterCommunication.encodeResponse();
 }
 
 void ListUserAuctionsCommand::handle(std::stringstream &message,
@@ -105,6 +124,8 @@ void ListUserAuctionsCommand::handle(std::stringstream &message,
         }
     } catch (LoginException const &e) {
         listUserAuctionsCommunication._status = "NLG";
+    } catch (ProtocolException const &e) {
+        listUserAuctionsCommunication._status = "ERR";
     }
     response = listUserAuctionsCommunication.encodeResponse();
 }
@@ -125,6 +146,8 @@ void ListUserBidsCommand::handle(std::stringstream &message,
         }
     } catch (LoginException const &e) {
         listUserBidsCommunication._status = "NLG";
+    } catch (ProtocolException const &e) {
+        listUserBidsCommunication._status = "ERR";
     }
     response = listUserBidsCommunication.encodeResponse();
 }
@@ -133,13 +156,17 @@ void ListAllAuctionsCommand::handle(std::stringstream &message,
                                     std::stringstream &response,
                                     Server &receiver) {
     ListAllAuctionsCommunication listAllAuctionsCommunication;
-    listAllAuctionsCommunication.decodeRequest(message);
-    listAllAuctionsCommunication._auctions =
-        receiver._database->getAllAuctions();
-    if (listAllAuctionsCommunication._auctions.empty()) {
-        listAllAuctionsCommunication._status = "NOK";
-    } else {
-        listAllAuctionsCommunication._status = "OK";
+    try {
+        listAllAuctionsCommunication.decodeRequest(message);
+        listAllAuctionsCommunication._auctions =
+            receiver._database->getAllAuctions();
+        if (listAllAuctionsCommunication._auctions.empty()) {
+            listAllAuctionsCommunication._status = "NOK";
+        } else {
+            listAllAuctionsCommunication._status = "OK";
+        }
+    } catch (ProtocolException const &e) {
+        listAllAuctionsCommunication._status = "ERR";
     }
     response = listAllAuctionsCommunication.encodeResponse();
 }
