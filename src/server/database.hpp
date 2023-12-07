@@ -70,7 +70,6 @@ struct AuctionBidInfo {
     time_t bidTime;
 };
 
-
 class DatabaseCore {
   private:
     std::unique_ptr<fs::path> _path;
@@ -130,8 +129,9 @@ class Database {
 
     std::string generateAid();
     std::string createAuction(std::string uid, std::string password,
-                             std::string name, int startValue,
-                             time_t timeActive, std::string fileName, std::stringstream &file);
+                              std::string name, int startValue,
+                              time_t timeActive, std::string fileName,
+                              std::stringstream &file);
 };
 
 class DatabaseException : public std::runtime_error {

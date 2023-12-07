@@ -143,7 +143,8 @@ std::stringstream TcpSession::receive() {
                 break;
             }
         }
-        if (found) return message;
+        if (found)
+            return message;
 
         n = read(_fd, messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
 

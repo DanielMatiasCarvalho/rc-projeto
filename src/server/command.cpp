@@ -182,14 +182,14 @@ void OpenCommand::handle(std::stringstream &message,
         openAuctionCommunication.decodeRequest(message);
         std::string aid = receiver._database->createAuction(
             openAuctionCommunication._uid, openAuctionCommunication._password,
-            openAuctionCommunication._name, openAuctionCommunication._startValue,
+            openAuctionCommunication._name,
+            openAuctionCommunication._startValue,
             openAuctionCommunication._timeActive,
             openAuctionCommunication._fileName,
             openAuctionCommunication._fileData);
         openAuctionCommunication._status = "OK";
         openAuctionCommunication._aid = aid;
-    }
-    catch (LoginException const &e) {
+    } catch (LoginException const &e) {
         openAuctionCommunication._status = "NLG";
     } catch (AidException const &e) {
         openAuctionCommunication._status = "NOK";

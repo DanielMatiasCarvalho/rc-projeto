@@ -163,8 +163,9 @@ std::string Database::generateAid() {
 }
 
 std::string Database::createAuction(std::string uid, std::string password,
-                             std::string name, int startValue,
-                             time_t timeActive, std::string fileName, std::stringstream &file) {
+                                    std::string name, int startValue,
+                                    time_t timeActive, std::string fileName,
+                                    std::stringstream &file) {
     lock();
 
     if (!checkLoggedIn(uid, password)) {
