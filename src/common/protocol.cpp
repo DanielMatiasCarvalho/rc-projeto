@@ -10,14 +10,23 @@ char ProtocolCommunication::readChar(std::stringstream &message) {
     return c;
 }
 
-void ProtocolCommunication::readChar(std::stringstream &message,
-                                     char expected) {
+char ProtocolCommunication::readChar(MessageSource &message) {
+    char c = (char)message.get();
+
+    if (!message.good()) {
+        throw ProtocolViolationException();
+    }
+
+    return c;
+}
+
+void ProtocolCommunication::readChar(MessageSource &message, char expected) {
     if (readChar(message) != expected) {
         throw ProtocolViolationException();
     }
 }
 
-char ProtocolCommunication::readChar(std::stringstream &message,
+char ProtocolCommunication::readChar(MessageSource &message,
                                      std::vector<char> options) {
     char c = readChar(message);
 
@@ -30,21 +39,21 @@ char ProtocolCommunication::readChar(std::stringstream &message,
     throw ProtocolViolationException();
 }
 
-void ProtocolCommunication::readDelimiter(std::stringstream &message) {
+void ProtocolCommunication::readDelimiter(MessageSource &message) {
     readChar(message, PROTOCOL_MESSAGE_DELIMITER);
 }
 
-void ProtocolCommunication::readSpace(std::stringstream &message) {
+void ProtocolCommunication::readSpace(MessageSource &message) {
     readChar(message, ' ');
 }
 
-std::string ProtocolCommunication::readString(std::stringstream &message) {
+std::string ProtocolCommunication::readString(MessageSource &message) {
     // To read an arbitrarily sized string, just read a string with a limit of
     // size equal to the maximum possible.
     return readString(message, std::string::npos);
 }
 
-std::string ProtocolCommunication::readString(std::stringstream &message,
+std::string ProtocolCommunication::readString(MessageSource &message,
                                               size_t n) {
     std::string result;
 
@@ -66,7 +75,7 @@ std::string ProtocolCommunication::readString(std::stringstream &message,
     return result;
 }
 
-void ProtocolCommunication::readString(std::stringstream &message,
+void ProtocolCommunication::readString(MessageSource &message,
                                        std::string expected) {
     if (readString(message) != expected) {
         throw ProtocolViolationException();
@@ -74,7 +83,7 @@ void ProtocolCommunication::readString(std::stringstream &message,
 }
 
 std::string ProtocolCommunication::readString(
-    std::stringstream &message, std::vector<std::string> options) {
+    MessageSource &message, std::vector<std::string> options) {
     std::string string = readString(message);
 
     for (auto option : options) {
@@ -86,7 +95,7 @@ std::string ProtocolCommunication::readString(
     throw ProtocolViolationException();
 }
 
-int ProtocolCommunication::readNumber(std::stringstream &message) {
+int ProtocolCommunication::readNumber(MessageSource &message) {
     std::string string = readString(message);
 
     // Check if string only contains digits
@@ -97,7 +106,7 @@ int ProtocolCommunication::readNumber(std::stringstream &message) {
     return stoi(string);
 }
 
-std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
+std::time_t ProtocolCommunication::readDateTime(MessageSource &message) {
     std::stringstream stream;
     std::string aux;
 
@@ -138,7 +147,7 @@ std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
 
     stream >> std::get_time(&tm, "%Y-%m-%d%n%H:%M:%S");
 
-    if (!message) {
+    if (!message.good()) {
         throw ProtocolViolationException();
     }
 
@@ -147,7 +156,7 @@ std::time_t ProtocolCommunication::readDateTime(std::stringstream &message) {
     return time;
 }
 
-std::string ProtocolCommunication::readUid(std::stringstream &message) {
+std::string ProtocolCommunication::readUid(MessageSource &message) {
     std::string uid = readString(message, PROTOCOL_UID_SIZE);
 
     if (!isNumeric(uid) || uid.length() != PROTOCOL_UID_SIZE) {
@@ -157,7 +166,7 @@ std::string ProtocolCommunication::readUid(std::stringstream &message) {
     return uid;
 }
 
-std::string ProtocolCommunication::readPassword(std::stringstream &message) {
+std::string ProtocolCommunication::readPassword(MessageSource &message) {
     std::string password = readString(message, PROTOCOL_PASSWORD_SIZE);
 
     if (!isAlphaNumeric(password) ||
@@ -168,7 +177,7 @@ std::string ProtocolCommunication::readPassword(std::stringstream &message) {
     return password;
 }
 
-std::string ProtocolCommunication::readAid(std::stringstream &message) {
+std::string ProtocolCommunication::readAid(MessageSource &message) {
     std::string aid = readString(message, PROTOCOL_AID_SIZE);
 
     if (!isAlphaNumeric(aid) || aid.length() != PROTOCOL_AID_SIZE) {
@@ -178,7 +187,7 @@ std::string ProtocolCommunication::readAid(std::stringstream &message) {
     return aid;
 }
 
-void ProtocolCommunication::readIdentifier(std::stringstream &message,
+void ProtocolCommunication::readIdentifier(MessageSource &message,
                                            std::string identifier) {
     std::string identifierRecieved = readString(message, 3);
 
@@ -271,7 +280,7 @@ std::stringstream LoginCommunication::encodeRequest() {
     return message;
 }
 
-void LoginCommunication::decodeRequest(std::stringstream &message) {
+void LoginCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "LIN");
 
     readSpace(message);
@@ -296,7 +305,7 @@ std::stringstream LoginCommunication::encodeResponse() {
     return message;
 }
 
-void LoginCommunication::decodeResponse(std::stringstream &message) {
+void LoginCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RLI");
     readSpace(message);
     _status = readString(message, {"OK", "NOK", "REG"});
@@ -320,7 +329,7 @@ std::stringstream LogoutCommunication::encodeRequest() {
     return message;
 }
 
-void LogoutCommunication::decodeRequest(std::stringstream &message) {
+void LogoutCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "LOU");
 
     readSpace(message);
@@ -345,7 +354,7 @@ std::stringstream LogoutCommunication::encodeResponse() {
     return message;
 }
 
-void LogoutCommunication::decodeResponse(std::stringstream &message) {
+void LogoutCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RLO");
     readSpace(message);
     _status = readString(message, {"OK", "NOK", "REG"});
@@ -369,7 +378,7 @@ std::stringstream UnregisterCommunication::encodeRequest() {
     return message;
 }
 
-void UnregisterCommunication::decodeRequest(std::stringstream &message) {
+void UnregisterCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "UNR");
 
     readSpace(message);
@@ -394,7 +403,7 @@ std::stringstream UnregisterCommunication::encodeResponse() {
     return message;
 }
 
-void UnregisterCommunication::decodeResponse(std::stringstream &message) {
+void UnregisterCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RUR");
     readSpace(message);
     _status = readString(message, {"OK", "NOK", "UNR"});
@@ -414,7 +423,7 @@ std::stringstream ListUserAuctionsCommunication::encodeRequest() {
     return message;
 }
 
-void ListUserAuctionsCommunication::decodeRequest(std::stringstream &message) {
+void ListUserAuctionsCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "LMA");
 
     readSpace(message);
@@ -447,7 +456,7 @@ std::stringstream ListUserAuctionsCommunication::encodeResponse() {
     return message;
 }
 
-void ListUserAuctionsCommunication::decodeResponse(std::stringstream &message) {
+void ListUserAuctionsCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RMA");
 
     readSpace(message);
@@ -490,7 +499,7 @@ std::stringstream ListUserBidsCommunication::encodeRequest() {
     return message;
 }
 
-void ListUserBidsCommunication::decodeRequest(std::stringstream &message) {
+void ListUserBidsCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "LMB");
 
     readSpace(message);
@@ -524,7 +533,7 @@ std::stringstream ListUserBidsCommunication::encodeResponse() {
     return message;
 }
 
-void ListUserBidsCommunication::decodeResponse(std::stringstream &message) {
+void ListUserBidsCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RMB");
 
     readSpace(message);
@@ -564,7 +573,7 @@ std::stringstream ListAllAuctionsCommunication::encodeRequest() {
     return message;
 }
 
-void ListAllAuctionsCommunication::decodeRequest(std::stringstream &message) {
+void ListAllAuctionsCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "LST");
 
     readDelimiter(message);
@@ -593,7 +602,7 @@ std::stringstream ListAllAuctionsCommunication::encodeResponse() {
     return message;
 }
 
-void ListAllAuctionsCommunication::decodeResponse(std::stringstream &message) {
+void ListAllAuctionsCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RLS");
 
     readSpace(message);
@@ -636,7 +645,7 @@ std::stringstream ShowRecordCommunication::encodeRequest() {
     return message;
 }
 
-void ShowRecordCommunication::decodeRequest(std::stringstream &message) {
+void ShowRecordCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "SRC");
 
     readSpace(message);
@@ -733,7 +742,7 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
     return message;
 }
 
-void ShowRecordCommunication::decodeResponse(std::stringstream &message) {
+void ShowRecordCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RRC");
 
     readSpace(message);
@@ -876,7 +885,7 @@ std::stringstream OpenAuctionCommunication::encodeRequest() {
     return message;
 }
 
-void OpenAuctionCommunication::decodeRequest(std::stringstream &message) {
+void OpenAuctionCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "OPA");
 
     readSpace(message);
@@ -937,7 +946,7 @@ std::stringstream OpenAuctionCommunication::encodeResponse() {
     return message;
 }
 
-void OpenAuctionCommunication::decodeResponse(std::stringstream &message) {
+void OpenAuctionCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "ROA");
 
     readSpace(message);
@@ -975,7 +984,7 @@ std::stringstream CloseAuctionCommunication::encodeRequest() {
     return message;
 }
 
-void CloseAuctionCommunication::decodeRequest(std::stringstream &message) {
+void CloseAuctionCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "CLS");
 
     readSpace(message);
@@ -1007,7 +1016,7 @@ std::stringstream CloseAuctionCommunication::encodeResponse() {
     return message;
 }
 
-void CloseAuctionCommunication::decodeResponse(std::stringstream &message) {
+void CloseAuctionCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RCL");
 
     readSpace(message);
@@ -1031,7 +1040,7 @@ std::stringstream ShowAssetCommunication::encodeRequest() {
     return message;
 }
 
-void ShowAssetCommunication::decodeRequest(std::stringstream &message) {
+void ShowAssetCommunication::decodeRequest(MessageSource &message) {
     // readIdentifier(message, "SAS");
 
     readSpace(message);
@@ -1080,7 +1089,7 @@ std::stringstream ShowAssetCommunication::encodeResponse() {
     return message;
 }
 
-void ShowAssetCommunication::decodeResponse(std::stringstream &message) {
+void ShowAssetCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RSA");
 
     readSpace(message);
@@ -1138,7 +1147,7 @@ std::stringstream BidCommunication::encodeRequest() {
     return message;
 }
 
-void BidCommunication::decodeRequest(std::stringstream &message) {
+void BidCommunication::decodeRequest(MessageSource &message) {
     readString(message, "BID");
 
     readSpace(message);
@@ -1174,7 +1183,7 @@ std::stringstream BidCommunication::encodeResponse() {
     return message;
 }
 
-void BidCommunication::decodeResponse(std::stringstream &message) {
+void BidCommunication::decodeResponse(MessageSource &message) {
     readIdentifier(message, "RBD");
 
     readSpace(message);

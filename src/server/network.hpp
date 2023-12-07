@@ -93,17 +93,15 @@ class TcpServer {
  * @brief Represents a TCP session that can send and receive data over the network.
  */
 class TcpSession {
-  private:
-    int _fd;
-
   public:
+    int _fd;
     /**
      * @brief Constructs a TcpSession object with the specified file descriptor, addres info hints and res.
      * @param _fd The file descriptor.
      * @param _hints The address info hints.
      * @param _res The address info res.
      */
-    TcpSession(int fd) : _fd(fd){};
+    TcpSession(int fd);
 
     /**
      * @brief Destroys the TcpSession object and closes the socket.

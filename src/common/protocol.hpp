@@ -1,7 +1,9 @@
 #ifndef __PROTOCOL_HPP__
 #define __PROTOCOL_HPP__
 
+#include <unistd.h>
 #include <ctime>
+#include <deque>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -40,6 +42,65 @@ class ProtocolViolationException : public ProtocolException {};
  */
 class ProtocolMessageErrorException : public ProtocolException {};
 
+class MessageSource {
+  public:
+    virtual char get() = 0;
+    virtual bool good() = 0;
+    virtual void unget() = 0;
+};
+
+class StreamMessage : public MessageSource {
+  private:
+    std::stringstream &_stream;
+
+  public:
+    StreamMessage(std::stringstream &stream) : _stream(stream){};
+
+    char get() { return (char)_stream.get(); };
+
+    bool good() { return _stream.good(); };
+
+    void unget() { _stream.unget(); };
+};
+
+class TcpMessage : public MessageSource {
+  private:
+    int _fd;
+    std::deque<char> _buffer;
+    char _last;
+
+  public:
+    TcpMessage(int fd) : _fd(fd){};
+
+    void fillBuffer() {
+        char buf[128];
+
+        ssize_t n = read(_fd, buf, 128);
+
+        if (n == -1) {
+            throw ProtocolException();
+        }
+
+        for (int i = 0; i < n; i++) {
+            _buffer.push_back(buf[i]);
+        }
+    }
+
+    char get() {
+        if (_buffer.size() == 0) {
+            fillBuffer();
+        }
+
+        _last = _buffer.front();
+        _buffer.pop_front();
+        return _last;
+    };
+
+    bool good() { return true; };
+
+    void unget() { _buffer.push_front(_last); };
+};
+
 /**
  * @brief The ProtocolCommunication class is an abstract base class that defines the interface for communication protocols.
  * 
@@ -52,27 +113,28 @@ class ProtocolCommunication {
 
     // Methods that encode/decode the message content into/from a string stream.
     virtual std::stringstream encodeRequest() = 0;
-    virtual void decodeRequest(std::stringstream &message) = 0;
+    virtual void decodeRequest(MessageSource &message) = 0;
     virtual std::stringstream encodeResponse() = 0;
-    virtual void decodeResponse(std::stringstream &message) = 0;
+    virtual void decodeResponse(MessageSource &message) = 0;
 
     // General purpose methods to allow parsing and encoding.
     char readChar(std::stringstream &message);
-    void readChar(std::stringstream &message, char expected);
-    char readChar(std::stringstream &message, std::vector<char> options);
-    void readDelimiter(std::stringstream &message);
-    void readSpace(std::stringstream &message);
-    std::string readString(std::stringstream &message);
-    std::string readString(std::stringstream &message, size_t n);
-    void readString(std::stringstream &message, std::string expected);
-    std::string readString(std::stringstream &message,
+    char readChar(MessageSource &message);
+    void readChar(MessageSource &message, char expected);
+    char readChar(MessageSource &message, std::vector<char> options);
+    void readDelimiter(MessageSource &message);
+    void readSpace(MessageSource &message);
+    std::string readString(MessageSource &message);
+    std::string readString(MessageSource &message, size_t n);
+    void readString(MessageSource &message, std::string expected);
+    std::string readString(MessageSource &message,
                            std::vector<std::string> options);
-    int readNumber(std::stringstream &message);
-    std::time_t readDateTime(std::stringstream &message);
-    std::string readUid(std::stringstream &message);
-    std::string readPassword(std::stringstream &message);
-    std::string readAid(std::stringstream &message);
-    void readIdentifier(std::stringstream &message, std::string identifier);
+    int readNumber(MessageSource &message);
+    std::time_t readDateTime(MessageSource &message);
+    std::string readUid(MessageSource &message);
+    std::string readPassword(MessageSource &message);
+    std::string readAid(MessageSource &message);
+    void readIdentifier(MessageSource &message, std::string identifier);
 
     void writeChar(std::stringstream &message, char c);
     void writeDelimiter(std::stringstream &message);
@@ -114,7 +176,7 @@ class LoginCommunication : public ProtocolCommunication {
      * 
      * @param message The stringstream containing the login request.
      */
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
 
     /**
      * @brief Encodes the login response into a stringstream.
@@ -128,7 +190,7 @@ class LoginCommunication : public ProtocolCommunication {
      * 
      * @param message The stringstream containing the login response.
      */
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     /**
      * @brief Checks if the communication is using TCP.
@@ -148,9 +210,9 @@ class LogoutCommunication : public ProtocolCommunication {
     std::string _status;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return false; };
 };
@@ -165,9 +227,9 @@ class UnregisterCommunication : public ProtocolCommunication {
     std::string _status;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return false; };
 };
@@ -182,9 +244,9 @@ class ListUserAuctionsCommunication : public ProtocolCommunication {
     std::map<std::string, std::string> _auctions;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return false; };
 };
@@ -199,9 +261,9 @@ class ListUserBidsCommunication : public ProtocolCommunication {
     std::map<std::string, std::string> _bids;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return false; };
 };
@@ -215,9 +277,9 @@ class ListAllAuctionsCommunication : public ProtocolCommunication {
     std::map<std::string, std::string> _auctions;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return false; };
 };
@@ -249,9 +311,9 @@ class ShowRecordCommunication : public ProtocolCommunication {
     int _endSecTime;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return false; };
 };
@@ -273,9 +335,9 @@ class OpenAuctionCommunication : public ProtocolCommunication {
     std::string _aid;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return true; };
 };
@@ -291,9 +353,9 @@ class CloseAuctionCommunication : public ProtocolCommunication {
     std::string _status;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return true; };
 };
@@ -310,9 +372,9 @@ class ShowAssetCommunication : public ProtocolCommunication {
     std::stringstream _fileData;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return true; };
 };
@@ -329,9 +391,9 @@ class BidCommunication : public ProtocolCommunication {
     std::string _status;
 
     std::stringstream encodeRequest();
-    void decodeRequest(std::stringstream &message);
+    void decodeRequest(MessageSource &message);
     std::stringstream encodeResponse();
-    void decodeResponse(std::stringstream &message);
+    void decodeResponse(MessageSource &message);
 
     bool isTcp() { return true; };
 };

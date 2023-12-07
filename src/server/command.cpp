@@ -19,7 +19,7 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
  * @param message The stringstream containing the command message.
  * @param receiver The Server object that receives the command.
  */
-void CommandManager::readCommand(std::stringstream &message,
+void CommandManager::readCommand(MessageSource &message,
                                  std::stringstream &response,
                                  Server &receiver) {
     std::string code;
@@ -46,8 +46,8 @@ void CommandManager::readCommand(std::stringstream &message,
         receiver);  //Executes the command on the correct handler
 }
 
-void LoginCommand::handle(std::stringstream &message,
-                          std::stringstream &response, Server &receiver) {
+void LoginCommand::handle(MessageSource &message, std::stringstream &response,
+                          Server &receiver) {
 
     LoginCommunication loginCommunication;
     try {
@@ -67,8 +67,8 @@ void LoginCommand::handle(std::stringstream &message,
     response = loginCommunication.encodeResponse();
 }
 
-void LogoutCommand::handle(std::stringstream &message,
-                           std::stringstream &response, Server &receiver) {
+void LogoutCommand::handle(MessageSource &message, std::stringstream &response,
+                           Server &receiver) {
     LogoutCommunication logoutCommunication;
     try {
         logoutCommunication.decodeRequest(message);
@@ -85,7 +85,7 @@ void LogoutCommand::handle(std::stringstream &message,
     response = logoutCommunication.encodeResponse();
 }
 
-void UnregisterCommand::handle(std::stringstream &message,
+void UnregisterCommand::handle(MessageSource &message,
                                std::stringstream &response, Server &receiver) {
     UnregisterCommunication unregisterCommunication;
     try {
@@ -103,7 +103,7 @@ void UnregisterCommand::handle(std::stringstream &message,
     response = unregisterCommunication.encodeResponse();
 }
 
-void ListUserAuctionsCommand::handle(std::stringstream &message,
+void ListUserAuctionsCommand::handle(MessageSource &message,
                                      std::stringstream &response,
                                      Server &receiver) {
 
@@ -126,7 +126,7 @@ void ListUserAuctionsCommand::handle(std::stringstream &message,
     response = listUserAuctionsCommunication.encodeResponse();
 }
 
-void ListUserBidsCommand::handle(std::stringstream &message,
+void ListUserBidsCommand::handle(MessageSource &message,
                                  std::stringstream &response,
                                  Server &receiver) {
 
@@ -148,7 +148,7 @@ void ListUserBidsCommand::handle(std::stringstream &message,
     response = listUserBidsCommunication.encodeResponse();
 }
 
-void ListAllAuctionsCommand::handle(std::stringstream &message,
+void ListAllAuctionsCommand::handle(MessageSource &message,
                                     std::stringstream &response,
                                     Server &receiver) {
     ListAllAuctionsCommunication listAllAuctionsCommunication;
@@ -167,15 +167,15 @@ void ListAllAuctionsCommand::handle(std::stringstream &message,
     response = listAllAuctionsCommunication.encodeResponse();
 }
 
-void ShowRecordCommand::handle(std::stringstream &message,
+void ShowRecordCommand::handle(MessageSource &message,
                                std::stringstream &response, Server &receiver) {
     (void)receiver;
     (void)message;
     (void)response;
 }
 
-void OpenCommand::handle(std::stringstream &message,
-                         std::stringstream &response, Server &receiver) {
+void OpenCommand::handle(MessageSource &message, std::stringstream &response,
+                         Server &receiver) {
     OpenAuctionCommunication openAuctionCommunication;
 
     try {
@@ -200,21 +200,21 @@ void OpenCommand::handle(std::stringstream &message,
     response = openAuctionCommunication.encodeResponse();
 }
 
-void CloseCommand::handle(std::stringstream &message,
-                          std::stringstream &response, Server &receiver) {
+void CloseCommand::handle(MessageSource &message, std::stringstream &response,
+                          Server &receiver) {
     (void)receiver;
     (void)message;
     (void)response;
 }
 
-void ShowAssetCommand::handle(std::stringstream &message,
+void ShowAssetCommand::handle(MessageSource &message,
                               std::stringstream &response, Server &receiver) {
     (void)receiver;
     (void)message;
     (void)response;
 }
 
-void BidCommand::handle(std::stringstream &message, std::stringstream &response,
+void BidCommand::handle(MessageSource &message, std::stringstream &response,
                         Server &receiver) {
     (void)receiver;
     (void)message;

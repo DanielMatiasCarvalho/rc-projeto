@@ -107,6 +107,17 @@ int TcpServer::acceptConnection() {
     return clientFd;
 }
 
+TcpSession::TcpSession(int fd) {
+    _fd = fd;
+
+    struct timeval read_timeout;
+    read_timeout.tv_sec = 5;
+    read_timeout.tv_usec = 0;
+
+    setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout,
+               sizeof(read_timeout));
+}
+
 void TcpSession::send(std::stringstream &message) {
     char messageBuffer[SOCKETS_TCP_BUFFER_SIZE];
 
@@ -136,19 +147,13 @@ std::stringstream TcpSession::receive() {
     while (n != 0) {
         message.write(messageBuffer, n);
 
-        bool found = false;
-        for (int i = 0; i < n; i++) {
-            if (messageBuffer[i] == '\n') {
-                found = true;
-                break;
-            }
-        }
-        if (found)
-            return message;
-
         n = read(_fd, messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
 
         if (n == -1) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK ||
+                errno == EINPROGRESS) {
+                break;
+            }
             throw SocketException();
         }
     }
