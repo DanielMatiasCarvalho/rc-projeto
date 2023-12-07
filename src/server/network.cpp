@@ -39,7 +39,7 @@ void UdpServer::send(std::stringstream &message) {
         throw SocketException();
     }
 
-    if (sendto(_fd, messageBuffer, (size_t)n, 0, (sockaddr *)_client,
+    if (sendto(_fd, messageBuffer, (size_t)n, 0, (struct sockaddr *)&_client,
                _clientSize) != n) {
         throw SocketException();
     }
@@ -49,7 +49,7 @@ std::stringstream UdpServer::receive() {
     char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1];
     ssize_t n =
         recvfrom(_fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1, 0,
-                 (struct sockaddr *)_client, &_clientSize);
+                 (struct sockaddr *)&_client, &_clientSize);
 
     if (n > SOCKETS_MAX_DATAGRAM_SIZE_SERVER) {
         throw SocketException();
