@@ -63,6 +63,7 @@ CXXFLAGS += -Wundef
 CXXFLAGS += -Wunreachable-code
 CXXFLAGS += -Wunused
 LDFLAGS += -pthread
+LDFLAGS += -lreadline
 
 
 .PHONY: all clean fmt fmt-check package
