@@ -38,6 +38,9 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<BidCommand>());
     manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
+    server._database->loginUser("100293", "12345678");
+    server._database->createAuction("100293", "12345678", "Teste", 10000, 3600);
+
     if ((pid = fork()) == -1) {
         exit(1);
     } else if (pid == 0) {

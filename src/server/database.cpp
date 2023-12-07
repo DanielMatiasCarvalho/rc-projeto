@@ -16,6 +16,7 @@ bool Database::loginUser(std::string uid, std::string password) {
 
     if (!_core->isUserRegistered(uid)) {
         _core->registerUser(uid, password);
+        _core->setLoggedIn(uid);
         unlock();
         return true;
     }
@@ -147,6 +148,44 @@ std::map<std::string, std::string> Database::getUserBids(std::string uid) {
     unlock();
 
     return auctionsMap;
+}
+
+std::string Database::generateAid() {
+    std::vector<std::string> auctions = _core->getAllAuctions();
+
+    if (auctions.size() == 0) {
+        return "001";
+    }
+
+    std::string last = auctions.back();
+
+    return AidIntToStr(AidStrToInt(last) + 1);
+}
+
+void Database::createAuction(std::string uid, std::string password,
+                             std::string name, int startValue,
+                             time_t timeActive) {
+    lock();
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    std::string aid = generateAid();
+
+    AuctionStartInfo info;
+    info.uid = uid;
+    info.name = name;
+    info.startValue = startValue;
+    info.timeActive = timeActive;
+    info.startTime = time(NULL);
+
+    _core->createAuction(aid, info);
+
+    _core->addUserHostedAuction(uid, aid);
+
+    unlock();
 }
 
 void Database::lock() {
@@ -477,7 +516,7 @@ std::vector<std::string> DatabaseCore::getUserBids(std::string uid) {
     return bids;
 }
 
-void DatabaseCore::createAuction(std::string aid, std::string startInfo) {
+void DatabaseCore::createAuction(std::string aid, AuctionStartInfo &startInfo) {
     guaranteeBaseStructure();
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -496,11 +535,15 @@ void DatabaseCore::createAuction(std::string aid, std::string startInfo) {
 
     fs::create_directory(filePath);
 
-    fs::path fileStartedPath = filePath / ("START_" + aid);
+    fs::path fileStartedPath = auctionPath / ("START_" + aid);
 
     std::ofstream fileStarted(fileStartedPath);
 
-    fileStarted << startInfo;
+    fileStarted << startInfo.uid << std::endl;
+    fileStarted << startInfo.name << std::endl;
+    fileStarted << startInfo.startValue << std::endl;
+    fileStarted << startInfo.startTime << std::endl;
+    fileStarted << startInfo.timeActive << std::endl;
 }
 
 bool DatabaseCore::auctionExists(std::string aid) {
@@ -627,4 +670,22 @@ void DatabaseLock::lock() {
 void DatabaseLock::unlock() {
     // Unlock the semaphore
     sem_post(_lock);
+}
+
+int AidStrToInt(std::string aid) {
+    if (aid.length() != 3) {
+        throw AidException();
+    }
+
+    return stoi(aid);
+}
+
+std::string AidIntToStr(int aid) {
+    if (aid < 0 || aid > 999) {
+        throw AidException();
+    }
+
+    char aidStr[4];
+    sprintf(aidStr, "%03d", aid);
+    return std::string(aidStr);
 }
