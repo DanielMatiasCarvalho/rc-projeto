@@ -893,6 +893,10 @@ void OpenAuctionCommunication::decodeRequest(std::stringstream &message) {
 
     readSpace(message);
 
+    _startValue = readNumber(message);
+
+    readSpace(message);
+
     _timeActive = readNumber(message);
 
     readSpace(message);
@@ -924,9 +928,8 @@ std::stringstream OpenAuctionCommunication::encodeResponse() {
     writeString(message, _status);
 
     if (_status == "OK") {
+        writeSpace(message);
         writeAid(message, _aid);
-
-        writeString(message, _aid);
     }
 
     writeDelimiter(message);

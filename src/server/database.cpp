@@ -162,9 +162,9 @@ std::string Database::generateAid() {
     return AidIntToStr(AidStrToInt(last) + 1);
 }
 
-void Database::createAuction(std::string uid, std::string password,
+std::string Database::createAuction(std::string uid, std::string password,
                              std::string name, int startValue,
-                             time_t timeActive) {
+                             time_t timeActive, std::string fileName, std::stringstream &file) {
     lock();
 
     if (!checkLoggedIn(uid, password)) {
@@ -175,6 +175,7 @@ void Database::createAuction(std::string uid, std::string password,
     std::string aid = generateAid();
 
     AuctionStartInfo info;
+
     info.uid = uid;
     info.name = name;
     info.startValue = startValue;
@@ -185,7 +186,14 @@ void Database::createAuction(std::string uid, std::string password,
 
     _core->addUserHostedAuction(uid, aid);
 
+    _core->getAuctionFilePath(aid);
+
+    std::ofstream auctionFile(_core->getAuctionFilePath(aid) / fileName);
+
+    auctionFile << file.rdbuf();
+
     unlock();
+    return aid;
 }
 
 void Database::lock() {
@@ -556,7 +564,7 @@ bool DatabaseCore::auctionExists(std::string aid) {
     return exists;
 }
 
-std::string DatabaseCore::getAuctionStartInfo(std::string aid) {
+AuctionStartInfo DatabaseCore::getAuctionStartInfo(std::string aid) {
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -569,9 +577,13 @@ std::string DatabaseCore::getAuctionStartInfo(std::string aid) {
 
     std::ifstream fileStarted(fileStartedPath);
 
-    std::string startInfo;
+    AuctionStartInfo startInfo;
 
-    std::getline(fileStarted, startInfo);
+    fileStarted >> startInfo.uid;
+    fileStarted >> startInfo.name;
+    fileStarted >> startInfo.startValue;
+    fileStarted >> startInfo.startTime;
+    fileStarted >> startInfo.timeActive;
 
     return startInfo;
 }

@@ -126,6 +126,7 @@ std::stringstream TcpClient::receive() {
 
     while (n != 0) {
         message.write(messageBuffer, n);
+
         n = read(_fd, messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
 
         if (n == -1) {

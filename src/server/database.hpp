@@ -97,7 +97,7 @@ class DatabaseCore {
 
     void createAuction(std::string aid, AuctionStartInfo &startInfo);
     bool auctionExists(std::string aid);
-    std::string getAuctionStartInfo(std::string aid);
+    AuctionStartInfo getAuctionStartInfo(std::string aid);
     void endAuction(std::string aid, std::string endInfo);
     bool hasAuctionEnded(std::string aid);
     std::string getAuctionEndInfo(std::string aid);
@@ -129,9 +129,9 @@ class Database {
     std::map<std::string, std::string> getUserBids(std::string uid);
 
     std::string generateAid();
-    void createAuction(std::string uid, std::string password,
+    std::string createAuction(std::string uid, std::string password,
                              std::string name, int startValue,
-                             time_t timeActive);
+                             time_t timeActive, std::string fileName, std::stringstream &file);
 };
 
 class DatabaseException : public std::runtime_error {

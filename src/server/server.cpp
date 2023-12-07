@@ -38,9 +38,6 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<BidCommand>());
     manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
-    server._database->loginUser("100293", "12345678");
-    server._database->createAuction("100293", "12345678", "Teste", 10000, 3600);
-
     if ((pid = fork()) == -1) {
         exit(1);
     } else if (pid == 0) {
@@ -117,14 +114,18 @@ void TCPServer(CommandManager &manager, Server &server) {
     TcpServer TCPserver(server.getPort());
     while (1) {
         TcpSession session(TCPserver.acceptConnection());
+        std::cout << "TCP server accepted connection" << std::endl;
         pid_t pid;
         if ((pid = fork()) == -1) {
             exit(1);
         } else if (pid == 0) {
             std::stringstream message = session.receive();
             std::stringstream response;
+            std::cout << "Received" << std::endl;
             manager.readCommand(message, response, server);
+            std::cout << "Processed" << std::endl;
             session.send(response);
+            std::cout << "Sent" << std::endl;
             exit(0);
         }
     }

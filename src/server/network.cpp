@@ -135,6 +135,16 @@ std::stringstream TcpSession::receive() {
 
     while (n != 0) {
         message.write(messageBuffer, n);
+
+        bool found = false;
+        for (int i = 0; i < n; i++) {
+            if (messageBuffer[i] == '\n') {
+                found = true;
+                break;
+            }
+        }
+        if (found) return message;
+
         n = read(_fd, messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
 
         if (n == -1) {
