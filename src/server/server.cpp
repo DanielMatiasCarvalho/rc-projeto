@@ -103,9 +103,9 @@ void UDPServer(CommandManager &manager, Server &server) {
     UdpServer UDPserver(server.getPort());
     while (1) {
         std::stringstream message = UDPserver.receive();
-        std::cout << "UDP server received message" << std::endl;
+        StreamMessage streamMessage(message);
         std::stringstream response;
-        manager.readCommand(message, response, server);
+        manager.readCommand(streamMessage, response, server);
         UDPserver.send(response);
     }
 }
@@ -118,7 +118,7 @@ void TCPServer(CommandManager &manager, Server &server) {
         if ((pid = fork()) == -1) {
             exit(1);
         } else if (pid == 0) {
-            std::stringstream message = session.receive();
+            TcpMessage message(session._fd);
             std::stringstream response;
             manager.readCommand(message, response, server);
             session.send(response);

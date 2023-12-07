@@ -98,7 +98,8 @@ void Client::processRequest(ProtocolCommunication &comm) {
         resMessage = udpClient.receive();
     }
 
-    comm.decodeResponse(resMessage);
+    StreamMessage resStreamMessage(resMessage);
+    comm.decodeResponse(resStreamMessage);
 }
 
 void Client::writeFile(std::string fName, std::stringstream &content) {

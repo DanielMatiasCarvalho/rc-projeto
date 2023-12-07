@@ -52,6 +52,24 @@ class DatabaseLock {
     void unlock();
 };
 
+struct AuctionStartInfo {
+    std::string uid;
+    std::string name;
+    int startValue;
+    time_t startTime;
+    time_t timeActive;
+};
+
+struct AuctionEndInfo {
+    time_t endTime;
+};
+
+struct AuctionBidInfo {
+    std::string uid;
+    int bidValue;
+    time_t bidTime;
+};
+
 class DatabaseCore {
   private:
     std::unique_ptr<fs::path> _path;
@@ -76,9 +94,9 @@ class DatabaseCore {
     void addUserHostedAuction(std::string uid, std::string aid);
     std::vector<std::string> getUserHostedAuctions(std::string uid);
 
-    void createAuction(std::string aid, std::string startInfo);
+    void createAuction(std::string aid, AuctionStartInfo &startInfo);
     bool auctionExists(std::string aid);
-    std::string getAuctionStartInfo(std::string aid);
+    AuctionStartInfo getAuctionStartInfo(std::string aid);
     void endAuction(std::string aid, std::string endInfo);
     bool hasAuctionEnded(std::string aid);
     std::string getAuctionEndInfo(std::string aid);
@@ -89,10 +107,10 @@ class DatabaseCore {
 
 class Database {
   private:
-    std::unique_ptr<DatabaseCore> _core;
     std::unique_ptr<DatabaseLock> _lock;
 
   public:
+    std::unique_ptr<DatabaseCore> _core;
     Database(std::string path);
 
     void lock();
@@ -108,24 +126,12 @@ class Database {
     std::map<std::string, std::string> getAllAuctions();
     std::map<std::string, std::string> getUserAuctions(std::string uid);
     std::map<std::string, std::string> getUserBids(std::string uid);
-};
 
-struct AuctionStartInfo {
-    std::string uid;
-    std::string name;
-    int startValue;
-    time_t startTime;
-    time_t timeActive;
-};
-
-struct AuctionEndInfo {
-    time_t endTime;
-};
-
-struct AuctionBidInfo {
-    std::string uid;
-    int bidValue;
-    time_t bidTime;
+    std::string generateAid();
+    std::string createAuction(std::string uid, std::string password,
+                              std::string name, int startValue,
+                              time_t timeActive, std::string fileName,
+                              std::stringstream &file);
 };
 
 class DatabaseException : public std::runtime_error {
@@ -142,5 +148,14 @@ class UnregisteredException : public DatabaseException {
   public:
     UnregisteredException() : DatabaseException("User is not registered") {}
 };
+
+class AidException : public DatabaseException {
+  public:
+    AidException() : DatabaseException("Auction ID unavaillable.") {}
+};
+
+int AidStrToInt(std::string aid);
+
+std::string AidIntToStr(int aid);
 
 #endif
