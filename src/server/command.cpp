@@ -52,17 +52,13 @@ void LoginCommand::handle(std::stringstream &message,
     LoginCommunication loginCommunication;
     try {
         loginCommunication.decodeRequest(message);
-        if (receiver._database->checkLoggedIn(loginCommunication._uid,
-                                              loginCommunication._password)) {
-            loginCommunication._status = "OK";
-        } else {
+
             if (!receiver._database->loginUser(loginCommunication._uid,
                                                loginCommunication._password)) {
                 loginCommunication._status = "OK";
             } else {
                 loginCommunication._status = "REG";
             }
-        }
     } catch (LoginException const &e) {
         loginCommunication._status = "NOK";
     } catch (ProtocolException const &e) {
