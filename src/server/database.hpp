@@ -110,6 +110,24 @@ class Database {
     std::map<std::string, std::string> getUserBids(std::string uid);
 };
 
+struct AuctionStartInfo {
+    std::string uid;
+    std::string name;
+    int startValue;
+    time_t startTime;
+    time_t timeActive;
+};
+
+struct AuctionEndInfo {
+    time_t endTime;
+};
+
+struct AuctionBidInfo {
+    std::string uid;
+    int bidValue;
+    time_t bidTime;
+};
+
 class DatabaseException : public std::runtime_error {
   public:
     DatabaseException(std::string message) : std::runtime_error(message) {}
