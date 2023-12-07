@@ -62,12 +62,10 @@ CXXFLAGS += -Wswitch-enum
 CXXFLAGS += -Wundef
 CXXFLAGS += -Wunreachable-code
 CXXFLAGS += -Wunused
-CXXFLAGS += -lreadline
 LDFLAGS += -pthread
-LDFLAGS += -lreadline
+LDLIBS += -lreadline
 
-
-.PHONY: all clean fmt fmt-check package
+.PHONY: all clean fmt fmt-check
 
 all: $(TARGET_EXECS)
 
