@@ -8,42 +8,33 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
     }
 }
 
-void CommandManager::readCommand(Client &receiver) {
-    std::cout << "> ";
-
-    std::string line;
-    std::getline(std::cin, line);
-
-    if (std::cin.eof()) {
-        return;
-    }
-
-    if (line.length() == 0) {
+void CommandManager::readCommand(std::string command, Client &receiver) {
+    if (command.length() == 0) {
         return;
     }
 
     std::string name;
     std::vector<std::string> args;
 
-    auto position = line.find(" ");
+    auto position = command.find(" ");
 
     if (position == std::string::npos) {
-        name = line;
-        line = "";
+        name = command;
+        command = "";
     } else {
-        name = line.substr(0, position);
-        line.erase(0, position + 1);
+        name = command.substr(0, position);
+        command.erase(0, position + 1);
     }
 
-    position = line.find(" ");
+    position = command.find(" ");
     while (position != std::string::npos) {
-        args.push_back(line.substr(0, position));
-        line.erase(0, position + 1);
-        position = line.find(" ");
+        args.push_back(command.substr(0, position));
+        command.erase(0, position + 1);
+        position = command.find(" ");
     }
 
-    if (line.length() != 0) {
-        args.push_back(line);
+    if (command.length() != 0) {
+        args.push_back(command);
     }
 
     auto handler = this->handlers.find(name);
