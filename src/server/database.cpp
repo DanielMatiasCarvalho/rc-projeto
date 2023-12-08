@@ -197,6 +197,63 @@ std::string Database::createAuction(std::string uid, std::string password,
     return aid;
 }
 
+int Database::getAuctionCurrentMaxValue(std::string aid) {
+    std::vector<AuctionBidInfo> bids = _core->getAuctionBids(aid);
+
+    if (bids.size() == 0) {
+        return _core->getAuctionStartInfo(aid).startValue;
+    }
+
+    return bids.back().bidValue;
+}
+
+std::string Database::getAuctionOwner(std::string aid) {
+    AuctionStartInfo info = _core->getAuctionStartInfo(aid);
+
+    return info.uid;
+}
+
+void Database::bidAuction(std::string uid, std::string password, std::string aid, int value) {
+    lock();
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    if (_core->hasAuctionEnded(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    if (value <= getAuctionCurrentMaxValue(aid)) {
+        unlock();
+        throw BidValueException();
+    }
+
+    if (getAuctionOwner(aid) == uid) {
+        unlock();
+        throw AuctionOwnerException();
+    }
+
+    AuctionBidInfo bidInfo;
+
+    bidInfo.uid = uid;
+    bidInfo.bidValue = value;
+    bidInfo.bidTime = time(NULL);
+
+    _core->addUserBid(uid, aid);
+
+    _core->addAuctionBid(aid, bidInfo);
+
+    unlock();
+}
+
 void Database::lock() {
     _lock->lock();
 }
@@ -501,13 +558,13 @@ void DatabaseCore::addUserBid(std::string uid, std::string aid) {
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
-    fs::path userHostedPath = *_path / "USERS" / uid / "BIDDED" / aid;
+    fs::path userBidPath = *_path / "USERS" / uid / "BIDDED" / aid;
 
-    if (fs::exists(userHostedPath)) {
-        throw DatabaseException("Bid is already registered on user.");
+    if (fs::exists(userBidPath)) {
+        return;
     }
 
-    fs::create_symlink(auctionPath, userHostedPath);
+    fs::create_symlink(auctionPath, userBidPath);
 }
 
 std::vector<std::string> DatabaseCore::getUserBids(std::string uid) {
@@ -553,6 +610,48 @@ void DatabaseCore::createAuction(std::string aid, AuctionStartInfo &startInfo) {
     fileStarted << startInfo.startValue << std::endl;
     fileStarted << startInfo.startTime << std::endl;
     fileStarted << startInfo.timeActive << std::endl;
+}
+
+AuctionBidInfo DatabaseCore::getAuctionBidInfo(std::string aid, std::string value) {
+    guaranteeAuctionStructure(aid);
+
+    fs::path bidPath = *_path / "AUCTIONS" / aid / "BIDS" / value;
+
+    if (!fs::exists(bidPath)) {
+        throw DatabaseException("Bid does not exist");
+    }
+
+    std::ifstream bidFile(bidPath);
+
+    AuctionBidInfo bidInfo;
+
+    bidFile >> bidInfo.uid;
+    bidFile >> bidInfo.bidValue;
+    bidFile >> bidInfo.bidTime;
+
+    return bidInfo;
+}
+
+std::vector<AuctionBidInfo> DatabaseCore::getAuctionBids(std::string aid) {
+    guaranteeAuctionStructure(aid);
+
+    fs::path bidsPath = *_path / "AUCTIONS" / aid / "BIDS";
+
+    std::vector<std::string> bidsStr;
+
+    for (auto &bid : fs::directory_iterator(bidsPath)) {
+        bidsStr.push_back(bid.path().filename().string());
+    }
+
+    std::sort(bidsStr.begin(), bidsStr.end());
+
+    std::vector<AuctionBidInfo> bids;
+
+    for (auto &bid : bidsStr) {
+        bids.push_back(getAuctionBidInfo(aid, bid));
+    }
+
+    return bids;
 }
 
 bool DatabaseCore::auctionExists(std::string aid) {
@@ -662,6 +761,22 @@ std::vector<std::string> DatabaseCore::getAllAuctions() {
     return auctions;
 }
 
+void DatabaseCore::addAuctionBid(std::string aid, AuctionBidInfo &bidInfo) {
+    guaranteeAuctionStructure(aid);
+
+    fs::path bidPath = *_path / "AUCTIONS" / aid / "BIDS" / BidValueToString(bidInfo.bidValue);
+
+    if (fs::exists(bidPath)) {
+        throw DatabaseException("Bid already exists");
+    }
+
+    std::ofstream bidFile(bidPath);
+
+    bidFile << bidInfo.uid << std::endl;
+    bidFile << bidInfo.bidValue << std::endl;
+    bidFile << bidInfo.bidTime << std::endl;
+}
+
 DatabaseLock::DatabaseLock(std::string name) {
     // Unlink the semaphore if it already exists, to guarantee that the initialized value is correct
     sem_unlink(name.c_str());
@@ -686,7 +801,7 @@ void DatabaseLock::unlock() {
 }
 
 int AidStrToInt(std::string aid) {
-    if (aid.length() != 3) {
+    if (aid.length() != 3 || !isNumeric(aid)) {
         throw AidException();
     }
 
@@ -701,4 +816,22 @@ std::string AidIntToStr(int aid) {
     char aidStr[4];
     sprintf(aidStr, "%03d", aid);
     return std::string(aidStr);
+}
+
+int BidValueToInt(std::string bidValue) {
+    if (bidValue.length() != 6 || !isNumeric(bidValue)) {
+        throw BidValueException();
+    }
+
+    return stoi(bidValue);
+}
+
+std::string BidValueToString(int bidValue) {
+    if (bidValue < 0 || bidValue > 999999) {
+        throw BidValueException();
+    }
+
+    char bidValueStr[7];
+    sprintf(bidValueStr, "%06d", bidValue);
+    return std::string(bidValueStr);
 }
