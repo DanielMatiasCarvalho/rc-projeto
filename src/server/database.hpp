@@ -6,9 +6,9 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 #include <fcntl.h>
 #include <semaphore.h>
@@ -140,7 +140,10 @@ class Database {
                               std::stringstream &file);
     int getAuctionCurrentMaxValue(std::string aid);
     std::string getAuctionOwner(std::string aid);
-    void bidAuction(std::string uid, std::string password, std::string aid, int value);
+    void bidAuction(std::string uid, std::string password, std::string aid,
+                    int value);
+    int getAuctionAsset(std::string aid, std::string &fileName,
+                        std::stringstream &file);
 };
 
 class DatabaseException : public std::runtime_error {
@@ -175,9 +178,10 @@ class AuctionException : public DatabaseException {
 
 class AuctionOwnerException : public DatabaseException {
   public:
-    AuctionOwnerException() : DatabaseException("This user is unnable to do this action to this auction.") {}
+    AuctionOwnerException()
+        : DatabaseException(
+              "This user is unnable to do this action to this auction.") {}
 };
-
 
 int AidStrToInt(std::string aid);
 

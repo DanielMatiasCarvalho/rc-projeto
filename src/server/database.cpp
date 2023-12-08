@@ -213,7 +213,8 @@ std::string Database::getAuctionOwner(std::string aid) {
     return info.uid;
 }
 
-void Database::bidAuction(std::string uid, std::string password, std::string aid, int value) {
+void Database::bidAuction(std::string uid, std::string password,
+                          std::string aid, int value) {
     lock();
 
     if (!checkLoggedIn(uid, password)) {
@@ -252,6 +253,33 @@ void Database::bidAuction(std::string uid, std::string password, std::string aid
     _core->addAuctionBid(aid, bidInfo);
 
     unlock();
+}
+
+int Database::getAuctionAsset(std::string aid, std::string &fileName,
+                              std::stringstream &file) {
+    lock();
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    if (fs::is_empty(_core->getAuctionFilePath(aid))) {
+        unlock();
+        throw AuctionException();
+    }
+
+    int size = 0;
+    for (auto x : fs::directory_iterator(_core->getAuctionFilePath(aid))) {
+        fileName = x.path().filename().string();
+        std::ifstream auctionFile(x.path());
+        file << auctionFile.rdbuf();
+        size = (int)fs::file_size(x.path());
+        break;
+    }
+
+    unlock();
+    return size;
 }
 
 void Database::lock() {
@@ -612,7 +640,8 @@ void DatabaseCore::createAuction(std::string aid, AuctionStartInfo &startInfo) {
     fileStarted << startInfo.timeActive << std::endl;
 }
 
-AuctionBidInfo DatabaseCore::getAuctionBidInfo(std::string aid, std::string value) {
+AuctionBidInfo DatabaseCore::getAuctionBidInfo(std::string aid,
+                                               std::string value) {
     guaranteeAuctionStructure(aid);
 
     fs::path bidPath = *_path / "AUCTIONS" / aid / "BIDS" / value;
@@ -764,7 +793,8 @@ std::vector<std::string> DatabaseCore::getAllAuctions() {
 void DatabaseCore::addAuctionBid(std::string aid, AuctionBidInfo &bidInfo) {
     guaranteeAuctionStructure(aid);
 
-    fs::path bidPath = *_path / "AUCTIONS" / aid / "BIDS" / BidValueToString(bidInfo.bidValue);
+    fs::path bidPath =
+        *_path / "AUCTIONS" / aid / "BIDS" / BidValueToString(bidInfo.bidValue);
 
     if (fs::exists(bidPath)) {
         throw DatabaseException("Bid already exists");
