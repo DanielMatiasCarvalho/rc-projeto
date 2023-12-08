@@ -6,11 +6,14 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
 #include <fcntl.h>
 #include <semaphore.h>
+
+#include "utils.hpp"
 
 namespace fs = std::filesystem;
 
@@ -101,6 +104,9 @@ class DatabaseCore {
     bool hasAuctionEnded(std::string aid);
     std::string getAuctionEndInfo(std::string aid);
     fs::path getAuctionFilePath(std::string aid);
+    AuctionBidInfo getAuctionBidInfo(std::string aid, std::string value);
+    std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
+    void addAuctionBid(std::string aid, AuctionBidInfo &bidInfo);
 
     std::vector<std::string> getAllAuctions();
 };
@@ -132,6 +138,12 @@ class Database {
                               std::string name, int startValue,
                               time_t timeActive, std::string fileName,
                               std::stringstream &file);
+    int getAuctionCurrentMaxValue(std::string aid);
+    std::string getAuctionOwner(std::string aid);
+    void bidAuction(std::string uid, std::string password, std::string aid,
+                    int value);
+    int getAuctionAsset(std::string aid, std::string &fileName,
+                        std::stringstream &file);
 };
 
 class DatabaseException : public std::runtime_error {
@@ -154,8 +166,29 @@ class AidException : public DatabaseException {
     AidException() : DatabaseException("Auction ID unavaillable.") {}
 };
 
+class BidValueException : public DatabaseException {
+  public:
+    BidValueException() : DatabaseException("Bid value is invalid.") {}
+};
+
+class AuctionException : public DatabaseException {
+  public:
+    AuctionException() : DatabaseException("Auction does not exist.") {}
+};
+
+class AuctionOwnerException : public DatabaseException {
+  public:
+    AuctionOwnerException()
+        : DatabaseException(
+              "This user is unnable to do this action to this auction.") {}
+};
+
 int AidStrToInt(std::string aid);
 
 std::string AidIntToStr(int aid);
+
+int BidValueToInt(std::string bidValue);
+
+std::string BidValueToString(int bidValue);
 
 #endif
