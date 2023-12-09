@@ -100,9 +100,9 @@ class DatabaseCore {
     void createAuction(std::string aid, AuctionStartInfo &startInfo);
     bool auctionExists(std::string aid);
     AuctionStartInfo getAuctionStartInfo(std::string aid);
-    void endAuction(std::string aid, std::string endInfo);
+    void endAuction(std::string aid, AuctionEndInfo endInfo);
     bool hasAuctionEnded(std::string aid);
-    std::string getAuctionEndInfo(std::string aid);
+    AuctionEndInfo getAuctionEndInfo(std::string aid);
     fs::path getAuctionFilePath(std::string aid);
     AuctionBidInfo getAuctionBidInfo(std::string aid, std::string value);
     std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
@@ -144,6 +144,11 @@ class Database {
                     int value);
     int getAuctionAsset(std::string aid, std::string &fileName,
                         std::stringstream &file);
+
+    void closeAuction(std::string uid, std::string password, std::string aid);
+    AuctionStartInfo getAuctionStartInfo(std::string aid);
+    std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
+    AuctionEndInfo getAuctionEndInfo(std::string aid);
 };
 
 class DatabaseException : public std::runtime_error {
@@ -181,6 +186,11 @@ class AuctionOwnerException : public DatabaseException {
     AuctionOwnerException()
         : DatabaseException(
               "This user is unnable to do this action to this auction.") {}
+};
+
+class AuctionEndedException : public DatabaseException {
+  public:
+    AuctionEndedException() : DatabaseException("Auction has ended.") {}
 };
 
 int AidStrToInt(std::string aid);
