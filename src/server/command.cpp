@@ -211,8 +211,6 @@ void ShowRecordCommand::handle(MessageSource &message,
         showRecordCommunication._status = "OK";
     } catch (AuctionException const &e) {
         showRecordCommunication._status = "NOK";
-    } catch (AuctionEndedException const &e) {
-        //Nothing is done here, because the auction has not ended
     } catch (ProtocolException const &e) {
         showRecordCommunication._status = "ERR";
     }
@@ -248,7 +246,7 @@ void OpenCommand::handle(MessageSource &message, std::stringstream &response,
 void CloseCommand::handle(MessageSource &message, std::stringstream &response,
                           Server &receiver) {
     CloseAuctionCommunication closeAuctionCommunication;
-    try {  //NOK STATUS PARA PASSE ERRADA
+    try {
         closeAuctionCommunication.decodeRequest(message);
         receiver._database->closeAuction(closeAuctionCommunication._uid,
                                          closeAuctionCommunication._password,
@@ -257,7 +255,7 @@ void CloseCommand::handle(MessageSource &message, std::stringstream &response,
     } catch (LoginException const &e) {
         closeAuctionCommunication._status = "NLG";
     } catch (AuctionException const &e) {
-        closeAuctionCommunication._status = "NOK";
+        closeAuctionCommunication._status = "EAU";
     } catch (AuctionEndedException const &e) {
         closeAuctionCommunication._status = "END";
     } catch (AuctionOwnerException const &e) {
