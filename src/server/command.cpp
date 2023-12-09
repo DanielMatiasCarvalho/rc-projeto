@@ -169,9 +169,6 @@ void ListAllAuctionsCommand::handle(MessageSource &message,
 
 void ShowRecordCommand::handle(MessageSource &message,
                                std::stringstream &response, Server &receiver) {
-    (void)receiver;
-    (void)message;
-    (void)response;
     ShowRecordCommunication showRecordCommunication;
     try {
         showRecordCommunication.decodeRequest(message);
@@ -182,7 +179,7 @@ void ShowRecordCommand::handle(MessageSource &message,
         showRecordCommunication._hostUid = auctionStartInfo.uid;
         showRecordCommunication._auctionName = auctionStartInfo.name;
         showRecordCommunication._startValue = auctionStartInfo.startValue;
-        //showRecordCommunication._timeActive = auctionStartInfo.timeActive;
+        showRecordCommunication._timeActive = (int) auctionStartInfo.timeActive;
         //showRecordCommunication._assetFName = auctionStartInfo.fileName;
         showRecordCommunication._startDateTime = auctionStartInfo.startTime;
 
@@ -194,20 +191,22 @@ void ShowRecordCommand::handle(MessageSource &message,
             showRecordCommunication._bidderUids.push_back(c.uid);
             showRecordCommunication._bidValues.push_back(c.bidValue);
             showRecordCommunication._bidDateTime.push_back(c.bidTime);
-            //showRecordCommunication._bidSecTimes.push_back(c.bidSecTime);
+            int bidSecTime = (int) difftime(c.bidTime, auctionStartInfo.startTime);
+            showRecordCommunication._bidSecTimes.push_back(bidSecTime);
         }
         AuctionEndInfo auctionEndInfo =
             receiver._database->getAuctionEndInfo(
                 showRecordCommunication._aid);
         showRecordCommunication._hasEnded = true;
         showRecordCommunication._endDateTime = auctionEndInfo.endTime;
-        //showRecordCommunication._endSecTime = auctionEndInfo.endSecTime;
+        int endSecTime = (int) difftime(auctionEndInfo.endTime, auctionStartInfo.startTime);
+        showRecordCommunication._endSecTime = endSecTime;
 
         showRecordCommunication._status = "OK";
     } catch (AuctionException const &e) {
         showRecordCommunication._status = "NOK";
     } catch (AuctionEndedException const &e) {
-        //Nothing is done here, because the auction is ended
+        //Nothing is done here, because the auction has not ended
     } catch (ProtocolException const &e) {
         showRecordCommunication._status = "ERR";
     }
