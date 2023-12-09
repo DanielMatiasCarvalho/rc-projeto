@@ -172,6 +172,46 @@ void ShowRecordCommand::handle(MessageSource &message,
     (void)receiver;
     (void)message;
     (void)response;
+    ShowRecordCommunication showRecordCommunication;
+    try {
+        showRecordCommunication.decodeRequest(message);
+        AuctionStartInfo auctionStartInfo =
+            receiver._database->getAuctionStartInfo(
+                showRecordCommunication._aid);
+        
+        showRecordCommunication._hostUid = auctionStartInfo.uid;
+        showRecordCommunication._auctionName = auctionStartInfo.name;
+        showRecordCommunication._startValue = auctionStartInfo.startValue;
+        //showRecordCommunication._timeActive = auctionStartInfo.timeActive;
+        //showRecordCommunication._assetFName = auctionStartInfo.fileName;
+        showRecordCommunication._startDateTime = auctionStartInfo.startTime;
+
+        std::vector<AuctionBidInfo> auctionBidInfo =
+            receiver._database->getAuctionBids(
+                showRecordCommunication._aid);
+        
+        for (auto c: auctionBidInfo){
+            showRecordCommunication._bidderUids.push_back(c.uid);
+            showRecordCommunication._bidValues.push_back(c.bidValue);
+            showRecordCommunication._bidDateTime.push_back(c.bidTime);
+            //showRecordCommunication._bidSecTimes.push_back(c.bidSecTime);
+        }
+        AuctionEndInfo auctionEndInfo =
+            receiver._database->getAuctionEndInfo(
+                showRecordCommunication._aid);
+        showRecordCommunication._hasEnded = true;
+        showRecordCommunication._endDateTime = auctionEndInfo.endTime;
+        //showRecordCommunication._endSecTime = auctionEndInfo.endSecTime;
+
+        showRecordCommunication._status = "OK";
+    } catch (AuctionException const &e) {
+        showRecordCommunication._status = "NOK";
+    } catch (AuctionEndedException const &e) {
+        //Nothing is done here, because the auction is ended
+    } catch (ProtocolException const &e) {
+        showRecordCommunication._status = "ERR";
+    }
+    response = showRecordCommunication.encodeResponse();
 }
 
 void OpenCommand::handle(MessageSource &message, std::stringstream &response,
@@ -202,21 +242,67 @@ void OpenCommand::handle(MessageSource &message, std::stringstream &response,
 
 void CloseCommand::handle(MessageSource &message, std::stringstream &response,
                           Server &receiver) {
-    (void)receiver;
-    (void)message;
-    (void)response;
+    CloseAuctionCommunication closeAuctionCommunication;
+    try { //NOK STATUS PARA PASSE ERRADA
+        closeAuctionCommunication.decodeRequest(message);
+        receiver._database->closeAuction(closeAuctionCommunication._uid,
+                                          closeAuctionCommunication._password,
+                                          closeAuctionCommunication._aid);
+        closeAuctionCommunication._status = "OK";
+    } catch (LoginException const &e) {
+        closeAuctionCommunication._status = "NLG";
+    } catch (AuctionException const &e) {
+        closeAuctionCommunication._status = "NOK";
+    } catch (AuctionEndedException const &e) {
+        closeAuctionCommunication._status = "END";
+    } catch (AuctionOwnerException const &e) {
+        closeAuctionCommunication._status = "EOW";
+    } catch (ProtocolException const &e) {
+        closeAuctionCommunication._status = "ERR";
+    }
+    response = closeAuctionCommunication.encodeResponse();
 }
 
 void ShowAssetCommand::handle(MessageSource &message,
                               std::stringstream &response, Server &receiver) {
-    (void)receiver;
-    (void)message;
-    (void)response;
+    ShowAssetCommunication showAssetCommunication;
+    try {
+        showAssetCommunication.decodeRequest(message);
+        showAssetCommunication._fileSize =
+            receiver._database->getAuctionAsset(showAssetCommunication._aid,
+                                                showAssetCommunication._fileName,
+                                                showAssetCommunication._fileData);
+        showAssetCommunication._status = "OK";
+    } catch (AuctionException const &e) {
+        showAssetCommunication._status = "NOK";
+    } catch (ProtocolException const &e) {
+        showAssetCommunication._status = "ERR";
+    }
+    response = showAssetCommunication.encodeResponse();
 }
 
 void BidCommand::handle(MessageSource &message, std::stringstream &response,
                         Server &receiver) {
-    (void)receiver;
-    (void)message;
-    (void)response;
+    BidCommunication bidCommunication;
+    try {
+        bidCommunication.decodeRequest(message);
+        receiver._database->bidAuction(bidCommunication._uid,
+                                       bidCommunication._password,
+                                       bidCommunication._aid,
+                                       bidCommunication._value);
+        bidCommunication._status = "ACC";
+    } catch (LoginException const &e) {
+        bidCommunication._status = "NLG";
+    } catch (AuctionException const &e) {
+        bidCommunication._status = "NOK";
+    } catch (AuctionEndedException const &e) {
+        bidCommunication._status = "NOK";
+    } catch (BidValueException const &e) {
+        bidCommunication._status = "REF";
+    } catch (AuctionOwnerException const &e) {
+        bidCommunication._status = "ILG";
+    } catch (ProtocolException const &e) {
+        bidCommunication._status = "ERR";
+    }
+    response = bidCommunication.encodeResponse();
 }
