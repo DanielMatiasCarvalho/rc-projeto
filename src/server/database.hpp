@@ -104,6 +104,7 @@ class DatabaseCore {
     bool hasAuctionEnded(std::string aid);
     AuctionEndInfo getAuctionEndInfo(std::string aid);
     fs::path getAuctionFilePath(std::string aid);
+    std::string getAuctionFileName(std::string aid);
     AuctionBidInfo getAuctionBidInfo(std::string aid, std::string value);
     std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
     void addAuctionBid(std::string aid, AuctionBidInfo &bidInfo);
@@ -144,11 +145,12 @@ class Database {
                     int value);
     int getAuctionAsset(std::string aid, std::string &fileName,
                         std::stringstream &file);
-
+    std::string getAssetName(std::string aid);
     void closeAuction(std::string uid, std::string password, std::string aid);
     AuctionStartInfo getAuctionStartInfo(std::string aid);
     std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
     AuctionEndInfo getAuctionEndInfo(std::string aid);
+    bool hasAuctionEnded(std::string aid);
 };
 
 class DatabaseException : public std::runtime_error {

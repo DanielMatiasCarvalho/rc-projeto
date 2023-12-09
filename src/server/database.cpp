@@ -269,17 +269,27 @@ int Database::getAuctionAsset(std::string aid, std::string &fileName,
         throw AuctionException();
     }
 
-    int size = 0;
-    for (auto x : fs::directory_iterator(_core->getAuctionFilePath(aid))) {
-        fileName = x.path().filename().string();
-        std::ifstream auctionFile(x.path());
-        file << auctionFile.rdbuf();
-        size = (int)fs::file_size(x.path());
-        break;
-    }
+    fileName = _core->getAuctionFileName(aid);
+    std::ifstream auctionAsset(_core->getAuctionFilePath(aid) / fileName);
+    file << auctionAsset.rdbuf();
+    int size = (int)fs::file_size(_core->getAuctionFilePath(aid) / fileName);
 
     unlock();
     return size;
+}
+
+std::string Database::getAssetName(std::string aid) {
+    lock();
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    std::string name = _core->getAuctionFileName(aid);
+
+    unlock();
+    return name;
 }
 
 void Database::closeAuction(std::string uid, std::string password,
@@ -359,6 +369,20 @@ AuctionEndInfo Database::getAuctionEndInfo(std::string aid) {
 
     unlock();
     return info;
+}
+
+bool Database::hasAuctionEnded(std::string aid) {
+    lock();
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    bool res = _core->hasAuctionEnded(aid);
+
+    unlock();
+    return res;
 }
 
 void Database::lock() {
@@ -852,6 +876,23 @@ fs::path DatabaseCore::getAuctionFilePath(std::string aid) {
     fs::path filePath = auctionPath / "FILE";
 
     return filePath;
+}
+
+std::string DatabaseCore::getAuctionFileName(std::string aid) {
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path filePath = auctionPath / "FILE";
+
+    std::string fileName;
+
+    for (auto &file : fs::directory_iterator(filePath)) {
+        fileName = file.path().filename().string();
+        break;
+    }
+
+    return fileName;
 }
 
 std::vector<std::string> DatabaseCore::getAllAuctions() {
