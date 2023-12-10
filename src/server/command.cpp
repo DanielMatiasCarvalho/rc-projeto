@@ -65,6 +65,8 @@ void LoginCommand::handle(MessageSource &message, std::stringstream &response,
         loginCommunication._status = "ERR";
     }
     response = loginCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        loginCommunication._uid, "Login", loginCommunication._status));
 }
 
 void LogoutCommand::handle(MessageSource &message, std::stringstream &response,
@@ -83,6 +85,8 @@ void LogoutCommand::handle(MessageSource &message, std::stringstream &response,
         logoutCommunication._status = "ERR";
     }
     response = logoutCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        logoutCommunication._uid, "Logout", logoutCommunication._status));
 }
 
 void UnregisterCommand::handle(MessageSource &message,
@@ -101,6 +105,9 @@ void UnregisterCommand::handle(MessageSource &message,
         unregisterCommunication._status = "ERR";
     }
     response = unregisterCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        unregisterCommunication._uid, "Unregister",
+        unregisterCommunication._status));
 }
 
 void ListUserAuctionsCommand::handle(MessageSource &message,
@@ -124,6 +131,9 @@ void ListUserAuctionsCommand::handle(MessageSource &message,
         listUserAuctionsCommunication._status = "ERR";
     }
     response = listUserAuctionsCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        listUserAuctionsCommunication._uid, "List User Auctions",
+        listUserAuctionsCommunication._status));
 }
 
 void ListUserBidsCommand::handle(MessageSource &message,
@@ -146,6 +156,9 @@ void ListUserBidsCommand::handle(MessageSource &message,
         listUserBidsCommunication._status = "ERR";
     }
     response = listUserBidsCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        listUserBidsCommunication._uid, "List User Bids",
+        listUserBidsCommunication._status));
 }
 
 void ListAllAuctionsCommand::handle(MessageSource &message,
@@ -165,6 +178,8 @@ void ListAllAuctionsCommand::handle(MessageSource &message,
         listAllAuctionsCommunication._status = "ERR";
     }
     response = listAllAuctionsCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        "List Auctions", listAllAuctionsCommunication._status));
 }
 
 void ShowRecordCommand::handle(MessageSource &message,
@@ -215,6 +230,8 @@ void ShowRecordCommand::handle(MessageSource &message,
         showRecordCommunication._status = "ERR";
     }
     response = showRecordCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        "Show Record", showRecordCommunication._status));
 }
 
 void OpenCommand::handle(MessageSource &message, std::stringstream &response,
@@ -241,6 +258,9 @@ void OpenCommand::handle(MessageSource &message, std::stringstream &response,
     }
 
     response = openAuctionCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        openAuctionCommunication._uid, "Open Auction",
+        openAuctionCommunication._status));
 }
 
 void CloseCommand::handle(MessageSource &message, std::stringstream &response,
@@ -264,6 +284,9 @@ void CloseCommand::handle(MessageSource &message, std::stringstream &response,
         closeAuctionCommunication._status = "ERR";
     }
     response = closeAuctionCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        closeAuctionCommunication._uid, "Close Auction",
+        closeAuctionCommunication._status));
 }
 
 void ShowAssetCommand::handle(MessageSource &message,
@@ -281,6 +304,8 @@ void ShowAssetCommand::handle(MessageSource &message,
         showAssetCommunication._status = "ERR";
     }
     response = showAssetCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        "Show Asset", showAssetCommunication._status));
 }
 
 void BidCommand::handle(MessageSource &message, std::stringstream &response,
@@ -306,4 +331,6 @@ void BidCommand::handle(MessageSource &message, std::stringstream &response,
         bidCommunication._status = "ERR";
     }
     response = bidCommunication.encodeResponse();
+    receiver.showMessage(Message::ServerRequestDetails(
+        bidCommunication._uid, "Bid", bidCommunication._status));
 }

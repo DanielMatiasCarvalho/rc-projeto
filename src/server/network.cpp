@@ -62,6 +62,16 @@ std::stringstream UdpServer::receive() {
     return message;
 }
 
+std::string UdpServer::getClientIP() {
+    char ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &_client.sin_addr, ip, INET_ADDRSTRLEN);
+    return std::string(ip);
+}
+
+std::string UdpServer::getClientPort() {
+    return std::to_string(ntohs(_client.sin_port));
+}
+
 TcpServer::TcpServer(std::string port) {
     _fd = socket(AF_INET, SOCK_STREAM, 0);
     if (_fd == -1) {
@@ -97,8 +107,16 @@ TcpServer::~TcpServer() {
     close(_fd);
 }
 
-int TcpServer::acceptConnection() {
-    int clientFd = accept(_fd, NULL, NULL);
+int TcpServer::acceptConnection(struct sockaddr_in &client,
+                                socklen_t &clientSize) {
+    sockaddr_in clientAddress;
+    socklen_t clientAddressSize;
+
+    int clientFd =
+        accept(_fd, (struct sockaddr *)&clientAddress, &clientAddressSize);
+
+    client = clientAddress;
+    clientSize = clientAddressSize;
 
     if (clientFd == -1) {
         throw SocketException();
@@ -107,8 +125,11 @@ int TcpServer::acceptConnection() {
     return clientFd;
 }
 
-TcpSession::TcpSession(int fd) {
+TcpSession::TcpSession(int fd, struct sockaddr_in client,
+                       socklen_t clientSize) {
     _fd = fd;
+    _client = client;
+    _clientSize = clientSize;
 
     struct timeval read_timeout;
     read_timeout.tv_sec = 5;
@@ -163,4 +184,14 @@ std::stringstream TcpSession::receive() {
 
 TcpSession::~TcpSession() {
     close(_fd);
+}
+
+std::string TcpSession::getClientIP() {
+    char ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &_client.sin_addr, ip, INET_ADDRSTRLEN);
+    return std::string(ip);
+}
+
+std::string TcpSession::getClientPort() {
+    return std::to_string(ntohs(_client.sin_port));
 }

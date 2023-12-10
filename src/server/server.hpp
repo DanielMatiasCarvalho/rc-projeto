@@ -40,10 +40,10 @@ class Server {
     void showMessage(std::string message);
 
     /**
- * @brief Get the port number.
- * 
- * @return std::string The port number.
- */
+      * @brief Get the port number.
+      * 
+      * @return std::string The port number.
+      */
     std::string getPort() { return _port; }
 };
 #endif
