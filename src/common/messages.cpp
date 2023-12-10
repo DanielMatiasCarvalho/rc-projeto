@@ -151,3 +151,19 @@ void Message::ShowRecordBids(vector<string> bidderUids, vector<int> bidValues,
     }
     cout << "---------------------" << endl;
 }
+
+std::string Message::ServerRequestDetails(std::string uid,
+                                          std::string requestType,
+                                          std::string resultType) {
+    return "From: " + uid + " Request: " + requestType +
+           " Result: " + resultType;
+}
+
+std::string Message::ServerRequestDetails(std::string requestType,
+                                          std::string resultType) {
+    return "Request: " + requestType + " Result: " + resultType;
+}
+
+std::string Message::ServerConnectionDetails(std::string ip, std::string port, std::string protocol) {
+    return "Request received from: " + ip + ":" + port + " (" + protocol + ")";
+}

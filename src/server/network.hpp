@@ -55,6 +55,10 @@ class UdpServer {
      * @return The received message as a stringstream.
      */
     std::stringstream receive();
+
+    std::string getClientIP();
+
+    std::string getClientPort();
 };
 
 /**
@@ -85,7 +89,7 @@ class TcpServer {
      * This function is responsible for accepting incoming connections from clients.
      * It should be called in a loop to continuously accept new connections.
      */
-    int acceptConnection();
+    int acceptConnection(struct sockaddr_in &client, socklen_t &clientSize);
 };
 
 /**
@@ -93,6 +97,10 @@ class TcpServer {
  * @brief Represents a TCP session that can send and receive data over the network.
  */
 class TcpSession {
+  private:
+    struct sockaddr_in _client;
+    socklen_t _clientSize = sizeof(_client);
+
   public:
     int _fd;
     /**
@@ -101,7 +109,7 @@ class TcpSession {
      * @param _hints The address info hints.
      * @param _res The address info res.
      */
-    TcpSession(int fd);
+    TcpSession(int fd, struct sockaddr_in client, socklen_t clientSize);
 
     /**
      * @brief Destroys the TcpSession object and closes the socket.
@@ -119,6 +127,10 @@ class TcpSession {
      * @return The received message as a stringstream.
      */
     std::stringstream receive();
+
+    std::string getClientIP();
+
+    std::string getClientPort();
 };
 
 /**

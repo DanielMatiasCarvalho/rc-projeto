@@ -38,13 +38,15 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<BidCommand>());
     manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
+    server.showMessage("Listening on port " + server.getPort());
+
     if ((pid = fork()) == -1) {
         exit(1);
     } else if (pid == 0) {
-        std::cout << "UDP server started" << std::endl;
+        server.showMessage("UDP server started");
         UDPServer(manager, server);
     } else {
-        std::cout << "TCP server started" << std::endl;
+        server.showMessage("TCP server started");
         TCPServer(manager, server);
     }
 
@@ -95,29 +97,41 @@ void Server::ShowInfo() {
  * @param message The message to be displayed.
  */
 void Server::showMessage(std::string message) {
-    if (_verbose)
-        std::cout << message << std::endl;
+    if (_verbose) {
+        std::cout << "[LOG] " << message << std::endl;
+    }
 }
 
 void UDPServer(CommandManager &manager, Server &server) {
-    UdpServer UDPserver(server.getPort());
+    UdpServer udpServer(server.getPort());
     while (1) {
-        std::stringstream message = UDPserver.receive();
+        std::stringstream message = udpServer.receive();
+        server.showMessage(Message::ServerConnectionDetails(udpServer.getClientIP(),
+                                                            udpServer.getClientPort(),
+                                                            "UDP"));
         StreamMessage streamMessage(message);
         std::stringstream response;
         manager.readCommand(streamMessage, response, server);
-        UDPserver.send(response);
+        udpServer.send(response);
     }
 }
 
 void TCPServer(CommandManager &manager, Server &server) {
-    TcpServer TCPserver(server.getPort());
+    TcpServer tcpServer(server.getPort());
     while (1) {
-        TcpSession session(TCPserver.acceptConnection());
+        struct sockaddr_in client;
+        socklen_t clientSize;
+        int fd = tcpServer.acceptConnection(client, clientSize);
+
+        TcpSession session(fd, client, clientSize);
+
         pid_t pid;
         if ((pid = fork()) == -1) {
             exit(1);
         } else if (pid == 0) {
+            server.showMessage(Message::ServerConnectionDetails(session.getClientIP(),
+                                                    session.getClientPort(),
+                                                    "TCP"));
             TcpMessage message(session._fd);
             std::stringstream response;
             manager.readCommand(message, response, server);

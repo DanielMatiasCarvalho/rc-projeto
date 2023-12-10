@@ -188,6 +188,15 @@ class Message {
                                std::vector<int> bidValues,
                                std::vector<std::time_t> bidDateTime,
                                std::vector<int> bidSecTimes);
+
+    static std::string ServerRequestDetails(std::string uid,
+                                            std::string requestType,
+                                            std::string resultType);
+    static std::string ServerRequestDetails(std::string requestType,
+                                            std::string resultType);
+
+    static std::string ServerConnectionDetails(std::string ip, std::string port,
+                                               std::string protocol);
 };
 
 #endif

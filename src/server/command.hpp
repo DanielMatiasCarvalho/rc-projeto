@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include "config.hpp"
+#include "messages.hpp"
 #include "protocol.hpp"
 #include "server.hpp"
 
