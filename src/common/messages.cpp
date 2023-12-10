@@ -164,6 +164,7 @@ std::string Message::ServerRequestDetails(std::string requestType,
     return "Request: " + requestType + " Result: " + resultType;
 }
 
-std::string Message::ServerConnectionDetails(std::string ip, std::string port, std::string protocol) {
+std::string Message::ServerConnectionDetails(std::string ip, std::string port,
+                                             std::string protocol) {
     return "Request received from: " + ip + ":" + port + " (" + protocol + ")";
 }
