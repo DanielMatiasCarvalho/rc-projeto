@@ -10,6 +10,7 @@ bool Database::loginUser(std::string uid, std::string password) {
 
     if (!_core->userExists(uid)) {
         _core->createUser(uid, password);
+        _core->setLoggedIn(uid);
         unlock();
         return true;
     }
