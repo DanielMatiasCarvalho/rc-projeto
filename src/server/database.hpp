@@ -126,6 +126,7 @@ class Database {
     bool loginUser(std::string uid, std::string password);
     void logoutUser(std::string uid, std::string password);
     void unregisterUser(std::string uid, std::string password);
+    void handleAutoClosing(std::string uid);
 
     bool checkLoggedIn(std::string uid, std::string password);
     bool checkUserRegistered(std::string uid);

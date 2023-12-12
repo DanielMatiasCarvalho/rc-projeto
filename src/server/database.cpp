@@ -67,6 +67,20 @@ void Database::unregisterUser(std::string uid, std::string password) {
     unlock();
 }
 
+void Database::handleAutoClosing(std::string aid) {
+    if (_core->hasAuctionEnded(aid)) {
+        return;
+    }
+
+    AuctionStartInfo startInfo = _core->getAuctionStartInfo(aid);
+
+    if (startInfo.startTime + startInfo.timeActive >= time(NULL)) {
+        AuctionEndInfo endInfo;
+        endInfo.endTime = startInfo.startTime + startInfo.timeActive;
+        _core->endAuction(aid, endInfo);
+    }
+}
+
 bool Database::checkUserRegistered(std::string uid) {
     if (!_core->userExists(uid)) {
         return false;
