@@ -5,8 +5,13 @@
  *
  * @param handler The command handler to register.
  */
-void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
-    this->_handlers.insert({handler->_code, handler});
+void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler,
+                                     bool isTCP) {
+    if (isTCP) {
+        this->_handlersTCP.insert({handler->_code, handler});
+    } else {
+        this->_handlersUDP.insert({handler->_code, handler});
+    }
 }
 
 /**
@@ -20,30 +25,39 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler) {
  * @param receiver The Server object that receives the command.
  */
 void CommandManager::readCommand(MessageSource &message,
-                                 std::stringstream &response,
-                                 Server &receiver) {
+                                 std::stringstream &response, Server &receiver,
+                                 bool isTCP) {
     std::string code;
     for (size_t i = 0; i < 3; i++) {  //Reads the 3 digit code from the message
         char c = (char)message.get();
         code.push_back(c);
     }
 
-    auto handler =
-        this->_handlers.find(code);  //Finds the correct handler for the command
-    if (handler ==
-        this->_handlers
-            .end()) {  //If the handler is not found, the command is not valid
-        std::string str = PROTOCOL_ERROR_IDENTIFIER;
-        for (auto c : str) {
-            response.put(c);
+    if (isTCP) {
+        auto handler = this->_handlersTCP.find(
+            code);  //Finds the correct handler for the command
+        if (handler ==
+            this->_handlersTCP
+                .end()) {  //If the handler is not found, the command is not valid
+            protocolError(response);
+            return;
         }
-        response.put('\n');
-        return;
+        handler->second->handle(
+            message, response,
+            receiver);  //Executes the command on the correct handler
+    } else {
+        auto handler = this->_handlersUDP.find(
+            code);  //Finds the correct handler for the command
+        if (handler ==
+            this->_handlersUDP
+                .end()) {  //If the handler is not found, the command is not valid
+            protocolError(response);
+            return;
+        }
+        handler->second->handle(
+            message, response,
+            receiver);  //Executes the command on the correct handler
     }
-
-    handler->second->handle(
-        message, response,
-        receiver);  //Executes the command on the correct handler
 }
 
 void LoginCommand::handle(MessageSource &message, std::stringstream &response,
@@ -333,4 +347,12 @@ void BidCommand::handle(MessageSource &message, std::stringstream &response,
     response = bidCommunication.encodeResponse();
     receiver.showMessage(Message::ServerRequestDetails(
         bidCommunication._uid, "Bid", bidCommunication._status));
+}
+
+void protocolError(std::stringstream &response) {
+    std::string str = PROTOCOL_ERROR_IDENTIFIER;
+    for (auto c : str) {
+        response.put(c);
+    }
+    response.put('\n');
 }

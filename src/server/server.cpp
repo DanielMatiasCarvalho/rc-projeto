@@ -25,18 +25,21 @@ int main(int argc, char **argv) {
     if (sigaction(SIGCHLD, &act, NULL) == -1) {
         exit(1);
     }
+    if (sigaction(SIGPIPE, &act, NULL) == -1) {
+        exit(1);
+    }
 
-    manager.registerCommand(std::make_shared<LoginCommand>());
-    manager.registerCommand(std::make_shared<LogoutCommand>());
-    manager.registerCommand(std::make_shared<UnregisterCommand>());
-    manager.registerCommand(std::make_shared<OpenCommand>());
-    manager.registerCommand(std::make_shared<CloseCommand>());
-    manager.registerCommand(std::make_shared<ListUserAuctionsCommand>());
-    manager.registerCommand(std::make_shared<ListUserBidsCommand>());
-    manager.registerCommand(std::make_shared<ListAllAuctionsCommand>());
-    manager.registerCommand(std::make_shared<ShowAssetCommand>());
-    manager.registerCommand(std::make_shared<BidCommand>());
-    manager.registerCommand(std::make_shared<ShowRecordCommand>());
+    manager.registerCommand(std::make_shared<LoginCommand>(), false);
+    manager.registerCommand(std::make_shared<LogoutCommand>(), false);
+    manager.registerCommand(std::make_shared<UnregisterCommand>(), false);
+    manager.registerCommand(std::make_shared<OpenCommand>(), true);
+    manager.registerCommand(std::make_shared<CloseCommand>(), true);
+    manager.registerCommand(std::make_shared<ListUserAuctionsCommand>(), false);
+    manager.registerCommand(std::make_shared<ListUserBidsCommand>(), false);
+    manager.registerCommand(std::make_shared<ListAllAuctionsCommand>(), false);
+    manager.registerCommand(std::make_shared<ShowAssetCommand>(), true);
+    manager.registerCommand(std::make_shared<BidCommand>(), true);
+    manager.registerCommand(std::make_shared<ShowRecordCommand>(), false);
 
     server.showMessage("Listening on port " + server.getPort());
 
@@ -110,7 +113,7 @@ void UDPServer(CommandManager &manager, Server &server) {
             udpServer.getClientIP(), udpServer.getClientPort(), "UDP"));
         StreamMessage streamMessage(message);
         std::stringstream response;
-        manager.readCommand(streamMessage, response, server);
+        manager.readCommand(streamMessage, response, server, false);
         udpServer.send(response);
     }
 }
@@ -132,7 +135,7 @@ void TCPServer(CommandManager &manager, Server &server) {
                 session.getClientIP(), session.getClientPort(), "TCP"));
             TcpMessage message(session._fd);
             std::stringstream response;
-            manager.readCommand(message, response, server);
+            manager.readCommand(message, response, server, true);
             session.send(response);
             exit(0);
         }

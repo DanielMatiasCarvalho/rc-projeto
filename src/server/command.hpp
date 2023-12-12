@@ -45,15 +45,17 @@ class CommandHandler {
  */
 class CommandManager {
   private:
-    std::unordered_map<std::string, std::shared_ptr<CommandHandler>> _handlers =
-        {};
+    std::unordered_map<std::string, std::shared_ptr<CommandHandler>>
+        _handlersUDP = {};
+    std::unordered_map<std::string, std::shared_ptr<CommandHandler>>
+        _handlersTCP = {};
 
   public:
     /**
      * @brief Registers a command handler.
      * @param handler The command handler to register.
      */
-    void registerCommand(std::shared_ptr<CommandHandler> handler);
+    void registerCommand(std::shared_ptr<CommandHandler> handler, bool isTCP);
 
     /**
      * @brief Reads and executes a command from the given message.
@@ -61,7 +63,7 @@ class CommandManager {
      * @param receiver The server object that will receive the command.
      */
     void readCommand(MessageSource &message, std::stringstream &response,
-                     Server &receiver);
+                     Server &receiver, bool isTCP);
 };
 
 /**
@@ -360,4 +362,6 @@ class BidCommand : public CommandHandler {
     void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
+
+void protocolError(std::stringstream &response);
 #endif
