@@ -10,12 +10,14 @@ bool Database::loginUser(std::string uid, std::string password) {
 
     if (!_core->userExists(uid)) {
         _core->createUser(uid, password);
+        _core->setLoggedIn(uid);
         unlock();
         return true;
     }
 
     if (!_core->isUserRegistered(uid)) {
         _core->registerUser(uid, password);
+        _core->setLoggedIn(uid);
         unlock();
         return true;
     }
@@ -31,19 +33,71 @@ bool Database::loginUser(std::string uid, std::string password) {
     return false;
 }
 
-bool Database::checkLoggedIn(std::string uid, std::string password) {
-    if (!_core->userExists(uid)) {
+void Database::logoutUser(std::string uid, std::string password) {
+    lock();
+
+    if (!checkUserRegistered(uid)) {
         unlock();
+        throw UnregisteredException();
+    }
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    unlock();
+}
+
+void Database::unregisterUser(std::string uid, std::string password) {
+    lock();
+
+    if (!checkUserRegistered(uid)) {
+        unlock();
+        throw UnregisteredException();
+    }
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    _core->unregisterUser(uid);
+
+    unlock();
+}
+
+void Database::handleAutoClosing(std::string aid) {
+    if (_core->hasAuctionEnded(aid)) {
+        return;
+    }
+
+    AuctionStartInfo startInfo = _core->getAuctionStartInfo(aid);
+    if (startInfo.startTime + startInfo.timeActive < time(NULL)) {
+        AuctionEndInfo endInfo;
+        endInfo.endTime = startInfo.startTime + startInfo.timeActive;
+        _core->endAuction(aid, endInfo);
+    }
+}
+
+bool Database::checkUserRegistered(std::string uid) {
+    if (!_core->userExists(uid)) {
         return false;
     }
 
     if (!_core->isUserRegistered(uid)) {
-        unlock();
+        return false;
+    }
+
+    return true;
+}
+
+bool Database::checkLoggedIn(std::string uid, std::string password) {
+    if (!checkUserRegistered(uid)) {
         return false;
     }
 
     if (_core->getUserPassword(uid) != password) {
-        unlock();
         return false;
     }
 
@@ -52,15 +106,16 @@ bool Database::checkLoggedIn(std::string uid, std::string password) {
     return loggedIn;
 }
 
-std::map<std::string, bool> Database::getAllAuctions() {
+std::map<std::string, std::string> Database::getAllAuctions() {
     lock();
 
     std::vector<std::string> auctions = _core->getAllAuctions();
 
-    std::map<std::string, bool> auctionsMap;
+    std::map<std::string, std::string> auctionsMap;
 
     for (auto &auction : auctions) {
-        auctionsMap[auction] = _core->hasAuctionEnded(auction);
+        handleAutoClosing(auction);
+        auctionsMap[auction] = (_core->hasAuctionEnded(auction) ? "0" : "1");
     }
 
     unlock();
@@ -68,21 +123,21 @@ std::map<std::string, bool> Database::getAllAuctions() {
     return auctionsMap;
 }
 
-std::map<std::string, bool> Database::getUserAuctions(std::string uid,
-                                                      std::string password) {
+std::map<std::string, std::string> Database::getUserAuctions(std::string uid) {
     lock();
 
-    if (!checkLoggedIn(uid, password)) {
+    if (!_core->userExists(uid) || !_core->isUserLoggedIn(uid)) {
         unlock();
         throw LoginException();
     }
 
     std::vector<std::string> auctions = _core->getUserHostedAuctions(uid);
 
-    std::map<std::string, bool> auctionsMap;
+    std::map<std::string, std::string> auctionsMap;
 
     for (auto &auction : auctions) {
-        auctionsMap[auction] = _core->hasAuctionEnded(auction);
+        handleAutoClosing(auction);
+        auctionsMap[auction] = (_core->hasAuctionEnded(auction) ? "0" : "1");
     }
 
     unlock();
@@ -90,8 +145,44 @@ std::map<std::string, bool> Database::getUserAuctions(std::string uid,
     return auctionsMap;
 }
 
-std::map<std::string, bool> Database::getUserBids(std::string uid,
-                                                  std::string password) {
+std::map<std::string, std::string> Database::getUserBids(std::string uid) {
+    lock();
+
+    if (!_core->userExists(uid) || !_core->isUserLoggedIn(uid)) {
+        unlock();
+        throw LoginException();
+    }
+
+    std::vector<std::string> auctions = _core->getUserBids(uid);
+
+    std::map<std::string, std::string> auctionsMap;
+
+    for (auto &auction : auctions) {
+        handleAutoClosing(auction);
+        auctionsMap[auction] = (_core->hasAuctionEnded(auction) ? "0" : "1");
+    }
+
+    unlock();
+
+    return auctionsMap;
+}
+
+std::string Database::generateAid() {
+    std::vector<std::string> auctions = _core->getAllAuctions();
+
+    if (auctions.size() == 0) {
+        return "001";
+    }
+
+    std::string last = auctions.back();
+
+    return AidIntToStr(AidStrToInt(last) + 1);
+}
+
+std::string Database::createAuction(std::string uid, std::string password,
+                                    std::string name, int startValue,
+                                    time_t timeActive, std::string fileName,
+                                    std::stringstream &file) {
     lock();
 
     if (!checkLoggedIn(uid, password)) {
@@ -99,17 +190,224 @@ std::map<std::string, bool> Database::getUserBids(std::string uid,
         throw LoginException();
     }
 
-    std::vector<std::string> auctions = _core->getUserBids(uid);
+    std::string aid = generateAid();
 
-    std::map<std::string, bool> auctionsMap;
+    AuctionStartInfo info;
 
-    for (auto &auction : auctions) {
-        auctionsMap[auction] = _core->hasAuctionEnded(auction);
-    }
+    info.uid = uid;
+    info.name = name;
+    info.startValue = startValue;
+    info.timeActive = timeActive;
+    info.startTime = time(NULL);
+
+    _core->createAuction(aid, info);
+
+    _core->addUserHostedAuction(uid, aid);
+
+    _core->getAuctionFilePath(aid);
+
+    std::ofstream auctionFile(_core->getAuctionFilePath(aid) / fileName);
+
+    auctionFile << file.rdbuf();
 
     unlock();
+    return aid;
+}
 
-    return auctionsMap;
+int Database::getAuctionCurrentMaxValue(std::string aid) {
+    std::vector<AuctionBidInfo> bids = _core->getAuctionBids(aid);
+
+    if (bids.size() == 0) {
+        return _core->getAuctionStartInfo(aid).startValue;
+    }
+
+    return bids.back().bidValue;
+}
+
+std::string Database::getAuctionOwner(std::string aid) {
+    AuctionStartInfo info = _core->getAuctionStartInfo(aid);
+
+    return info.uid;
+}
+
+void Database::bidAuction(std::string uid, std::string password,
+                          std::string aid, int value) {
+    lock();
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    handleAutoClosing(aid);
+
+    if (_core->hasAuctionEnded(aid)) {
+        unlock();
+        throw AuctionEndedException();
+    }
+
+    if (value <= getAuctionCurrentMaxValue(aid)) {
+        unlock();
+        throw BidValueException();
+    }
+
+    if (getAuctionOwner(aid) == uid) {
+        unlock();
+        throw AuctionOwnerException();
+    }
+
+    AuctionBidInfo bidInfo;
+
+    bidInfo.uid = uid;
+    bidInfo.bidValue = value;
+    bidInfo.bidTime = time(NULL);
+
+    _core->addUserBid(uid, aid);
+
+    _core->addAuctionBid(aid, bidInfo);
+
+    unlock();
+}
+
+int Database::getAuctionAsset(std::string aid, std::string &fileName,
+                              std::stringstream &file) {
+    lock();
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    if (fs::is_empty(_core->getAuctionFilePath(aid))) {
+        unlock();
+        throw AuctionException();
+    }
+
+    handleAutoClosing(aid);
+
+    fileName = _core->getAuctionFileName(aid);
+    std::ifstream auctionAsset(_core->getAuctionFilePath(aid) / fileName);
+    file << auctionAsset.rdbuf();
+    int size = (int)fs::file_size(_core->getAuctionFilePath(aid) / fileName);
+
+    unlock();
+    return size;
+}
+
+std::string Database::getAssetName(std::string aid) {
+    lock();
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    std::string name = _core->getAuctionFileName(aid);
+
+    unlock();
+    return name;
+}
+
+void Database::closeAuction(std::string uid, std::string password,
+                            std::string aid) {
+    lock();
+
+    if (!checkLoggedIn(uid, password)) {
+        unlock();
+        throw LoginException();
+    }
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    handleAutoClosing(aid);
+
+    if (_core->hasAuctionEnded(aid)) {
+        unlock();
+        throw AuctionEndedException();
+    }
+
+    if (getAuctionOwner(aid) != uid) {
+        unlock();
+        throw AuctionOwnerException();
+    }
+
+    AuctionEndInfo endInfo;
+    endInfo.endTime = time(NULL);
+
+    _core->endAuction(aid, endInfo);
+
+    unlock();
+}
+
+AuctionStartInfo Database::getAuctionStartInfo(std::string aid) {
+    lock();
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    AuctionStartInfo info = _core->getAuctionStartInfo(aid);
+
+    unlock();
+    return info;
+}
+
+std::vector<AuctionBidInfo> Database::getAuctionBids(std::string aid) {
+    lock();
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    std::vector<AuctionBidInfo> bids = _core->getAuctionBids(aid);
+
+    unlock();
+    return bids;
+}
+
+AuctionEndInfo Database::getAuctionEndInfo(std::string aid) {
+    lock();
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    handleAutoClosing(aid);
+
+    if (!_core->hasAuctionEnded(aid)) {
+        unlock();
+        throw AuctionEndedException();
+    }
+
+    AuctionEndInfo info = _core->getAuctionEndInfo(aid);
+
+    unlock();
+    return info;
+}
+
+bool Database::hasAuctionEnded(std::string aid) {
+    lock();
+
+    if (!_core->auctionExists(aid)) {
+        unlock();
+        throw AuctionException();
+    }
+
+    bool res = _core->hasAuctionEnded(aid);
+
+    unlock();
+    return res;
 }
 
 void Database::lock() {
@@ -416,13 +714,13 @@ void DatabaseCore::addUserBid(std::string uid, std::string aid) {
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
-    fs::path userHostedPath = *_path / "USERS" / uid / "BIDDED" / aid;
+    fs::path userBidPath = *_path / "USERS" / uid / "BIDDED" / aid;
 
-    if (fs::exists(userHostedPath)) {
-        throw DatabaseException("Bid is already registered on user.");
+    if (fs::exists(userBidPath)) {
+        return;
     }
 
-    fs::create_symlink(auctionPath, userHostedPath);
+    fs::create_symlink(auctionPath, userBidPath);
 }
 
 std::vector<std::string> DatabaseCore::getUserBids(std::string uid) {
@@ -440,7 +738,7 @@ std::vector<std::string> DatabaseCore::getUserBids(std::string uid) {
     return bids;
 }
 
-void DatabaseCore::createAuction(std::string aid, std::string startInfo) {
+void DatabaseCore::createAuction(std::string aid, AuctionStartInfo &startInfo) {
     guaranteeBaseStructure();
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -459,11 +757,58 @@ void DatabaseCore::createAuction(std::string aid, std::string startInfo) {
 
     fs::create_directory(filePath);
 
-    fs::path fileStartedPath = filePath / ("START_" + aid);
+    fs::path fileStartedPath = auctionPath / ("START_" + aid);
 
     std::ofstream fileStarted(fileStartedPath);
 
-    fileStarted << startInfo;
+    fileStarted << startInfo.uid << std::endl;
+    fileStarted << startInfo.name << std::endl;
+    fileStarted << startInfo.startValue << std::endl;
+    fileStarted << startInfo.startTime << std::endl;
+    fileStarted << startInfo.timeActive << std::endl;
+}
+
+AuctionBidInfo DatabaseCore::getAuctionBidInfo(std::string aid,
+                                               std::string value) {
+    guaranteeAuctionStructure(aid);
+
+    fs::path bidPath = *_path / "AUCTIONS" / aid / "BIDS" / value;
+
+    if (!fs::exists(bidPath)) {
+        throw DatabaseException("Bid does not exist");
+    }
+
+    std::ifstream bidFile(bidPath);
+
+    AuctionBidInfo bidInfo;
+
+    bidFile >> bidInfo.uid;
+    bidFile >> bidInfo.bidValue;
+    bidFile >> bidInfo.bidTime;
+
+    return bidInfo;
+}
+
+std::vector<AuctionBidInfo> DatabaseCore::getAuctionBids(std::string aid) {
+    guaranteeAuctionStructure(aid);
+
+    fs::path bidsPath = *_path / "AUCTIONS" / aid / "BIDS";
+
+    std::vector<std::string> bidsStr;
+
+    for (auto &bid : fs::directory_iterator(bidsPath)) {
+        bidsStr.push_back(bid.path().filename().string());
+    }
+
+    std::sort(bidsStr.begin(), bidsStr.end());
+
+    std::vector<AuctionBidInfo> bids;
+
+    for (auto &bid : bidsStr) {
+        bids.push_back(getAuctionBidInfo(aid, bid));
+    }
+
+    return bids;
 }
 
 bool DatabaseCore::auctionExists(std::string aid) {
@@ -476,7 +821,7 @@ bool DatabaseCore::auctionExists(std::string aid) {
     return exists;
 }
 
-std::string DatabaseCore::getAuctionStartInfo(std::string aid) {
+AuctionStartInfo DatabaseCore::getAuctionStartInfo(std::string aid) {
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -489,14 +834,18 @@ std::string DatabaseCore::getAuctionStartInfo(std::string aid) {
 
     std::ifstream fileStarted(fileStartedPath);
 
-    std::string startInfo;
+    AuctionStartInfo startInfo;
 
-    std::getline(fileStarted, startInfo);
+    fileStarted >> startInfo.uid;
+    fileStarted >> startInfo.name;
+    fileStarted >> startInfo.startValue;
+    fileStarted >> startInfo.startTime;
+    fileStarted >> startInfo.timeActive;
 
     return startInfo;
 }
 
-void DatabaseCore::endAuction(std::string aid, std::string endInfo) {
+void DatabaseCore::endAuction(std::string aid, AuctionEndInfo endInfo) {
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -509,7 +858,7 @@ void DatabaseCore::endAuction(std::string aid, std::string endInfo) {
 
     std::ofstream endAuctionFile(endAuctionPath);
 
-    endAuctionFile << endInfo;
+    endAuctionFile << endInfo.endTime << std::endl;
 }
 
 bool DatabaseCore::hasAuctionEnded(std::string aid) {
@@ -524,7 +873,7 @@ bool DatabaseCore::hasAuctionEnded(std::string aid) {
     return exists;
 }
 
-std::string DatabaseCore::getAuctionEndInfo(std::string aid) {
+AuctionEndInfo DatabaseCore::getAuctionEndInfo(std::string aid) {
     guaranteeAuctionStructure(aid);
 
     fs::path auctionPath = *_path / "AUCTIONS" / aid;
@@ -537,9 +886,9 @@ std::string DatabaseCore::getAuctionEndInfo(std::string aid) {
 
     std::ifstream fileEnded(fileEndedPath);
 
-    std::string endInfo;
+    AuctionEndInfo endInfo;
 
-    std::getline(fileEnded, endInfo);
+    fileEnded >> endInfo.endTime;
 
     return endInfo;
 }
@@ -552,6 +901,23 @@ fs::path DatabaseCore::getAuctionFilePath(std::string aid) {
     fs::path filePath = auctionPath / "FILE";
 
     return filePath;
+}
+
+std::string DatabaseCore::getAuctionFileName(std::string aid) {
+    guaranteeAuctionStructure(aid);
+
+    fs::path auctionPath = *_path / "AUCTIONS" / aid;
+
+    fs::path filePath = auctionPath / "FILE";
+
+    std::string fileName;
+
+    for (auto &file : fs::directory_iterator(filePath)) {
+        fileName = file.path().filename().string();
+        break;
+    }
+
+    return fileName;
 }
 
 std::vector<std::string> DatabaseCore::getAllAuctions() {
@@ -567,6 +933,23 @@ std::vector<std::string> DatabaseCore::getAllAuctions() {
 
     std::sort(auctions.begin(), auctions.end());
     return auctions;
+}
+
+void DatabaseCore::addAuctionBid(std::string aid, AuctionBidInfo &bidInfo) {
+    guaranteeAuctionStructure(aid);
+
+    fs::path bidPath =
+        *_path / "AUCTIONS" / aid / "BIDS" / BidValueToString(bidInfo.bidValue);
+
+    if (fs::exists(bidPath)) {
+        throw DatabaseException("Bid already exists");
+    }
+
+    std::ofstream bidFile(bidPath);
+
+    bidFile << bidInfo.uid << std::endl;
+    bidFile << bidInfo.bidValue << std::endl;
+    bidFile << bidInfo.bidTime << std::endl;
 }
 
 DatabaseLock::DatabaseLock(std::string name) {
@@ -590,4 +973,40 @@ void DatabaseLock::lock() {
 void DatabaseLock::unlock() {
     // Unlock the semaphore
     sem_post(_lock);
+}
+
+int AidStrToInt(std::string aid) {
+    if (aid.length() != 3 || !isNumeric(aid)) {
+        throw AidException();
+    }
+
+    return stoi(aid);
+}
+
+std::string AidIntToStr(int aid) {
+    if (aid < 0 || aid > 999) {
+        throw AidException();
+    }
+
+    char aidStr[4];
+    sprintf(aidStr, "%03d", aid);
+    return std::string(aidStr);
+}
+
+int BidValueToInt(std::string bidValue) {
+    if (bidValue.length() != 6 || !isNumeric(bidValue)) {
+        throw BidValueException();
+    }
+
+    return stoi(bidValue);
+}
+
+std::string BidValueToString(int bidValue) {
+    if (bidValue < 0 || bidValue > 999999) {
+        throw BidValueException();
+    }
+
+    char bidValueStr[7];
+    sprintf(bidValueStr, "%06d", bidValue);
+    return std::string(bidValueStr);
 }

@@ -7,9 +7,9 @@
 #include <unordered_map>
 
 #include "config.hpp"
+#include "messages.hpp"
 #include "protocol.hpp"
-
-class Server;
+#include "server.hpp"
 
 /**
  * @brief The base class for command handlers.
@@ -26,7 +26,7 @@ class CommandHandler {
      * @param message The command message.
      * @param receiver The server object that receives the command.
      */
-    virtual void handle(std::stringstream &message, std::stringstream &response,
+    virtual void handle(MessageSource &message, std::stringstream &response,
                         Server &receiver) = 0;
 
     std::string _code; /**< The code associated with the command. */
@@ -60,7 +60,7 @@ class CommandManager {
      * @param message The message containing the command.
      * @param receiver The server object that will receive the command.
      */
-    void readCommand(std::stringstream &message, std::stringstream &response,
+    void readCommand(MessageSource &message, std::stringstream &response,
                      Server &receiver);
 };
 
@@ -87,7 +87,7 @@ class LoginCommand : public CommandHandler {
      * @param message The message containing the command parameters.
      * @param receiver The server object that will handle the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -114,7 +114,7 @@ class LogoutCommand : public CommandHandler {
      * @param message The message containing the command parameters.
      * @param receiver The server object that will handle the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -141,7 +141,7 @@ class UnregisterCommand : public CommandHandler {
      * @param message The message containing the command parameters.
      * @param receiver The server object that receives the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -168,7 +168,7 @@ class ListUserAuctionsCommand : public CommandHandler {
      * @param message The message containing the command parameters.
      * @param receiver The server object that receives the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -195,7 +195,7 @@ class ListUserBidsCommand : public CommandHandler {
      * @param message The message containing the command parameters.
      * @param receiver The server object that receives the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -222,7 +222,7 @@ class ListAllAuctionsCommand : public CommandHandler {
      * @param message The command message received from the client.
      * @param receiver The server object that receives the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -249,7 +249,7 @@ class ShowRecordCommand : public CommandHandler {
      * @param message The message containing the command parameters.
      * @param receiver The server object that receives the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -276,7 +276,7 @@ class OpenCommand : public CommandHandler {
      * @param message The message containing the command parameters.
      * @param receiver The server object that receives the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -303,7 +303,7 @@ class CloseCommand : public CommandHandler {
      * @param message The message containing the command.
      * @param receiver The server object that receives the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -330,7 +330,7 @@ class ShowAssetCommand : public CommandHandler {
      * @param message The message containing the command parameters.
      * @param receiver The server object that receives the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 
@@ -357,7 +357,7 @@ class BidCommand : public CommandHandler {
      * @param message The message containing the command arguments.
      * @param receiver The server object that receives the command.
      */
-    void handle(std::stringstream &message, std::stringstream &response,
+    void handle(MessageSource &message, std::stringstream &response,
                 Server &receiver);
 };
 #endif

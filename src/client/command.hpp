@@ -71,7 +71,7 @@ class CommandManager {
      * @brief Reads and executes a command.
      * @param state The client state.
      */
-    void readCommand(Client &state);
+    void readCommand(std::string command, Client &state);
 };
 
 /**

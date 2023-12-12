@@ -1,4 +1,19 @@
 #include "server.hpp"
+#include "command.hpp"
+
+/**
+ * @brief Starts and runs the UDP server.
+ * 
+ * This function initializes and runs the UDP server.
+ */
+void UDPServer(CommandManager &manager, Server &server);
+
+/**
+ * @brief Starts and runs the TCP server.
+ * 
+ * This function initializes and runs the TCP server.
+ */
+void TCPServer(CommandManager &manager, Server &server);
 
 int main(int argc, char **argv) {
     Server server(argc, argv);
@@ -23,15 +38,19 @@ int main(int argc, char **argv) {
     manager.registerCommand(std::make_shared<BidCommand>());
     manager.registerCommand(std::make_shared<ShowRecordCommand>());
 
+    server.showMessage("Listening on port " + server.getPort());
+
     if ((pid = fork()) == -1) {
         exit(1);
     } else if (pid == 0) {
-        server.UDPServer();
+        server.showMessage("UDP server started");
+        UDPServer(manager, server);
     } else {
-        server.TCPServer();
+        server.showMessage("TCP server started");
+        TCPServer(manager, server);
     }
 
-    return 1;
+    return 0;
 }
 
 /**
@@ -78,33 +97,42 @@ void Server::ShowInfo() {
  * @param message The message to be displayed.
  */
 void Server::showMessage(std::string message) {
-    if (_verbose)
-        std::cout << message << std::endl;
-}
-
-void Server::UDPServer() {
-    UdpServer server(_port);
-    CommandManager manager;
-    while (1) {
-        std::stringstream message = server.receive();
-        std::stringstream response;
-        manager.readCommand(message, response, *this);
-        server.send(response);
+    if (_verbose) {
+        std::cout << "[LOG] " << message << std::endl;
     }
 }
 
-void Server::TCPServer() {
-    TcpServer server(_port);
-    CommandManager manager;
+void UDPServer(CommandManager &manager, Server &server) {
+    UdpServer udpServer(server.getPort());
     while (1) {
-        TcpSession session(server.acceptConnection());
+        std::stringstream message = udpServer.receive();
+        server.showMessage(Message::ServerConnectionDetails(
+            udpServer.getClientIP(), udpServer.getClientPort(), "UDP"));
+        StreamMessage streamMessage(message);
+        std::stringstream response;
+        manager.readCommand(streamMessage, response, server);
+        udpServer.send(response);
+    }
+}
+
+void TCPServer(CommandManager &manager, Server &server) {
+    TcpServer tcpServer(server.getPort());
+    while (1) {
+        struct sockaddr_in client;
+        socklen_t clientSize;
+        int fd = tcpServer.acceptConnection(client, clientSize);
+
+        TcpSession session(fd, client, clientSize);
+
         pid_t pid;
         if ((pid = fork()) == -1) {
             exit(1);
         } else if (pid == 0) {
-            std::stringstream message = session.receive();
+            server.showMessage(Message::ServerConnectionDetails(
+                session.getClientIP(), session.getClientPort(), "TCP"));
+            TcpMessage message(session._fd);
             std::stringstream response;
-            manager.readCommand(message, response, *this);
+            manager.readCommand(message, response, server);
             session.send(response);
             exit(0);
         }

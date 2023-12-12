@@ -39,8 +39,8 @@ void UdpServer::send(std::stringstream &message) {
         throw SocketException();
     }
 
-    if (sendto(_fd, messageBuffer, (size_t)n, 0, _client->ai_addr,
-               _client->ai_addrlen) != n) {
+    if (sendto(_fd, messageBuffer, (size_t)n, 0, (struct sockaddr *)&_client,
+               _clientSize) != n) {
         throw SocketException();
     }
 }
@@ -49,7 +49,7 @@ std::stringstream UdpServer::receive() {
     char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1];
     ssize_t n =
         recvfrom(_fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1, 0,
-                 _client->ai_addr, &(_client->ai_addrlen));
+                 (struct sockaddr *)&_client, &_clientSize);
 
     if (n > SOCKETS_MAX_DATAGRAM_SIZE_SERVER) {
         throw SocketException();
@@ -62,11 +62,25 @@ std::stringstream UdpServer::receive() {
     return message;
 }
 
+std::string UdpServer::getClientIP() {
+    char ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &_client.sin_addr, ip, INET_ADDRSTRLEN);
+    return std::string(ip);
+}
+
+std::string UdpServer::getClientPort() {
+    return std::to_string(ntohs(_client.sin_port));
+}
+
 TcpServer::TcpServer(std::string port) {
     _fd = socket(AF_INET, SOCK_STREAM, 0);
     if (_fd == -1) {
         throw SocketException();
     }
+
+    int reuse_addr = 1;
+
+    setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr));
 
     memset(&_hints, 0, sizeof(_hints));
     _hints.ai_family = AF_INET;
@@ -93,14 +107,36 @@ TcpServer::~TcpServer() {
     close(_fd);
 }
 
-int TcpServer::acceptConnection() {
-    int clientFd = accept(_fd, NULL, NULL);
+int TcpServer::acceptConnection(struct sockaddr_in &client,
+                                socklen_t &clientSize) {
+    sockaddr_in clientAddress;
+    socklen_t clientAddressSize;
+
+    int clientFd =
+        accept(_fd, (struct sockaddr *)&clientAddress, &clientAddressSize);
+
+    client = clientAddress;
+    clientSize = clientAddressSize;
 
     if (clientFd == -1) {
         throw SocketException();
     }
 
     return clientFd;
+}
+
+TcpSession::TcpSession(int fd, struct sockaddr_in client,
+                       socklen_t clientSize) {
+    _fd = fd;
+    _client = client;
+    _clientSize = clientSize;
+
+    struct timeval read_timeout;
+    read_timeout.tv_sec = 5;
+    read_timeout.tv_usec = 0;
+
+    setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout,
+               sizeof(read_timeout));
 }
 
 void TcpSession::send(std::stringstream &message) {
@@ -131,9 +167,14 @@ std::stringstream TcpSession::receive() {
 
     while (n != 0) {
         message.write(messageBuffer, n);
+
         n = read(_fd, messageBuffer, SOCKETS_TCP_BUFFER_SIZE);
 
         if (n == -1) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK ||
+                errno == EINPROGRESS) {
+                break;
+            }
             throw SocketException();
         }
     }
@@ -143,4 +184,14 @@ std::stringstream TcpSession::receive() {
 
 TcpSession::~TcpSession() {
     close(_fd);
+}
+
+std::string TcpSession::getClientIP() {
+    char ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &_client.sin_addr, ip, INET_ADDRSTRLEN);
+    return std::string(ip);
+}
+
+std::string TcpSession::getClientPort() {
+    return std::to_string(ntohs(_client.sin_port));
 }

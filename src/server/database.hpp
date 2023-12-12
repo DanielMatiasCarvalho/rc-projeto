@@ -4,13 +4,17 @@
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
 #include <fcntl.h>
 #include <semaphore.h>
+
+#include "utils.hpp"
 
 namespace fs = std::filesystem;
 
@@ -52,6 +56,24 @@ class DatabaseLock {
     void unlock();
 };
 
+struct AuctionStartInfo {
+    std::string uid;
+    std::string name;
+    int startValue;
+    time_t startTime;
+    time_t timeActive;
+};
+
+struct AuctionEndInfo {
+    time_t endTime;
+};
+
+struct AuctionBidInfo {
+    std::string uid;
+    int bidValue;
+    time_t bidTime;
+};
+
 class DatabaseCore {
   private:
     std::unique_ptr<fs::path> _path;
@@ -76,36 +98,61 @@ class DatabaseCore {
     void addUserHostedAuction(std::string uid, std::string aid);
     std::vector<std::string> getUserHostedAuctions(std::string uid);
 
-    void createAuction(std::string aid, std::string startInfo);
+    void createAuction(std::string aid, AuctionStartInfo &startInfo);
     bool auctionExists(std::string aid);
-    std::string getAuctionStartInfo(std::string aid);
-    void endAuction(std::string aid, std::string endInfo);
+    AuctionStartInfo getAuctionStartInfo(std::string aid);
+    void endAuction(std::string aid, AuctionEndInfo endInfo);
     bool hasAuctionEnded(std::string aid);
-    std::string getAuctionEndInfo(std::string aid);
+    AuctionEndInfo getAuctionEndInfo(std::string aid);
     fs::path getAuctionFilePath(std::string aid);
+    std::string getAuctionFileName(std::string aid);
+    AuctionBidInfo getAuctionBidInfo(std::string aid, std::string value);
+    std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
+    void addAuctionBid(std::string aid, AuctionBidInfo &bidInfo);
 
     std::vector<std::string> getAllAuctions();
 };
 
 class Database {
   private:
-    std::unique_ptr<DatabaseCore> _core;
     std::unique_ptr<DatabaseLock> _lock;
 
   public:
+    std::unique_ptr<DatabaseCore> _core;
     Database(std::string path);
 
     void lock();
     void unlock();
 
     bool loginUser(std::string uid, std::string password);
-    bool checkLoggedIn(std::string uid, std::string password);
+    void logoutUser(std::string uid, std::string password);
+    void unregisterUser(std::string uid, std::string password);
+    void handleAutoClosing(std::string uid);
 
-    std::map<std::string, bool> getAllAuctions();
-    std::map<std::string, bool> getUserAuctions(std::string uid,
-                                                std::string password);
-    std::map<std::string, bool> getUserBids(std::string uid,
-                                            std::string password);
+    bool checkLoggedIn(std::string uid, std::string password);
+    bool checkUserRegistered(std::string uid);
+
+    std::map<std::string, std::string> getAllAuctions();
+    std::map<std::string, std::string> getUserAuctions(std::string uid);
+    std::map<std::string, std::string> getUserBids(std::string uid);
+
+    std::string generateAid();
+    std::string createAuction(std::string uid, std::string password,
+                              std::string name, int startValue,
+                              time_t timeActive, std::string fileName,
+                              std::stringstream &file);
+    int getAuctionCurrentMaxValue(std::string aid);
+    std::string getAuctionOwner(std::string aid);
+    void bidAuction(std::string uid, std::string password, std::string aid,
+                    int value);
+    int getAuctionAsset(std::string aid, std::string &fileName,
+                        std::stringstream &file);
+    std::string getAssetName(std::string aid);
+    void closeAuction(std::string uid, std::string password, std::string aid);
+    AuctionStartInfo getAuctionStartInfo(std::string aid);
+    std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
+    AuctionEndInfo getAuctionEndInfo(std::string aid);
+    bool hasAuctionEnded(std::string aid);
 };
 
 class DatabaseException : public std::runtime_error {
@@ -117,5 +164,45 @@ class LoginException : public DatabaseException {
   public:
     LoginException() : DatabaseException("User is not logged in") {}
 };
+
+class UnregisteredException : public DatabaseException {
+  public:
+    UnregisteredException() : DatabaseException("User is not registered") {}
+};
+
+class AidException : public DatabaseException {
+  public:
+    AidException() : DatabaseException("Auction ID unavaillable.") {}
+};
+
+class BidValueException : public DatabaseException {
+  public:
+    BidValueException() : DatabaseException("Bid value is invalid.") {}
+};
+
+class AuctionException : public DatabaseException {
+  public:
+    AuctionException() : DatabaseException("Auction does not exist.") {}
+};
+
+class AuctionOwnerException : public DatabaseException {
+  public:
+    AuctionOwnerException()
+        : DatabaseException(
+              "This user is unnable to do this action to this auction.") {}
+};
+
+class AuctionEndedException : public DatabaseException {
+  public:
+    AuctionEndedException() : DatabaseException("Auction has ended.") {}
+};
+
+int AidStrToInt(std::string aid);
+
+std::string AidIntToStr(int aid);
+
+int BidValueToInt(std::string bidValue);
+
+std::string BidValueToString(int bidValue);
 
 #endif

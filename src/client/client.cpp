@@ -1,6 +1,7 @@
 #include "client.hpp"
 #include "command.hpp"
 #include "protocol.hpp"
+#include "terminal.hpp"
 
 #include <unistd.h>
 #include <iostream>
@@ -8,6 +9,7 @@
 int main(int argc, char **argv) {
     Client client(argc, argv);
     CommandManager manager;
+    Terminal terminal;
 
     manager.registerCommand(std::make_shared<LoginCommand>());
     manager.registerCommand(std::make_shared<LogoutCommand>());
@@ -24,7 +26,8 @@ int main(int argc, char **argv) {
 
     while (!client._toExit) {
         try {
-            manager.readCommand(client);
+            std::string command = terminal.readLine("> ");
+            manager.readCommand(command, client);
         } catch (CommandException const &e) {
             std::cout << e.what() << std::endl;
         } catch (ProtocolViolationException const &e) {
@@ -98,7 +101,8 @@ void Client::processRequest(ProtocolCommunication &comm) {
         resMessage = udpClient.receive();
     }
 
-    comm.decodeResponse(resMessage);
+    StreamMessage resStreamMessage(resMessage);
+    comm.decodeResponse(resStreamMessage);
 }
 
 void Client::writeFile(std::string fName, std::stringstream &content) {
