@@ -73,8 +73,7 @@ void Database::handleAutoClosing(std::string aid) {
     }
 
     AuctionStartInfo startInfo = _core->getAuctionStartInfo(aid);
-
-    if (startInfo.startTime + startInfo.timeActive >= time(NULL)) {
+    if (startInfo.startTime + startInfo.timeActive < time(NULL)) {
         AuctionEndInfo endInfo;
         endInfo.endTime = startInfo.startTime + startInfo.timeActive;
         _core->endAuction(aid, endInfo);
@@ -115,6 +114,7 @@ std::map<std::string, std::string> Database::getAllAuctions() {
     std::map<std::string, std::string> auctionsMap;
 
     for (auto &auction : auctions) {
+        handleAutoClosing(auction);
         auctionsMap[auction] = (_core->hasAuctionEnded(auction) ? "0" : "1");
     }
 
@@ -136,6 +136,7 @@ std::map<std::string, std::string> Database::getUserAuctions(std::string uid) {
     std::map<std::string, std::string> auctionsMap;
 
     for (auto &auction : auctions) {
+        handleAutoClosing(auction);
         auctionsMap[auction] = (_core->hasAuctionEnded(auction) ? "0" : "1");
     }
 
@@ -157,6 +158,7 @@ std::map<std::string, std::string> Database::getUserBids(std::string uid) {
     std::map<std::string, std::string> auctionsMap;
 
     for (auto &auction : auctions) {
+        handleAutoClosing(auction);
         auctionsMap[auction] = (_core->hasAuctionEnded(auction) ? "0" : "1");
     }
 
@@ -242,6 +244,8 @@ void Database::bidAuction(std::string uid, std::string password,
         throw AuctionException();
     }
 
+    handleAutoClosing(aid);
+
     if (_core->hasAuctionEnded(aid)) {
         unlock();
         throw AuctionEndedException();
@@ -284,6 +288,8 @@ int Database::getAuctionAsset(std::string aid, std::string &fileName,
         throw AuctionException();
     }
 
+    handleAutoClosing(aid);
+
     fileName = _core->getAuctionFileName(aid);
     std::ifstream auctionAsset(_core->getAuctionFilePath(aid) / fileName);
     file << auctionAsset.rdbuf();
@@ -320,6 +326,8 @@ void Database::closeAuction(std::string uid, std::string password,
         unlock();
         throw AuctionException();
     }
+
+    handleAutoClosing(aid);
 
     if (_core->hasAuctionEnded(aid)) {
         unlock();
@@ -374,6 +382,8 @@ AuctionEndInfo Database::getAuctionEndInfo(std::string aid) {
         unlock();
         throw AuctionException();
     }
+
+    handleAutoClosing(aid);
 
     if (!_core->hasAuctionEnded(aid)) {
         unlock();
