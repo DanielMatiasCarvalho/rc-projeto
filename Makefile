@@ -79,9 +79,9 @@ src/server/server: $(SERVER_OBJECTS) $(SERVER_HEADERS) $(COMMON_OBJECTS) $(COMMO
 src/client/client: $(CLIENT_OBJECTS) $(CLIENT_HEADERS) $(COMMON_OBJECTS) $(COMMON_HEADERS)
 
 server: src/server/server
-	cp src/server/server server
+	cp src/server/server AS
 client: src/client/client
-	cp src/client/client client
+	cp src/client/client user
 
 clean:
 	rm -f $(OBJECTS) $(TARGETS) $(TARGET_EXECS) project.zip
