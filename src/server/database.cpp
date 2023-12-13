@@ -218,7 +218,7 @@ int Database::getAuctionCurrentMaxValue(std::string aid) {
     std::vector<AuctionBidInfo> bids = _core->getAuctionBids(aid);
 
     if (bids.size() == 0) {
-        return _core->getAuctionStartInfo(aid).startValue;
+        return (_core->getAuctionStartInfo(aid).startValue - 1);
     }
 
     return bids.back().bidValue;
@@ -357,6 +357,8 @@ AuctionStartInfo Database::getAuctionStartInfo(std::string aid) {
 
     AuctionStartInfo info = _core->getAuctionStartInfo(aid);
 
+    handleAutoClosing(aid);
+
     unlock();
     return info;
 }
@@ -382,8 +384,6 @@ AuctionEndInfo Database::getAuctionEndInfo(std::string aid) {
         unlock();
         throw AuctionException();
     }
-
-    handleAutoClosing(aid);
 
     if (!_core->hasAuctionEnded(aid)) {
         unlock();

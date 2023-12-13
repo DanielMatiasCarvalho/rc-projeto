@@ -1148,7 +1148,7 @@ std::stringstream BidCommunication::encodeRequest() {
 }
 
 void BidCommunication::decodeRequest(MessageSource &message) {
-    readString(message, "BID");
+    // readString(message, "BID");
 
     readSpace(message);
 

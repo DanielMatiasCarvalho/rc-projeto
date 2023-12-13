@@ -306,7 +306,7 @@ class ShowRecordCommunication : public ProtocolCommunication {
     std::vector<int> _bidSecTimes;
 
     // End info
-    bool _hasEnded;
+    bool _hasEnded = false;
     std::time_t _endDateTime;
     int _endSecTime;
 
