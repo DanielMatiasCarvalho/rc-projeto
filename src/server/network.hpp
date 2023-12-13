@@ -27,6 +27,7 @@
 class UdpServer {
   private:
     int _fd;
+    bool _closed = false;
     struct addrinfo _hints;
     struct addrinfo *_res;
     struct sockaddr_in _client;
@@ -56,6 +57,8 @@ class UdpServer {
      */
     std::stringstream receive();
 
+    void close();
+
     std::string getClientIP();
 
     std::string getClientPort();
@@ -68,6 +71,7 @@ class UdpServer {
 class TcpServer {
   private:
     int _fd;
+    bool _closed = false;
     struct addrinfo _hints;
     struct addrinfo *_res;
 
@@ -82,6 +86,8 @@ class TcpServer {
      * @brief Destroys the TcpServer object and closes the socket.
      */
     ~TcpServer();
+
+    void close();
 
     /**
      * @brief Accepts incoming connections.
@@ -98,8 +104,9 @@ class TcpServer {
  */
 class TcpSession {
   private:
+    bool _closed = false;
     struct sockaddr_in _client;
-    socklen_t _clientSize = sizeof(_client);
+    socklen_t _clientSize;
 
   public:
     int _fd;
@@ -127,6 +134,8 @@ class TcpSession {
      * @return The received message as a stringstream.
      */
     std::stringstream receive();
+
+    void close();
 
     std::string getClientIP();
 

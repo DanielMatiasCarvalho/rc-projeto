@@ -108,8 +108,8 @@ void UnregisterCommand::handle(MessageSource &message,
     UnregisterCommunication unregisterCommunication;
     try {
         unregisterCommunication.decodeRequest(message);
-        receiver._database->logoutUser(unregisterCommunication._uid,
-                                       unregisterCommunication._password);
+        receiver._database->unregisterUser(unregisterCommunication._uid,
+                                           unregisterCommunication._password);
         unregisterCommunication._status = "OK";
     } catch (LoginException const &e) {
         unregisterCommunication._status = "NOK";

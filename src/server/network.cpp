@@ -24,8 +24,10 @@ UdpServer::UdpServer(std::string port) {
 }
 
 UdpServer::~UdpServer() {
+    if (!_closed) {
+        ::close(_fd);
+    }
     freeaddrinfo(_res);
-    close(_fd);
 }
 
 void UdpServer::send(std::stringstream &message) {
@@ -60,6 +62,12 @@ std::stringstream UdpServer::receive() {
     message.write(messageBuffer, (std::streamsize)n);
 
     return message;
+}
+
+void UdpServer::close() {
+    if (!_closed) {
+        ::close(_fd);
+    }
 }
 
 std::string UdpServer::getClientIP() {
@@ -103,14 +111,16 @@ TcpServer::TcpServer(std::string port) {
 }
 
 TcpServer::~TcpServer() {
+    if (!_closed) {
+        ::close(_fd);
+    }
     freeaddrinfo(_res);
-    close(_fd);
 }
 
 int TcpServer::acceptConnection(struct sockaddr_in &client,
                                 socklen_t &clientSize) {
     sockaddr_in clientAddress;
-    socklen_t clientAddressSize;
+    socklen_t clientAddressSize = sizeof(clientAddress);
 
     int clientFd =
         accept(_fd, (struct sockaddr *)&clientAddress, &clientAddressSize);
@@ -125,6 +135,12 @@ int TcpServer::acceptConnection(struct sockaddr_in &client,
     return clientFd;
 }
 
+void TcpServer::close() {
+    if (!_closed) {
+        ::close(_fd);
+    }
+}
+
 TcpSession::TcpSession(int fd, struct sockaddr_in client,
                        socklen_t clientSize) {
     _fd = fd;
@@ -137,6 +153,12 @@ TcpSession::TcpSession(int fd, struct sockaddr_in client,
 
     setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, &read_timeout,
                sizeof(read_timeout));
+}
+
+TcpSession::~TcpSession() {
+    if (!_closed) {
+        ::close(_fd);
+    }
 }
 
 void TcpSession::send(std::stringstream &message) {
@@ -182,8 +204,10 @@ std::stringstream TcpSession::receive() {
     return message;
 }
 
-TcpSession::~TcpSession() {
-    close(_fd);
+void TcpSession::close() {
+    if (!_closed) {
+        ::close(_fd);
+    }
 }
 
 std::string TcpSession::getClientIP() {
