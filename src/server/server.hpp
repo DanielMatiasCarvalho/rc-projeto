@@ -1,3 +1,9 @@
+/**
+ * @file server.hpp
+ * @brief Header file for the server program.
+ * 
+ * This file contains the class Server, used to represent a server object
+ */
 #ifndef __CLIENT_HPP__
 #define __CLIENT_HPP__
 

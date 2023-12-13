@@ -1,6 +1,8 @@
 /**
  * @file network.hpp
- * @brief This file contains the declaration of the UdpServer, TcpServer, SocketException, and TimeoutException classes.
+ * @brief Header file for the network program.
+ * 
+ * This file contains the declaration of the UdpServer, TcpServer, TcpSession, SocketException, and TimeoutException classes.
  */
 
 #ifndef __NETWORK_HPP__
@@ -26,12 +28,12 @@
  */
 class UdpServer {
   private:
-    int _fd;
-    bool _closed = false;
-    struct addrinfo _hints;
-    struct addrinfo *_res;
-    struct sockaddr_in _client;
-    socklen_t _clientSize = sizeof(_client);
+    int _fd; //The file descriptor created by the socket() function
+    bool _closed = false; //Flag indicating whether the server has been closed
+    struct addrinfo _hints; //The address info hints
+    struct addrinfo *_res; //The address info res
+    struct sockaddr_in _client; //The client address
+    socklen_t _clientSize = sizeof(_client); //The client address size
 
   public:
     /**
@@ -57,10 +59,23 @@ class UdpServer {
      */
     std::stringstream receive();
 
+    /**
+     * @brief Closes the network connection.
+     */
     void close();
 
+    /**
+     * @brief Get the IP address of the client.
+     * 
+     * @return std::string The IP address of the client.
+     */
     std::string getClientIP();
 
+    /**
+     * @brief Returns the port number of the client.
+     * 
+     * @return std::string The client port number.
+     */
     std::string getClientPort();
 };
 
@@ -70,10 +85,10 @@ class UdpServer {
  */
 class TcpServer {
   private:
-    int _fd;
-    bool _closed = false;
-    struct addrinfo _hints;
-    struct addrinfo *_res;
+    int _fd; //The file descriptor created by the socket() function
+    bool _closed = false; //Flag indicating whether the server has been closed
+    struct addrinfo _hints; //The address info hints
+    struct addrinfo *_res; //The address info res
 
   public:
     /**
@@ -87,6 +102,9 @@ class TcpServer {
      */
     ~TcpServer();
 
+    /**
+     * @brief Closes the network connection.
+     */
     void close();
 
     /**
@@ -104,9 +122,9 @@ class TcpServer {
  */
 class TcpSession {
   private:
-    bool _closed = false;
-    struct sockaddr_in _client;
-    socklen_t _clientSize;
+    bool _closed = false; //Flag indicating whether the session has been closed
+    struct sockaddr_in _client; //The client address
+    socklen_t _clientSize; //The client address size
 
   public:
     int _fd;
@@ -135,10 +153,23 @@ class TcpSession {
      */
     std::stringstream receive();
 
+    /**
+     * @brief Closes the network connection.
+     */
     void close();
 
+    /**
+     * @brief Get the IP address of the client.
+     * 
+     * @return std::string The IP address of the client.
+     */
     std::string getClientIP();
 
+    /**
+     * @brief Returns the port number of the client.
+     * 
+     * @return std::string The client port number.
+     */
     std::string getClientPort();
 };
 
