@@ -1,3 +1,11 @@
+
+/**
+ * @file command.cpp
+ * @brief Implementation of the CommandManager class and its derived classes.
+ *
+ * This file contains the implementation of the CommandManager class, which is responsible for registering and handling commands.
+ * It also includes the implementation of the derived classes which handle specific commands.
+ */
 #include "command.hpp"
 
 /**
