@@ -99,7 +99,7 @@ class TcpServer {
 class TcpSession {
   private:
     struct sockaddr_in _client;
-    socklen_t _clientSize = sizeof(_client);
+    socklen_t _clientSize;
 
   public:
     int _fd;

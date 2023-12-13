@@ -110,7 +110,7 @@ TcpServer::~TcpServer() {
 int TcpServer::acceptConnection(struct sockaddr_in &client,
                                 socklen_t &clientSize) {
     sockaddr_in clientAddress;
-    socklen_t clientAddressSize;
+    socklen_t clientAddressSize = sizeof(clientAddress);
 
     int clientFd =
         accept(_fd, (struct sockaddr *)&clientAddress, &clientAddressSize);
