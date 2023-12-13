@@ -215,8 +215,8 @@ void ShowRecordCommand::handle(MessageSource &message,
 
         std::vector<AuctionBidInfo> auctionBidInfo =
             receiver._database->getAuctionBids(showRecordCommunication._aid);
-        int size = auctionBidInfo.size();
-        int i = 0;
+        long unsigned int size = auctionBidInfo.size();
+        long unsigned int i = 0;
         if (size > 50) {
             i = size - 50;
         }
