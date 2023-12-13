@@ -28,12 +28,12 @@
  */
 class UdpServer {
   private:
-    int _fd; //The file descriptor created by the socket() function
-    bool _closed = false; //Flag indicating whether the server has been closed
-    struct addrinfo _hints; //The address info hints
-    struct addrinfo *_res; //The address info res
-    struct sockaddr_in _client; //The client address
-    socklen_t _clientSize = sizeof(_client); //The client address size
+    int _fd;  //The file descriptor created by the socket() function
+    bool _closed = false;  //Flag indicating whether the server has been closed
+    struct addrinfo _hints;                   //The address info hints
+    struct addrinfo *_res;                    //The address info res
+    struct sockaddr_in _client;               //The client address
+    socklen_t _clientSize = sizeof(_client);  //The client address size
 
   public:
     /**
@@ -85,10 +85,10 @@ class UdpServer {
  */
 class TcpServer {
   private:
-    int _fd; //The file descriptor created by the socket() function
-    bool _closed = false; //Flag indicating whether the server has been closed
-    struct addrinfo _hints; //The address info hints
-    struct addrinfo *_res; //The address info res
+    int _fd;  //The file descriptor created by the socket() function
+    bool _closed = false;  //Flag indicating whether the server has been closed
+    struct addrinfo _hints;  //The address info hints
+    struct addrinfo *_res;   //The address info res
 
   public:
     /**
@@ -122,9 +122,9 @@ class TcpServer {
  */
 class TcpSession {
   private:
-    bool _closed = false; //Flag indicating whether the session has been closed
-    struct sockaddr_in _client; //The client address
-    socklen_t _clientSize; //The client address size
+    bool _closed = false;  //Flag indicating whether the session has been closed
+    struct sockaddr_in _client;  //The client address
+    socklen_t _clientSize;       //The client address size
 
   public:
     int _fd;

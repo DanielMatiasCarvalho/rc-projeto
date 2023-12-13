@@ -182,7 +182,8 @@ void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server) {
         //Accept a connection from the client, storing its information in client and clientSize
         int fd = tcpServer.acceptConnection(client, clientSize);
 
-        TcpSession session(fd, client, clientSize); //Initialize the TCP session
+        TcpSession session(fd, client,
+                           clientSize);  //Initialize the TCP session
 
         pid_t pid;
         if ((pid = fork()) == -1) {  //Fork the process
