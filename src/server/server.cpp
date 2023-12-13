@@ -140,6 +140,7 @@ void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server) {
         if ((pid = fork()) == -1) {
             exit(1);
         } else if (pid == 0) {
+            tcpServer.close();
             server.showMessage(Message::ServerConnectionDetails(
                 session.getClientIP(), session.getClientPort(), "TCP"));
             TcpMessage message(session._fd);
