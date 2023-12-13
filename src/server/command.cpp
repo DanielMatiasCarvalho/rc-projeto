@@ -215,13 +215,20 @@ void ShowRecordCommand::handle(MessageSource &message,
 
         std::vector<AuctionBidInfo> auctionBidInfo =
             receiver._database->getAuctionBids(showRecordCommunication._aid);
-
-        for (auto c : auctionBidInfo) {
-            showRecordCommunication._bidderUids.push_back(c.uid);
-            showRecordCommunication._bidValues.push_back(c.bidValue);
-            showRecordCommunication._bidDateTime.push_back(c.bidTime);
-            int bidSecTime =
-                (int)difftime(c.bidTime, auctionStartInfo.startTime);
+        int size = auctionBidInfo.size();
+        int i = 0;
+        if (size > 50) {
+            i = size - 50;
+        }
+        for (; i < size; i++) {
+            showRecordCommunication._bidderUids.push_back(
+                auctionBidInfo[i].uid);
+            showRecordCommunication._bidValues.push_back(
+                auctionBidInfo[i].bidValue);
+            showRecordCommunication._bidDateTime.push_back(
+                auctionBidInfo[i].bidTime);
+            int bidSecTime = (int)difftime(auctionBidInfo[i].bidTime,
+                                           auctionStartInfo.startTime);
             showRecordCommunication._bidSecTimes.push_back(bidSecTime);
         }
 
