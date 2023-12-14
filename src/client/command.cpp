@@ -332,7 +332,7 @@ void BidCommand::handle(std::vector<std::string> args, Client &receiver) {
     }
 
     std::string AID = args[0];
-    std::string value = args[0];
+    std::string value = args[1];
 
     if (AID.length() != 3 || value.length() > 6) {
         throw CommandArgumentException(_usage);
