@@ -8,7 +8,6 @@
  */
 #include "command.hpp"
 
-
 void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler,
                                      bool isTCP) {
     if (isTCP) {  //Checks if the command is TCP or UDP
