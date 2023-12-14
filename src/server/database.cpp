@@ -46,6 +46,8 @@ void Database::logoutUser(std::string uid, std::string password) {
         throw LoginException();
     }
 
+    _core->setLoggedOut(uid);
+
     unlock();
 }
 
@@ -596,6 +598,16 @@ void DatabaseCore::setLoggedIn(std::string uid) {
     std::ofstream loggedInFile(loggedInPath);
 
     loggedInFile << "1";
+}
+
+void DatabaseCore::setLoggedOut(std::string uid) {
+    guaranteeUserStructure(uid);
+
+    fs::path loggedInPath = *_path / "USERS" / uid / (uid+"_login");
+
+    if (fs::exists(loggedInPath)) {
+        fs::remove(loggedInPath);
+    }
 }
 
 bool DatabaseCore::isUserLoggedIn(std::string uid) {
