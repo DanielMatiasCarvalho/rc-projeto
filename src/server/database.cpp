@@ -603,7 +603,7 @@ void DatabaseCore::setLoggedIn(std::string uid) {
 void DatabaseCore::setLoggedOut(std::string uid) {
     guaranteeUserStructure(uid);
 
-    fs::path loggedInPath = *_path / "USERS" / uid / (uid+"_login");
+    fs::path loggedInPath = *_path / "USERS" / uid / (uid + "_login");
 
     if (fs::exists(loggedInPath)) {
         fs::remove(loggedInPath);
