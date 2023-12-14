@@ -251,14 +251,14 @@ void Database::bidAuction(std::string uid, std::string password,
         throw AuctionEndedException();
     }
 
-    if (value <= getAuctionCurrentMaxValue(aid)) {
-        unlock();
-        throw BidValueException();
-    }
-
     if (getAuctionOwner(aid) == uid) {
         unlock();
         throw AuctionOwnerException();
+    }
+
+    if (value <= getAuctionCurrentMaxValue(aid)) {
+        unlock();
+        throw BidValueException();
     }
 
     AuctionBidInfo bidInfo;
