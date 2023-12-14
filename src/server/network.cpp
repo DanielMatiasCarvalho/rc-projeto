@@ -4,11 +4,6 @@
  */
 #include "network.hpp"
 
-/**
- * @brief Constructor for the UdpServer class.
- * 
- * @param port The port number to bind the server to.
- */
 UdpServer::UdpServer(std::string port) {
     _fd = socket(AF_INET, SOCK_DGRAM, 0);  //Create the socket
 
@@ -34,11 +29,6 @@ UdpServer::UdpServer(std::string port) {
     }
 }
 
-/**
- * @brief Destructor for the UdpServer class.
- * 
- * This destructor is responsible for cleaning up any resources used by the UdpServer object.
- */
 UdpServer::~UdpServer() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket
@@ -46,11 +36,6 @@ UdpServer::~UdpServer() {
     freeaddrinfo(_res);  //Free the address info
 }
 
-/**
- * @brief Sends a message via UDP.
- *
- * @param message The message to be sent.
- */
 void UdpServer::send(std::stringstream &message) {
     char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_SERVER];  //The message buffer
 
@@ -89,20 +74,12 @@ std::stringstream UdpServer::receive() {
     return message;
 }
 
-/**
- * @brief Closes the UDP server.
- */
 void UdpServer::close() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket
     }
 }
 
-/**
- * @brief Returns the IP address of the client connected to the UDP server.
- *
- * @return The IP address of the client as a string.
- */
 std::string UdpServer::getClientIP() {
     char ip[INET_ADDRSTRLEN];  //The IP address buffer
     inet_ntop(AF_INET, &_client.sin_addr, ip,
@@ -110,20 +87,10 @@ std::string UdpServer::getClientIP() {
     return std::string(ip);
 }
 
-/**
- * @brief Returns the port number of the client.
- *
- * @return The port number of the client as a string.
- */
 std::string UdpServer::getClientPort() {
     return std::to_string(ntohs(_client.sin_port));  //Get the port number
 }
 
-/**
- * @brief Constructs a TcpServer object with the specified port.
- *
- * @param port The port number to bind the server to.
- */
 TcpServer::TcpServer(std::string port) {
     _fd = socket(AF_INET, SOCK_STREAM, 0);  //Create the socket
     if (_fd == -1) {                        //Check for errors
@@ -156,12 +123,6 @@ TcpServer::TcpServer(std::string port) {
     }
 }
 
-/**
- * @brief Destructor for the TcpServer class.
- * 
- * This destructor is responsible for cleaning up any resources
- * used by the TcpServer object.
- */
 TcpServer::~TcpServer() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket
@@ -169,13 +130,6 @@ TcpServer::~TcpServer() {
     freeaddrinfo(_res);  //Free the address info
 }
 
-/**
- * Accepts a new client connection.
- *
- * @param client The client's socket address structure.
- * @param clientSize The size of the client's socket address structure.
- * @return The file descriptor of the accepted connection, or -1 if an error occurred.
- */
 int TcpServer::acceptConnection(struct sockaddr_in &client,
                                 socklen_t &clientSize) {
     sockaddr_in clientAddress;
@@ -194,22 +148,12 @@ int TcpServer::acceptConnection(struct sockaddr_in &client,
     return clientFd;
 }
 
-/**
- * @brief Closes the TCP server.
- */
 void TcpServer::close() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket
     }
 }
 
-/**
- * @brief Constructs a TcpSession object.
- *
- * @param fd The file descriptor of the TCP session.
- * @param client The client's socket address structure.
- * @param clientSize The size of the client's socket address structure.
- */
 TcpSession::TcpSession(int fd, struct sockaddr_in client,
                        socklen_t clientSize) {
     _fd = fd;                  //Set the file descriptor
@@ -224,20 +168,12 @@ TcpSession::TcpSession(int fd, struct sockaddr_in client,
                sizeof(read_timeout));  //Set the socket options
 }
 
-/**
- * @brief Destructor for the TcpSession class.
- */
 TcpSession::~TcpSession() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket
     }
 }
 
-/**
- * @brief Sends a message over the TCP session.
- *
- * @param message The message to be sent.
- */
 void TcpSession::send(std::stringstream &message) {
     char messageBuffer[SOCKETS_TCP_BUFFER_SIZE];  //The message buffer
 
@@ -257,11 +193,6 @@ void TcpSession::send(std::stringstream &message) {
     }
 }
 
-/**
- * @brief Receives data from the TCP session.
- * 
- * @return std::stringstream The received data.
- */
 std::stringstream TcpSession::receive() {
     char messageBuffer[SOCKETS_TCP_BUFFER_SIZE];  //The message buffer
     std::stringstream message;
@@ -293,20 +224,12 @@ std::stringstream TcpSession::receive() {
     return message;
 }
 
-/**
- * @brief Closes the TCP session.
- */
 void TcpSession::close() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket
     }
 }
 
-/**
- * @brief Returns the IP address of the client connected to the TCP session.
- *
- * @return The IP address of the client as a string.
- */
 std::string TcpSession::getClientIP() {
     char ip[INET_ADDRSTRLEN];  //The IP address buffer
     inet_ntop(AF_INET, &_client.sin_addr, ip,
@@ -314,11 +237,6 @@ std::string TcpSession::getClientIP() {
     return std::string(ip);
 }
 
-/**
- * @brief Returns the port number of the client connected to the TCP session.
- *
- * @return The client port number as a string.
- */
 std::string TcpSession::getClientPort() {
     return std::to_string(ntohs(_client.sin_port));  //Get the port number
 }

@@ -8,27 +8,10 @@
 #include "server.hpp"
 #include "command.hpp"
 
-/**
- * @brief Starts and runs the UDP server.
- * 
- * This function initializes and runs the UDP server.
- */
 void UDPServer(UdpServer &udpServer, CommandManager &manager, Server &server);
 
-/**
- * @brief Starts and runs the TCP server.
- * 
- * This function initializes and runs the TCP server.
- */
 void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server);
 
-/**
- * @brief The main function of the server program.
- *
- * @param argc The number of command-line arguments.
- * @param argv An array of strings containing the command-line arguments.
- * @return An integer representing the exit status of the program.
- */
 int main(int argc, char **argv) {
     Server server(argc, argv);  //Initialize the server
     CommandManager manager;     //Initialize the command manager
@@ -88,15 +71,6 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-/**
- * @brief Constructs a Server object.
- * 
- * This constructor initializes the Server object with the provided command line arguments.
- * It parses the command line arguments and sets the port and verbosity options accordingly.
- * 
- * @param argc The number of command line arguments.
- * @param argv An array of command line arguments.
- */
 Server::Server(int argc, char **argv) {
     char c;
     //Parse command line arguments
@@ -117,37 +91,17 @@ Server::Server(int argc, char **argv) {
         "database");  //Initialize the database in path ./database
 }
 
-/**
- * @brief Displays the information about the server.
- * 
- * This function prints the port number and verbosity level of the server.
- */
 void Server::ShowInfo() {
     std::cout << "Port: " << _port << std::endl
               << "Verbose: " << _verbose << std::endl;
 }
 
-/**
- * Displays a message if the server is in verbose mode.
- *
- * @param message The message to be displayed.
- */
 void Server::showMessage(std::string message) {
     if (_verbose) {
         std::cout << "[LOG] " << message << std::endl;
     }
 }
 
-/**
- * @brief Function that handles the UDP server.
- * 
- * This function receives an instance of UdpServer, CommandManager, and Server classes
- * and performs the necessary operations to handle the UDP server requests.
- * 
- * @param udpServer The UDP server instance.
- * @param manager The command manager instance.
- * @param server The server instance.
- */
 void UDPServer(UdpServer &udpServer, CommandManager &manager, Server &server) {
     while (1) {
         std::stringstream message =
@@ -165,16 +119,6 @@ void UDPServer(UdpServer &udpServer, CommandManager &manager, Server &server) {
     }
 }
 
-/**
- * @brief Function that handles the TCP server.
- * 
- * This function receives an instance of TcpServer, CommandManager, and Server classes
- * and performs the necessary operations to handle the TCP server requests.
- * 
- * @param tcpServer The TCP server instance.
- * @param manager The command manager instance.
- * @param server The server instance.
- */
 void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server) {
     while (1) {
         struct sockaddr_in client;

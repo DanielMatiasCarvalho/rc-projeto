@@ -8,11 +8,7 @@
  */
 #include "command.hpp"
 
-/**
- * Registers a command handler.
- *
- * @param handler The command handler to register.
- */
+
 void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler,
                                      bool isTCP) {
     if (isTCP) {  //Checks if the command is TCP or UDP
@@ -24,16 +20,6 @@ void CommandManager::registerCommand(std::shared_ptr<CommandHandler> handler,
     }
 }
 
-/**
- * @brief Reads and processes a command from a given message.
- * 
- * This function takes a stringstream message as input and processes the command contained in it.
- * The processed command is then executed on the correct handle function, which Server object is 
- * passed as a reference.
- * 
- * @param message The stringstream containing the command message.
- * @param receiver The Server object that receives the command.
- */
 void CommandManager::readCommand(MessageSource &message,
                                  std::stringstream &response, Server &receiver,
                                  bool isTCP) {
@@ -70,13 +56,6 @@ void CommandManager::readCommand(MessageSource &message,
     }
 }
 
-/**
- * @brief Handles the login command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void LoginCommand::handle(MessageSource &message, std::stringstream &response,
                           Server &receiver) {
 
@@ -106,13 +85,6 @@ void LoginCommand::handle(MessageSource &message, std::stringstream &response,
         loginCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles the logout command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void LogoutCommand::handle(MessageSource &message, std::stringstream &response,
                            Server &receiver) {
     LogoutCommunication
@@ -140,13 +112,6 @@ void LogoutCommand::handle(MessageSource &message, std::stringstream &response,
         logoutCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles the unregister command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void UnregisterCommand::handle(MessageSource &message,
                                std::stringstream &response, Server &receiver) {
     UnregisterCommunication
@@ -174,13 +139,6 @@ void UnregisterCommand::handle(MessageSource &message,
         unregisterCommunication._status));
 }
 
-/**
- * @brief Handles the list user auctions command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void ListUserAuctionsCommand::handle(MessageSource &message,
                                      std::stringstream &response,
                                      Server &receiver) {
@@ -213,13 +171,6 @@ void ListUserAuctionsCommand::handle(MessageSource &message,
         listUserAuctionsCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles the list user bids command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void ListUserBidsCommand::handle(MessageSource &message,
                                  std::stringstream &response,
                                  Server &receiver) {
@@ -250,13 +201,6 @@ void ListUserBidsCommand::handle(MessageSource &message,
         listUserBidsCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles the list all auctions command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void ListAllAuctionsCommand::handle(MessageSource &message,
                                     std::stringstream &response,
                                     Server &receiver) {
@@ -284,13 +228,6 @@ void ListAllAuctionsCommand::handle(MessageSource &message,
         listAllAuctionsCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles the show record command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void ShowRecordCommand::handle(MessageSource &message,
                                std::stringstream &response, Server &receiver) {
     ShowRecordCommunication
@@ -365,13 +302,6 @@ void ShowRecordCommand::handle(MessageSource &message,
         "Show Record", showRecordCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles the open command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void OpenCommand::handle(MessageSource &message, std::stringstream &response,
                          Server &receiver) {
     OpenAuctionCommunication
@@ -406,13 +336,6 @@ void OpenCommand::handle(MessageSource &message, std::stringstream &response,
         openAuctionCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles the close command.
- * 
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void CloseCommand::handle(MessageSource &message, std::stringstream &response,
                           Server &receiver) {
     CloseAuctionCommunication
@@ -448,13 +371,6 @@ void CloseCommand::handle(MessageSource &message, std::stringstream &response,
         closeAuctionCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles the show asset command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void ShowAssetCommand::handle(MessageSource &message,
                               std::stringstream &response, Server &receiver) {
     ShowAssetCommunication
@@ -479,13 +395,6 @@ void ShowAssetCommand::handle(MessageSource &message,
         "Show Asset", showAssetCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles the bid command.
- *
- * @param message The MessageSource object containing the command message.
- * @param response The std::stringstream object to store the response.
- * @param receiver The Server object to interact with.
- */
 void BidCommand::handle(MessageSource &message, std::stringstream &response,
                         Server &receiver) {
     BidCommunication
@@ -522,13 +431,6 @@ void BidCommand::handle(MessageSource &message, std::stringstream &response,
         bidCommunication._status));  //Display the message
 }
 
-/**
- * @brief Handles a protocol error.
- * 
- * This function is responsible for handling a protocol error and updating the response accordingly.
- * 
- * @param response The response stream to be updated.
- */
 void protocolError(std::stringstream &response) {
     std::string str =
         PROTOCOL_ERROR_IDENTIFIER;  //The protocol error identifier
