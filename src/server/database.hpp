@@ -89,6 +89,7 @@ class DatabaseCore {
     bool userExists(std::string uid);
     bool isUserRegistered(std::string uid);
     void setLoggedIn(std::string uid);
+    void setLoggedOut(std::string uid);
     bool isUserLoggedIn(std::string uid);
     void registerUser(std::string uid, std::string password);
     std::string getUserPassword(std::string uid);
