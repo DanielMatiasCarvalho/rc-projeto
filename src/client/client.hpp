@@ -98,7 +98,7 @@ class Client {
     std::stringstream readFile(std::string fName);
 
     /**
-     * @brief Ensures that the download directory exists.
+     * @brief Ensures that the download directory for the files exists.
      */
     void assureDirectory();
 
