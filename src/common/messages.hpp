@@ -1,4 +1,7 @@
-
+/**
+ * @file messages.hpp
+ * @brief This file contains the class Message, which contains static methods for displaying various messages.
+ */
 #ifndef __MESSAGES_HPP__
 #define __MESSAGES_HPP__
 
@@ -193,12 +196,33 @@ class Message {
                                std::vector<std::time_t> bidDateTime,
                                std::vector<int> bidSecTimes);
 
+    /**
+     * @brief Generates a string with server request details.
+     * @param uid The ID of the user.
+     * @param requestType The type of the request.
+     * @param resultType The type of the result.
+     * @return The generated string.
+     */
     static std::string ServerRequestDetails(std::string uid,
                                             std::string requestType,
                                             std::string resultType);
+
+    /**
+     * @brief Generates a string with server request details.
+     * @param requestType The type of the request.
+     * @param resultType The type of the result.
+     * @return The generated string.
+     */
     static std::string ServerRequestDetails(std::string requestType,
                                             std::string resultType);
 
+    /**
+     * @brief Generates a string with server connection details.
+     * @param ip The IP address of the request.
+     * @param port The port number of the request.
+     * @param protocol The protocol used for the connection.
+     * @return The generated string.
+     */
     static std::string ServerConnectionDetails(std::string ip, std::string port,
                                                std::string protocol);
 };

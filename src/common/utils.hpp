@@ -1,3 +1,7 @@
+/**
+ * @file utils.hpp
+ * @brief This file contains utility functions for string manipulation and time conversion.
+ */
 #ifndef __UTILS_HPP__
 #define __UTILS_HPP__
 

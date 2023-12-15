@@ -1,3 +1,7 @@
+/**
+ * @file messages.cpp
+ * @brief Implementation of the messages to be displayed by the Client or the Server.
+ */
 #include "messages.hpp"
 
 using namespace std;
@@ -79,11 +83,11 @@ void Message::ShowUser(string uid) {
 }
 
 void Message::ListAuctionsAndState(const map<string, string> &list) {
-    for (auto auction : list) {
+    for (auto auction : list) { //For each auction in the list
         string state;
-        if (auction.second == "0") {
+        if (auction.second == "0") { //If the auction is not active
             state = " NOT ACTIVE";
-        } else {
+        } else { //If the auction is active
             state = " ACTIVE";
         }
         cout << "Auction " << auction.first << "-" << state << endl;
@@ -119,6 +123,7 @@ void Message::BidOwnAuctions() {
 }
 
 void Message::AuctionRecordEnded(time_t endDateTime, int endSecTime) {
+    //The header of the record end data
     cout << "                                    AUCTION HAS ENDED             "
             "                       "
          << endl;
@@ -141,6 +146,7 @@ void Message::ShowRecordHeader(string aid, string host, string auctionName,
     cout << "------------------------------------------------------------------"
             "-----------------------"
          << endl;
+    //The details of the auction
     cout << "Auction ID: \t\t\t" << aid << endl;
     cout << "Host ID: \t\t\t" << host << endl;
     cout << "Auction Name: \t\t\t" << auctionName << endl;
@@ -164,9 +170,10 @@ void Message::ShowRecordBids(vector<string> bidderUids, vector<int> bidValues,
                              vector<time_t> bidDateTime,
                              vector<int> bidSecTimes) {
     long unsigned int size = bidderUids.size();
+    //The header of the bids
     cout << "Bidder ID\tBid Value\tBid Date and Time\tTime Elapsed (seconds)"
          << endl;
-    for (long unsigned int i = 0; i < size; i++) {
+    for (long unsigned int i = 0; i < size; i++) { //For each bid
         cout << " " << bidderUids[i] << "\t\t  " << bidValues[i] << "\t      "
              << DateTimeToString(bidDateTime[i]) << "\t\t" << bidSecTimes[i]
              << endl;
@@ -179,16 +186,19 @@ void Message::ShowRecordBids(vector<string> bidderUids, vector<int> bidValues,
 std::string Message::ServerRequestDetails(std::string uid,
                                           std::string requestType,
                                           std::string resultType) {
+    //For commands which send both the UID and the Password of the user
     return "From: " + uid + " Request: " + requestType +
            " Result: " + resultType;
 }
 
 std::string Message::ServerRequestDetails(std::string requestType,
                                           std::string resultType) {
+    //For commands which send only the Password of the user
     return "Request: " + requestType + " Result: " + resultType;
 }
 
 std::string Message::ServerConnectionDetails(std::string ip, std::string port,
                                              std::string protocol) {
+    //Shows the details of the Client connected to the Server
     return "Request received from: " + ip + ":" + port + " (" + protocol + ")";
 }
