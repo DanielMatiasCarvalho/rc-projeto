@@ -1,3 +1,7 @@
+/**
+ * @file messages.cpp
+ * @brief Implementation of the messages to be displayed by the Client or the Server.
+ */
 #include "messages.hpp"
 
 using namespace std;
@@ -8,6 +12,10 @@ void Message::UserLoginSuccess() {
 
 void Message::WrongPassword() {
     cout << "Wrong password" << endl;
+}
+
+void Message::WrongUsernameOrPassword() {
+    cout << "Username does not exist or wrong password" << endl;
 }
 
 void Message::UserRegisterSuccess() {
@@ -43,7 +51,7 @@ void Message::FileTooBig() {
 }
 
 void Message::AuctionCreated(string aid) {
-    cout << "Auction successfully created. AID: " << aid << endl;
+    cout << "Auction successfully created." << endl << "AID: " << aid << endl;
 }
 
 void Message::AuctionNotCreated() {
@@ -75,14 +83,14 @@ void Message::ShowUser(string uid) {
 }
 
 void Message::ListAuctionsAndState(const map<string, string> &list) {
-    for (auto auction : list) {
+    for (auto auction : list) {  //For each auction in the list
         string state;
-        if (auction.second == "0") {
-            state = " Status: Not active";
-        } else {
-            state = " Status: Active";
+        if (auction.second == "0") {  //If the auction is not active
+            state = " NOT ACTIVE";
+        } else {  //If the auction is active
+            state = " ACTIVE";
         }
-        cout << "Auction ID: " << auction.first << state << endl;
+        cout << "Auction " << auction.first << "-" << state << endl;
     }
 }
 
@@ -115,56 +123,82 @@ void Message::BidOwnAuctions() {
 }
 
 void Message::AuctionRecordEnded(time_t endDateTime, int endSecTime) {
-    cout << "This auction has ended" << endl;
+    //The header of the record end data
+    cout << "                                    AUCTION HAS ENDED             "
+            "                       "
+         << endl;
     cout << "End Date and Time: " << DateTimeToString(endDateTime);
-    cout << " Number of seconds the auction was opened: " << endSecTime << endl;
+    cout << "\t\t\tTime Elapsed (seconds): " << endSecTime << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
 }
 
 void Message::ShowRecordHeader(string aid, string host, string auctionName,
                                string assetFname, int startValue,
                                time_t startDateTime, int timeActive) {
-    cout << "Auction ID: " << aid << endl;
-    cout << "Host ID: " << host << endl;
-    cout << "Auction Name: " << auctionName << endl;
-    cout << "Asset File Name: " << assetFname << endl;
-    cout << "Start Value: " << startValue << endl;
-    cout << "Start Date and Time: " << DateTimeToString(startDateTime) << endl;
-    cout << "Time of activity: " << timeActive << endl;
-    cout << "---------------------" << endl;
-    cout << "Bids: " << endl;
-    cout << "---------------------" << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
+    cout << "                                      AUCTION RECORD              "
+            "                       "
+         << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
+    //The details of the auction
+    cout << "Auction ID: \t\t\t" << aid << endl;
+    cout << "Host ID: \t\t\t" << host << endl;
+    cout << "Auction Name: \t\t\t" << auctionName << endl;
+    cout << "Asset File Name: \t\t" << assetFname << endl;
+    cout << "Start Value: \t\t\t" << startValue << endl;
+    cout << "Start Date and Time: \t\t" << DateTimeToString(startDateTime)
+         << endl;
+    cout << "Time of activity (seconds): \t" << timeActive << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
+    cout << "                                            BIDS                  "
+            "                       "
+         << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
 }
 
 void Message::ShowRecordBids(vector<string> bidderUids, vector<int> bidValues,
                              vector<time_t> bidDateTime,
                              vector<int> bidSecTimes) {
     long unsigned int size = bidderUids.size();
-    cout << "Bidder ID\tBid Value\tBid Date and Time\tBid Time "
-            "after the opening of the auction"
+    //The header of the bids
+    cout << "Bidder ID\tBid Value\tBid Date and Time\tTime Elapsed (seconds)"
          << endl;
-    for (long unsigned int i = 0; i < size; i++) {
-        cout << bidderUids[i] << "            ";
-        cout << bidValues[i] << "          ";
-        cout << DateTimeToString(bidDateTime[i])
-             << "                          ";
-        cout << bidSecTimes[i] << endl;
+    for (long unsigned int i = 0; i < size; i++) {  //For each bid
+        cout << " " << bidderUids[i] << "\t\t  " << bidValues[i] << "\t      "
+             << DateTimeToString(bidDateTime[i]) << "\t\t" << bidSecTimes[i]
+             << endl;
     }
-    cout << "---------------------" << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
 }
 
 std::string Message::ServerRequestDetails(std::string uid,
                                           std::string requestType,
                                           std::string resultType) {
+    //For commands which send both the UID and the Password of the user
     return "From: " + uid + " Request: " + requestType +
            " Result: " + resultType;
 }
 
 std::string Message::ServerRequestDetails(std::string requestType,
                                           std::string resultType) {
+    //For commands which send only the Password of the user
     return "Request: " + requestType + " Result: " + resultType;
 }
 
 std::string Message::ServerConnectionDetails(std::string ip, std::string port,
                                              std::string protocol) {
+    //Shows the details of the Client connected to the Server
     return "Request received from: " + ip + ":" + port + " (" + protocol + ")";
 }

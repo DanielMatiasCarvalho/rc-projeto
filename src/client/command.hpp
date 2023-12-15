@@ -1,3 +1,7 @@
+/**
+ * @file command.hpp
+ * @brief Header file of classes and related functions for command handling.
+ */
 #ifndef __COMMAND_HPP__
 #define __COMMAND_HPP__
 
@@ -30,10 +34,10 @@ class CommandHandler {
      */
     virtual void handle(std::vector<std::string> args, Client &receiver) = 0;
 
-    std::string _name;        /**< The name of the command. */
-    std::string _description; /**< The description of the command. */
-    std::string _usage;       /**< The usage information of the command. */
-    std::vector<std::string> _alias; /**< The aliases of the command. */
+    std::string _name;                // The name of the command
+    std::string _description;         // The description of the command
+    std::string _usage;               // The usage information of the command
+    std::vector<std::string> _alias;  // The aliases of the command
 
   protected:
     /**
@@ -58,7 +62,7 @@ class CommandHandler {
 class CommandManager {
   private:
     std::unordered_map<std::string, std::shared_ptr<CommandHandler>> handlers =
-        {};
+        {};  // The registered command handlers
 
   public:
     /**
@@ -102,6 +106,7 @@ class LogoutCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the logout command.
+     * 
      * @param args The command arguments.
      * @param receiver The client object.
      */

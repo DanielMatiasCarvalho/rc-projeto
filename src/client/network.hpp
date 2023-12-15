@@ -26,10 +26,10 @@
  */
 class UdpClient {
   private:
-    int _fd;
-    struct addrinfo _hints;
-    struct addrinfo *_res;
-    struct sockaddr_in _addr;
+    int _fd;                   //The file descriptor of the socket
+    struct addrinfo _hints;    //The address flags
+    struct addrinfo *_res;     //The address info
+    struct sockaddr_in _addr;  //The address
 
   public:
     /**
@@ -63,9 +63,9 @@ class UdpClient {
  */
 class TcpClient {
   private:
-    int _fd;
-    struct addrinfo _hints;
-    struct addrinfo *_res;
+    int _fd;                 //The file descriptor of the socket
+    struct addrinfo _hints;  //The address flags
+    struct addrinfo *_res;   //The address info
 
   public:
     /**
