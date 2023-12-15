@@ -101,7 +101,7 @@ class DatabaseCore {
     std::unique_ptr<fs::path> _path;
 
   public:
-  /**
+    /**
    * @brief  Constructor of the core, just initializes and creates the base structure.
    * @param  path the path of the database directory.
    */
@@ -218,27 +218,97 @@ class DatabaseCore {
      */
     std::vector<std::string> getUserHostedAuctions(std::string uid);
 
+    /**
+     * @brief  Creates an auction entry in the db.
+     * @param  aid The auction's AID.
+     * @param  startInfo Structure containing the start information of the auction.
+     */
     void createAuction(std::string aid, AuctionStartInfo &startInfo);
+
+    /**
+     * @brief  Checks if the auction exists in the db.
+     * @param  aid The auction's AID.
+     * @retval true if the auction exists, false otherise
+     */
     bool auctionExists(std::string aid);
+
+    /**
+     * @brief  Gets a specific auction's start information.
+     * @param  aid The auction's AID.
+     * @retval A structure containing all of the auction's start information.
+     */
     AuctionStartInfo getAuctionStartInfo(std::string aid);
+
+    /**
+     * @brief  Sets an auction to the Ended state.
+     * @param  aid The auction's AID.
+     * @param  endInfo Structure containing the end information.
+    */
     void endAuction(std::string aid, AuctionEndInfo endInfo);
+
+    /**
+     * @brief  Checks if a specific auction has ended.
+     * @param  aid The auction's AID.
+     * @retval true if the auction has ended, false otherwise
+     */
     bool hasAuctionEnded(std::string aid);
+
+    /**
+     * @brief  Gets a specific auction's end information.
+     * @param  aid The auction's AID.
+     * @retval A structure containing the auction's end information.
+     */
     AuctionEndInfo getAuctionEndInfo(std::string aid);
+
+    /**
+     * @brief  Gets a specific auction's asset file path.
+     * @param  aid The auction's AID.
+     * @retval a path object to the auction's asset file.
+     */
     fs::path getAuctionFilePath(std::string aid);
+
+    /**
+     * @brief  Gets a specific auction's asset file name.
+     * @param  aid The auction's AID.
+     * @retval a string containing the name of the auction's asset file.
+     */
     std::string getAuctionFileName(std::string aid);
+
+    /**
+     * @brief  Gets the information of a specific bid on a specific auction.
+     * @param  aid The auction's AID.
+     * @param  value The bid's value.
+     * @retval a structure containing all of the bid's information.
+     */
     AuctionBidInfo getAuctionBidInfo(std::string aid, std::string value);
+
+    /**
+     * @brief  Gets all of the bid's from a specific auction.
+     * @param  aid The auction's AID.
+     * @retval a vector of structures, each containing the information of a single bid.
+     */
     std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
+
+    /**
+     * @brief  Adds a specific bid to a specific auction.
+     * @param  aid The auction's AID.
+     * @param  bidInfo Structure containing the info of the bid.
+     */
     void addAuctionBid(std::string aid, AuctionBidInfo &bidInfo);
 
+    /**
+     * @brief  Get's all the auctions currently in the database.
+     * @retval vector containing the AIDs of all of the auctions.
+     */
     std::vector<std::string> getAllAuctions();
 };
 
 class Database {
   private:
     std::unique_ptr<DatabaseLock> _lock;
+    std::unique_ptr<DatabaseCore> _core;
 
   public:
-    std::unique_ptr<DatabaseCore> _core;
     Database(std::string path);
 
     void lock();
