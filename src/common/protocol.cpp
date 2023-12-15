@@ -1,9 +1,10 @@
 #include "protocol.hpp"
 
 char ProtocolCommunication::readChar(std::stringstream &message) {
-    char c = (char)message.get();
+    char c = (char)message
+                 .get();  //get() returns an int, so we need to cast it to char
 
-    if (!message.good()) {
+    if (!message.good()) {  //if the stream is not good, throw an exception
         throw ProtocolViolationException();
     }
 
@@ -11,9 +12,10 @@ char ProtocolCommunication::readChar(std::stringstream &message) {
 }
 
 char ProtocolCommunication::readChar(MessageSource &message) {
-    char c = (char)message.get();
+    char c = (char)message
+                 .get();  //get() returns an int, so we need to cast it to char
 
-    if (!message.good()) {
+    if (!message.good()) {  //if the stream is not good, throw an exception
         throw ProtocolViolationException();
     }
 
@@ -22,29 +24,31 @@ char ProtocolCommunication::readChar(MessageSource &message) {
 
 void ProtocolCommunication::readChar(MessageSource &message, char expected) {
     if (readChar(message) != expected) {
+        //if the read char is not the expected one, throw an exception
         throw ProtocolViolationException();
     }
 }
 
 char ProtocolCommunication::readChar(MessageSource &message,
                                      std::vector<char> options) {
-    char c = readChar(message);
+    char c = readChar(message);  //read a char
 
     for (auto option : options) {
+        //check if the read char is one of the options
         if (option == c) {
             return c;
         }
     }
-
+    //if not, throw an exception
     throw ProtocolViolationException();
 }
 
 void ProtocolCommunication::readDelimiter(MessageSource &message) {
-    readChar(message, PROTOCOL_MESSAGE_DELIMITER);
+    readChar(message, PROTOCOL_MESSAGE_DELIMITER);  //read the delimiter
 }
 
 void ProtocolCommunication::readSpace(MessageSource &message) {
-    readChar(message, ' ');
+    readChar(message, ' ');  //read a space
 }
 
 std::string ProtocolCommunication::readString(MessageSource &message) {
@@ -57,18 +61,21 @@ std::string ProtocolCommunication::readString(MessageSource &message,
                                               size_t n) {
     std::string result;
 
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++) {  //read n chars
+        // Read a char
         char c = (char)message.get();
 
-        if (!message.good()) {
+        if (!message.good()) {  //if the stream is not good, throw an exception
             throw ProtocolViolationException();
         }
 
         if (c == ' ' || c == PROTOCOL_MESSAGE_DELIMITER) {
+            // If the char is a space or a delimiter, put it back in the stream
             message.unget();
             break;
         }
 
+        // Otherwise, add it to the result
         result.push_back(c);
     }
 
@@ -78,20 +85,23 @@ std::string ProtocolCommunication::readString(MessageSource &message,
 void ProtocolCommunication::readString(MessageSource &message,
                                        std::string expected) {
     if (readString(message) != expected) {
+        //if the read string is not the expected one, throw an exception
         throw ProtocolViolationException();
     }
 }
 
 std::string ProtocolCommunication::readString(
     MessageSource &message, std::vector<std::string> options) {
+    // Read a string
     std::string string = readString(message);
 
     for (auto option : options) {
+        // Check if the read string is one of the options
         if (string == option) {
             return string;
         }
     }
-
+    // If not, throw an exception
     throw ProtocolViolationException();
 }
 
@@ -103,63 +113,66 @@ int ProtocolCommunication::readNumber(MessageSource &message) {
         throw ProtocolViolationException();
     }
 
-    return stoi(string);
+    return stoi(string);  // Convert string to int
 }
 
 std::time_t ProtocolCommunication::readDateTime(MessageSource &message) {
     std::stringstream stream;
     std::string aux;
 
-    aux = readString(message, 4);
+    // Read the date and time in the format YYYY-MM-DD HH:MM:SS
+    aux = readString(message, 4);  //Year
     stream << aux;
 
     readChar(message, '-');
     stream << '-';
 
-    aux = readString(message, 2);
+    aux = readString(message, 2);  //Month
     stream << aux;
 
     readChar(message, '-');
     stream << '-';
 
-    aux = readString(message, 2);
+    aux = readString(message, 2);  //Day
     stream << aux;
 
     readSpace(message);
     stream << ' ';
 
-    aux = readString(message, 2);
+    aux = readString(message, 2);  //Hour
     stream << aux;
 
     readChar(message, ':');
     stream << ':';
 
-    aux = readString(message, 2);
+    aux = readString(message, 2);  //Minute
     stream << aux;
 
     readChar(message, ':');
     stream << ':';
 
-    aux = readString(message, 2);
+    aux = readString(message, 2);  //Second
     stream << aux;
 
     std::tm tm;
 
+    // Convert the string to a tm struct
     stream >> std::get_time(&tm, "%Y-%m-%d%n%H:%M:%S");
 
     if (!message.good()) {
         throw ProtocolViolationException();
     }
 
-    std::time_t time = std::mktime(&tm);
+    std::time_t time = std::mktime(&tm);  // Convert the tm struct to a time_t
 
     return time;
 }
 
 std::string ProtocolCommunication::readUid(MessageSource &message) {
-    std::string uid = readString(message, PROTOCOL_UID_SIZE);
+    std::string uid = readString(message, PROTOCOL_UID_SIZE);  //Read a string
 
     if (!isNumeric(uid) || uid.length() != PROTOCOL_UID_SIZE) {
+        //Check if the string only contains digits and has the correct size
         throw ProtocolViolationException();
     }
 
@@ -167,10 +180,12 @@ std::string ProtocolCommunication::readUid(MessageSource &message) {
 }
 
 std::string ProtocolCommunication::readPassword(MessageSource &message) {
-    std::string password = readString(message, PROTOCOL_PASSWORD_SIZE);
+    std::string password =
+        readString(message, PROTOCOL_PASSWORD_SIZE);  //Read a string
 
     if (!isAlphaNumeric(password) ||
         password.length() != PROTOCOL_PASSWORD_SIZE) {
+        //Check if the string only contains digits and has the correct size
         throw ProtocolViolationException();
     }
 
@@ -178,9 +193,10 @@ std::string ProtocolCommunication::readPassword(MessageSource &message) {
 }
 
 std::string ProtocolCommunication::readAid(MessageSource &message) {
-    std::string aid = readString(message, PROTOCOL_AID_SIZE);
+    std::string aid = readString(message, PROTOCOL_AID_SIZE);  //Read a string
 
     if (!isAlphaNumeric(aid) || aid.length() != PROTOCOL_AID_SIZE) {
+        //Check if the string only contains digits and has the correct size
         throw ProtocolViolationException();
     }
 
@@ -189,84 +205,91 @@ std::string ProtocolCommunication::readAid(MessageSource &message) {
 
 void ProtocolCommunication::readIdentifier(MessageSource &message,
                                            std::string identifier) {
-    std::string identifierRecieved = readString(message, 3);
+    std::string identifierRecieved = readString(message, 3);  //Read a string
 
     if (identifierRecieved == PROTOCOL_ERROR_IDENTIFIER) {
+        //If the identifier is the error identifier, throw an exception
         throw ProtocolMessageErrorException();
     } else if (identifierRecieved != identifier) {
+        //If the identifier is not the expected one, throw an exception
         throw ProtocolViolationException();
     }
 }
 
 void ProtocolCommunication::writeChar(std::stringstream &message, char c) {
-    message.put(c);
+    message.put(c);  //put() takes a char as an argument
 
-    if (!message.good()) {
+    if (!message.good()) {  //if the stream is not good, throw an exception
         throw ProtocolViolationException();
     }
 }
 
 void ProtocolCommunication::writeDelimiter(std::stringstream &message) {
-    writeChar(message, PROTOCOL_MESSAGE_DELIMITER);
+    writeChar(message, PROTOCOL_MESSAGE_DELIMITER);  //write the delimiter
 }
 
 void ProtocolCommunication::writeSpace(std::stringstream &message) {
-    writeChar(message, ' ');
+    writeChar(message, ' ');  //write a space
 }
 
 void ProtocolCommunication::writeString(std::stringstream &message,
                                         std::string string) {
-    for (auto c : string) {
+    for (auto c : string) {  //write each char of the string
         writeChar(message, c);
     }
 }
 
 void ProtocolCommunication::writeNumber(std::stringstream &message,
                                         int number) {
-    std::string value = std::to_string(number);
+    std::string value =
+        std::to_string(number);  //convert the number to a string
 
-    writeString(message, value);
+    writeString(message, value);  //write the string
 }
 
 void ProtocolCommunication::writeDateTime(std::stringstream &message,
                                           std::time_t time) {
-    std::tm tm = *(std::localtime(&time));
+    std::tm tm = *(std::localtime(&time));  //convert the time_t to a tm struct
 
+    //write the tm struct to the string format, then put it in the stringstream
     message << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
 }
 
 void ProtocolCommunication::writeUid(std::stringstream &message,
                                      std::string uid) {
     if (!isNumeric(uid) || uid.length() != PROTOCOL_UID_SIZE) {
+        //check if the string only contains digits and has the correct size
         throw ProtocolViolationException();
     }
 
-    writeString(message, uid);
+    writeString(message, uid);  //write the string
 }
 
 void ProtocolCommunication::writePassword(std::stringstream &message,
                                           std::string password) {
     if (!isAlphaNumeric(password) ||
         password.length() != PROTOCOL_PASSWORD_SIZE) {
+        //check if the string only contains digits and has the correct size
         throw ProtocolViolationException();
     }
 
-    writeString(message, password);
+    writeString(message, password);  //write the string
 }
 
 void ProtocolCommunication::writeAid(std::stringstream &message,
                                      std::string aid) {
     if (!isNumeric(aid) || aid.length() != PROTOCOL_AID_SIZE) {
+        //check if the string only contains digits and has the correct size
         throw ProtocolViolationException();
     }
 
-    writeString(message, aid);
+    writeString(message, aid);  //write the string
 }
 
 std::stringstream LoginCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "LIN");
+    writeString(message, "LIN");  //Write the identifier "LIN"
     writeSpace(message);
 
     writeUid(message, _uid);
@@ -275,13 +298,13 @@ std::stringstream LoginCommunication::encodeRequest() {
 
     writePassword(message, _password);
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void LoginCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "LIN");
+    // readIdentifier(message, "LIN"); The identifier is already read by the server
 
     readSpace(message);
 
@@ -297,25 +320,26 @@ void LoginCommunication::decodeRequest(MessageSource &message) {
 std::stringstream LoginCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RLI");
+    writeString(message, "RLI");  //Write the identifier "RLI"
     writeSpace(message);
     writeString(message, _status);
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void LoginCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RLI");
+    readIdentifier(message, "RLI");  //Read the identifier "RLI"
     readSpace(message);
+    //Read the status, and check if it is one of the options
     _status = readString(message, {"OK", "NOK", "REG"});
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream LogoutCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "LOU");
+    writeString(message, "LOU");  //Write the identifier "LOU"
     writeSpace(message);
 
     writeUid(message, _uid);
@@ -324,13 +348,13 @@ std::stringstream LogoutCommunication::encodeRequest() {
 
     writePassword(message, _password);
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void LogoutCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "LOU");
+    // readIdentifier(message, "LOU"); The identifier is already read by the server
 
     readSpace(message);
 
@@ -340,25 +364,26 @@ void LogoutCommunication::decodeRequest(MessageSource &message) {
 
     _password = readPassword(message);
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream LogoutCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RLO");
+    writeString(message, "RLO");  //Write the identifier "RLO"
     writeSpace(message);
     writeString(message, _status);
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void LogoutCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RLO");
+    readIdentifier(message, "RLO");  //Read the identifier "RLO"
     readSpace(message);
+    //Read the status, and check if it is one of the options
     _status = readString(message, {"OK", "NOK", "REG"});
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream UnregisterCommunication::encodeRequest() {
