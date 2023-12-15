@@ -119,43 +119,61 @@ void Message::BidOwnAuctions() {
 }
 
 void Message::AuctionRecordEnded(time_t endDateTime, int endSecTime) {
-    cout << "                                    AUCTION HAS ENDED                                    " << endl;
+    cout << "                                    AUCTION HAS ENDED             "
+            "                       "
+         << endl;
     cout << "End Date and Time: " << DateTimeToString(endDateTime);
     cout << "\t\t\tTime Elapsed (seconds): " << endSecTime << endl;
-    cout << "-----------------------------------------------------------------------------------------" << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
 }
 
 void Message::ShowRecordHeader(string aid, string host, string auctionName,
                                string assetFname, int startValue,
                                time_t startDateTime, int timeActive) {
-    cout << "-----------------------------------------------------------------------------------------" << endl;
-    cout << "                                      AUCTION RECORD                                     " << endl;
-    cout << "-----------------------------------------------------------------------------------------" << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
+    cout << "                                      AUCTION RECORD              "
+            "                       "
+         << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
     cout << "Auction ID: \t\t\t" << aid << endl;
     cout << "Host ID: \t\t\t" << host << endl;
     cout << "Auction Name: \t\t\t" << auctionName << endl;
     cout << "Asset File Name: \t\t" << assetFname << endl;
     cout << "Start Value: \t\t\t" << startValue << endl;
-    cout << "Start Date and Time: \t\t" << DateTimeToString(startDateTime) << endl;
+    cout << "Start Date and Time: \t\t" << DateTimeToString(startDateTime)
+         << endl;
     cout << "Time of activity (seconds): \t" << timeActive << endl;
-    cout << "-----------------------------------------------------------------------------------------" << endl;
-    cout << "                                            BIDS                                         " << endl;
-    cout << "-----------------------------------------------------------------------------------------" << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
+    cout << "                                            BIDS                  "
+            "                       "
+         << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
 }
 
 void Message::ShowRecordBids(vector<string> bidderUids, vector<int> bidValues,
                              vector<time_t> bidDateTime,
                              vector<int> bidSecTimes) {
     long unsigned int size = bidderUids.size();
-    cout
-        << "Bidder ID\tBid Value\tBid Date and Time\tTime Elapsed (seconds)"
-        << endl;
+    cout << "Bidder ID\tBid Value\tBid Date and Time\tTime Elapsed (seconds)"
+         << endl;
     for (long unsigned int i = 0; i < size; i++) {
-        cout << " " << bidderUids[i] << "\t\t  " << bidValues[i] << "\t      " 
-             << DateTimeToString(bidDateTime[i]) << "\t\t" 
-             << bidSecTimes[i] << endl;
+        cout << " " << bidderUids[i] << "\t\t  " << bidValues[i] << "\t      "
+             << DateTimeToString(bidDateTime[i]) << "\t\t" << bidSecTimes[i]
+             << endl;
     }
-    cout << "-----------------------------------------------------------------------------------------" << endl;
+    cout << "------------------------------------------------------------------"
+            "-----------------------"
+         << endl;
 }
 
 std::string Message::ServerRequestDetails(std::string uid,
