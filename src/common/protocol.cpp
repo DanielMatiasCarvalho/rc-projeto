@@ -1,3 +1,7 @@
+/**
+ * @file protocol.cpp
+ * @brief Implementation of the protocols enconders and decoder to be used by the Client or the Server.
+ */
 #include "protocol.hpp"
 
 char ProtocolCommunication::readChar(std::stringstream &message) {
@@ -389,7 +393,7 @@ void LogoutCommunication::decodeResponse(MessageSource &message) {
 std::stringstream UnregisterCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "UNR");
+    writeString(message, "UNR");  //Write the identifier "UNR"
     writeSpace(message);
 
     writeUid(message, _uid);
@@ -398,13 +402,13 @@ std::stringstream UnregisterCommunication::encodeRequest() {
 
     writePassword(message, _password);
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void UnregisterCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "UNR");
+    // readIdentifier(message, "UNR"); The identifier is already read by the server
 
     readSpace(message);
 
@@ -414,99 +418,105 @@ void UnregisterCommunication::decodeRequest(MessageSource &message) {
 
     _password = readPassword(message);
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream UnregisterCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RUR");
+    writeString(message, "RUR");  //Write the identifier "RUR"
     writeSpace(message);
     writeString(message, _status);
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void UnregisterCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RUR");
+    readIdentifier(message, "RUR");  //Read the identifier "RUR"
     readSpace(message);
+    //Read the status, and check if it is one of the options
     _status = readString(message, {"OK", "NOK", "UNR"});
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream ListUserAuctionsCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "LMA");
+    writeString(message, "LMA");  //Write the identifier "LMA"
     writeSpace(message);
 
     writeUid(message, _uid);
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ListUserAuctionsCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "LMA");
+    // readIdentifier(message, "LMA"); The identifier is already read by the server
 
     readSpace(message);
 
     _uid = readUid(message);
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream ListUserAuctionsCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RMA");
+    writeString(message, "RMA");  //Write the identifier "RMA"
 
     writeSpace(message);
     writeString(message, _status);
 
-    for (auto auction : _auctions) {
+    for (auto auction : _auctions) {  //Write each auction
         if (auction.second != "0" && auction.second != "1") {
             throw ProtocolViolationException();
         }
         writeSpace(message);
-        writeAid(message, auction.first);
+        writeAid(message, auction.first);  //Write the AID
         writeSpace(message);
-        writeString(message, auction.second);
+        writeString(message, auction.second);  //Write the auction state
     }
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ListUserAuctionsCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RMA");
+    readIdentifier(message, "RMA");  //Read the identifier "RMA"
 
     readSpace(message);
 
+    //Read the status, checking if it is one of the options
     _status = readString(message, {"OK", "NOK", "NLG"});
 
-    if (_status != "OK") {
+    if (_status !=
+        "OK") {  //If the status is not OK, read the delimiter and return
         readDelimiter(message);
         return;
     }
 
     while (1) {
+        //Read a char, checking if it is a space or a delimiter
         char c = readChar(message, {' ', PROTOCOL_MESSAGE_DELIMITER});
 
         if (c == PROTOCOL_MESSAGE_DELIMITER) {
+            //If it is a delimiter, return
             break;
         } else {
             std::string AID = readAid(message);
 
             readSpace(message);
 
+            //Read the auction state, checking if it is one of the options
             std::string status =
                 readString(message, std::vector<std::string>{"0", "1"});
 
-            _auctions.insert({AID, status});
+            _auctions.insert({AID, status});  //Insert the auction in the map
         }
     }
 }
@@ -514,76 +524,81 @@ void ListUserAuctionsCommunication::decodeResponse(MessageSource &message) {
 std::stringstream ListUserBidsCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "LMB");
+    writeString(message, "LMB");  //Write the identifier "LMB"
     writeSpace(message);
 
     writeUid(message, _uid);
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ListUserBidsCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "LMB");
+    // readIdentifier(message, "LMB"); The identifier is already read by the server
 
     readSpace(message);
 
     _uid = readUid(message);
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream ListUserBidsCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RMB");
+    writeString(message, "RMB");  //Write the identifier "RMB"
 
     writeSpace(message);
     writeString(message, _status);
 
-    for (auto auction : _bids) {
+    for (auto auction : _bids) {  //Write each bid
         if (auction.second != "0" && auction.second != "1") {
             throw ProtocolViolationException();
         }
 
         writeSpace(message);
-        writeAid(message, auction.first);
+        writeAid(message, auction.first);  //Write the AID
         writeSpace(message);
-        writeString(message, auction.second);
+        writeString(message, auction.second);  //Write the auction state
     }
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ListUserBidsCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RMB");
+    readIdentifier(message, "RMB");  //Read the identifier "RMB"
 
     readSpace(message);
 
+    //Read the status, checking if it is one of the options
     _status = readString(message, {"OK", "NOK", "NLG"});
 
     if (_status != "OK") {
+        //If the status is not OK, read the delimiter and return
         readDelimiter(message);
         return;
     }
 
     while (1) {
+        //Read a char, checking if it is a space or a delimiter
         char c = readChar(message, {' ', PROTOCOL_MESSAGE_DELIMITER});
 
         if (c == PROTOCOL_MESSAGE_DELIMITER) {
+            //If it is a delimiter, return
             break;
         } else {
             std::string AID = readAid(message);
 
             readSpace(message);
 
+            //Read the auction state, checking if it is one of the options
             std::string status =
                 readString(message, std::vector<std::string>{"0", "1"});
 
-            _bids.insert({AID, status});
+            _bids.insert({AID, status});  //Insert the bid in the map
         }
     }
 }
@@ -591,68 +606,73 @@ void ListUserBidsCommunication::decodeResponse(MessageSource &message) {
 std::stringstream ListAllAuctionsCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "LST");
+    writeString(message, "LST");  //Write the identifier "LST"
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ListAllAuctionsCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "LST");
+    // readIdentifier(message, "LST"); The identifier is already read by the server
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream ListAllAuctionsCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RLS");
+    writeString(message, "RLS");  //Write the identifier "RLS"
 
     writeSpace(message);
     writeString(message, _status);
 
-    for (auto auction : _auctions) {
+    for (auto auction : _auctions) {  //Write each auction
         if (auction.second != "0" && auction.second != "1") {
             throw ProtocolViolationException();
         }
         writeSpace(message);
-        writeAid(message, auction.first);
+        writeAid(message, auction.first);  //Write the AID
         writeSpace(message);
-        writeString(message, auction.second);
+        writeString(message, auction.second);  //Write the auction state
     }
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ListAllAuctionsCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RLS");
+    readIdentifier(message, "RLS");  //Read the identifier "RLS"
 
     readSpace(message);
 
+    //Read the status, checking if it is one of the options
     _status = readString(message, std::vector<std::string>({"OK", "NOK"}));
 
     if (_status != "OK") {
+        //If the status is not OK, read the delimiter and return
         readDelimiter(message);
         return;
     }
 
     while (1) {
+        //Read a char, checking if it is a space or a delimiter
         char c = readChar(message, {' ', PROTOCOL_MESSAGE_DELIMITER});
 
         if (c == PROTOCOL_MESSAGE_DELIMITER) {
+            //If it is a delimiter, return
             break;
         } else {
             std::string AID = readAid(message);
 
             readSpace(message);
 
+            //Read the auction state, checking if it is one of the options
             std::string status =
                 readString(message, std::vector<std::string>{"0", "1"});
 
-            _auctions.insert({AID, status});
+            _auctions.insert({AID, status});  //Insert the auction in the map
         }
     }
 }
@@ -660,36 +680,37 @@ void ListAllAuctionsCommunication::decodeResponse(MessageSource &message) {
 std::stringstream ShowRecordCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "SRC");
+    writeString(message, "SRC");  //Write the identifier "SRC"
     writeSpace(message);
 
     writeAid(message, _aid);
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ShowRecordCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "SRC");
+    // readIdentifier(message, "SRC"); The identifier is already read by the server
 
     readSpace(message);
 
     _aid = readAid(message);
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream ShowRecordCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RRC");
+    writeString(message, "RRC");  //Write the identifier "RRC"
 
     writeSpace(message);
 
     writeString(message, _status);
 
     if (_status != "OK") {
+        //If the status is not OK, read the delimiter and return
         writeDelimiter(message);
         return message;
     }
@@ -701,80 +722,86 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
     writeSpace(message);
 
     if (_auctionName.size() > 10) {
+        //If the auction name is too big, throw an exception
         throw ProtocolViolationException();
     }
 
-    writeString(message, _auctionName);
+    writeString(message, _auctionName);  //Write the auction name
 
     writeSpace(message);
 
     if (_assetFname.size() > 24) {
+        //If the asset file name is too big, throw an exception
         throw ProtocolViolationException();
     }
 
-    writeString(message, _assetFname);
+    writeString(message, _assetFname);  //Write the asset file name
 
     writeSpace(message);
 
-    writeNumber(message, _startValue);
+    writeNumber(message, _startValue);  //Write the start value
 
     writeSpace(message);
 
-    writeDateTime(message, _startDateTime);
+    writeDateTime(message, _startDateTime);  //Write the start date and time
 
     writeSpace(message);
 
-    writeNumber(message, _timeActive);
+    writeNumber(message, _timeActive);  //Write the time active
 
     for (long unsigned int i = 0; i < _bidderUids.size(); i++) {
+        //Write each bid
         writeSpace(message);
 
         writeChar(message, 'B');
 
         writeSpace(message);
 
-        writeUid(message, _bidderUids[i]);
+        writeUid(message, _bidderUids[i]);  //Write the bidder UID
 
         writeSpace(message);
 
-        writeNumber(message, _bidValues[i]);
+        writeNumber(message, _bidValues[i]);  //Write the bid value
 
         writeSpace(message);
 
-        writeDateTime(message, _bidDateTime[i]);
+        writeDateTime(message, _bidDateTime[i]);  //Write the bid date and time
 
         writeSpace(message);
 
-        writeNumber(message, _bidSecTimes[i]);
+        writeNumber(message, _bidSecTimes[i]);  //Write the bid sec time
     }
 
     if (_hasEnded) {
+        //If the auction has ended
         writeSpace(message);
 
         writeChar(message, 'E');
 
         writeSpace(message);
 
-        writeDateTime(message, _endDateTime);
+        writeDateTime(message, _endDateTime);  //Write the end date and time
 
         writeSpace(message);
 
-        writeNumber(message, _endSecTime);
+        writeNumber(message, _endSecTime);  //Write the end sec time
     }
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ShowRecordCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RRC");
+    readIdentifier(message, "RRC");  //Read the identifier "RRC"
 
     readSpace(message);
 
+    //Read the status, checking if it is one of the options
     _status = readString(message, std::vector<std::string>({"OK", "NOK"}));
 
     if (_status != "OK") {
+        //If the status is not OK, read the delimiter and return
         readDelimiter(message);
         return;
     }
@@ -785,73 +812,82 @@ void ShowRecordCommunication::decodeResponse(MessageSource &message) {
 
     readSpace(message);
 
-    _auctionName = readString(message, 10);
+    _auctionName = readString(message, 10);  //Read the auction name
 
     if (_auctionName.size() > 10) {
+        //If the auction name is too big, throw an exception
         throw ProtocolViolationException();
     }
 
     readSpace(message);
 
-    _assetFname = readString(message, 24);
+    _assetFname = readString(message, 24);  //Read the asset file name
 
     if (_assetFname.size() > 24) {
+        //If the asset file name is too big, throw an exception
         throw ProtocolViolationException();
     }
 
     readSpace(message);
 
-    _startValue = readNumber(message);
+    _startValue = readNumber(message);  //Read the start value
 
     readSpace(message);
 
-    _startDateTime = readDateTime(message);
+    _startDateTime = readDateTime(message);  //Read the start date and time
 
     readSpace(message);
 
-    _timeActive = readNumber(message);
+    _timeActive = readNumber(message);  //Read the time active
 
     char c;
 
     while (1) {
+        //Read a char, checking if it is a space or a delimiter
         c = readChar(message, {' ', PROTOCOL_MESSAGE_DELIMITER});
 
         if (c == PROTOCOL_MESSAGE_DELIMITER) {
+            //If it is a delimiter, return
             return;
         }
 
+        //Read a char, checking if it is 'B' or 'E
         c = readChar(message, {'B', 'E'});
 
         readSpace(message);
 
         if (c == 'B') {
-            _bidderUids.push_back(readUid(message));
+            //If it is 'B', read the bid
+            _bidderUids.push_back(readUid(message));  //Read the bidder UID
 
             readSpace(message);
 
-            _bidValues.push_back(readNumber(message));
+            _bidValues.push_back(readNumber(message));  //Read the bid value
 
             readSpace(message);
 
-            _bidDateTime.push_back(readDateTime(message));
+            _bidDateTime.push_back(
+                readDateTime(message));  //Read the bid date and time
 
             readSpace(message);
 
-            _bidSecTimes.push_back(readNumber(message));
+            _bidSecTimes.push_back(
+                readNumber(message));  //Read the bid sec time
         }
 
         if (c == 'E') {
+            //If it is 'E', read the end
             break;
         }
     }
 
-    _hasEnded = true;
+    _hasEnded = true;  //The auction has ended
 
-    _endDateTime = readDateTime(message);
+    _endDateTime = readDateTime(message);  //Read the end date and time
 
     readSpace(message);
 
-    _endSecTime = readNumber(message);
+    _endSecTime = readNumber(message);  //Read the end sec time
 
     readDelimiter(message);
 }
@@ -859,138 +895,145 @@ void ShowRecordCommunication::decodeResponse(MessageSource &message) {
 std::stringstream OpenAuctionCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "OPA");
+    writeString(message, "OPA");  //Write the identifier "OPA"
 
     writeSpace(message);
 
-    writeUid(message, _uid);
+    writeUid(message, _uid);  //Write the UID
 
     writeSpace(message);
 
-    writePassword(message, _password);
+    writePassword(message, _password);  //Write the password
 
     writeSpace(message);
 
     if (_name.length() > 10) {
+        //If the auction name is too big, throw an exception
         throw ProtocolViolationException();
     }
 
-    writeString(message, _name);
+    writeString(message, _name);  //Write the auction name
 
     writeSpace(message);
 
-    writeNumber(message, _startValue);
+    writeNumber(message, _startValue);  //Write the start value
 
     writeSpace(message);
 
-    writeNumber(message, _timeActive);
+    writeNumber(message, _timeActive);  //Write the time active
 
     writeSpace(message);
 
     if (_fileName.length() > 24) {
+        //If the asset file name is too big, throw an exception
         throw ProtocolViolationException();
     }
 
-    writeString(message, _fileName);
+    writeString(message, _fileName);  //Write the asset file name
 
     writeSpace(message);
 
-    writeNumber(message, _fileSize);
+    writeNumber(message, _fileSize);  //Write the asset file size
 
     writeSpace(message);
 
     for (int i = 0; i < _fileSize; i++) {
+        //Write each char of the asset file
         char c = readChar(_fileData);
 
         writeChar(message, c);
     }
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void OpenAuctionCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "OPA");
+    // readIdentifier(message, "OPA"); The identifier is already read by the server
 
     readSpace(message);
 
-    _uid = readUid(message);
+    _uid = readUid(message);  //Read the UID
 
     readSpace(message);
 
-    _password = readPassword(message);
+    _password = readPassword(message);  //Read the password
 
     readSpace(message);
 
-    _name = readString(message, 10);
+    _name = readString(message, 10);  //Read the auction name
 
     readSpace(message);
 
-    _startValue = readNumber(message);
+    _startValue = readNumber(message);  //Read the start value
 
     readSpace(message);
 
-    _timeActive = readNumber(message);
+    _timeActive = readNumber(message);  //Read the time active
 
     readSpace(message);
 
-    _fileName = readString(message, 24);
+    _fileName = readString(message, 24);  //Read the asset file name
 
     readSpace(message);
 
-    _fileSize = readNumber(message);
+    _fileSize = readNumber(message);  //Read the asset file size
 
     readSpace(message);
 
     for (int i = 0; i < _fileSize; i++) {
+        //Read each char of the asset file
         char c = readChar(message);
 
         writeChar(_fileData, c);
     }
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream OpenAuctionCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "ROA");
+    writeString(message, "ROA");  //Write the identifier "ROA"
 
     writeSpace(message);
 
-    writeString(message, _status);
+    writeString(message, _status);  //Write the status
 
     if (_status == "OK") {
+        //If the status is OK, write the AID
         writeSpace(message);
         writeAid(message, _aid);
     }
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void OpenAuctionCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "ROA");
+    readIdentifier(message, "ROA");  //Read the identifier "ROA"
 
     readSpace(message);
 
+    //Read the status, checking if it is one of the options
     _status = readString(message, {"OK", "NOK", "NLG"});
 
     if (_status == "OK") {
+        //If the status is OK, read the AID
         readSpace(message);
 
         _aid = readAid(message);
     }
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream CloseAuctionCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "CLS");
+    writeString(message, "CLS");  //Write the identifier "CLS"
 
     writeSpace(message);
 
@@ -1004,13 +1047,13 @@ std::stringstream CloseAuctionCommunication::encodeRequest() {
 
     writeAid(message, _aid);
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void CloseAuctionCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "CLS");
+    // readIdentifier(message, "CLS"); The identifier is already read by the server
 
     readSpace(message);
 
@@ -1024,28 +1067,29 @@ void CloseAuctionCommunication::decodeRequest(MessageSource &message) {
 
     _aid = readAid(message);
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream CloseAuctionCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RCL");
+    writeString(message, "RCL");  //Write the identifier "RCL"
 
     writeSpace(message);
 
     writeString(message, _status);
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void CloseAuctionCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RCL");
+    readIdentifier(message, "RCL");  //Read the identifier "RCL"
 
     readSpace(message);
 
+    //Read the status, checking if it is one of the options
     _status = readString(message, {"OK", "NLG", "EAU", "EOW", "END"});
 
     readDelimiter(message);
@@ -1054,37 +1098,38 @@ void CloseAuctionCommunication::decodeResponse(MessageSource &message) {
 std::stringstream ShowAssetCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "SAS");
+    writeString(message, "SAS");  //Write the identifier "SAS"
 
     writeSpace(message);
 
     writeAid(message, _aid);
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ShowAssetCommunication::decodeRequest(MessageSource &message) {
-    // readIdentifier(message, "SAS");
+    // readIdentifier(message, "SAS"); The identifier is already read by the server
 
     readSpace(message);
 
     _aid = readAid(message);
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream ShowAssetCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RSA");
+    writeString(message, "RSA");  //Write the identifier "RSA"
 
     writeSpace(message);
 
-    writeString(message, _status);
+    writeString(message, _status);  //Write the status
 
     if (_status != "OK") {
+        //If the status is not OK, write the delimiter and return
         writeDelimiter(message);
         return message;
     }
@@ -1092,36 +1137,40 @@ std::stringstream ShowAssetCommunication::encodeResponse() {
     writeSpace(message);
 
     if (_fileName.length() > 24) {
+        //If the asset file name is too big, throw an exception
         throw ProtocolViolationException();
     }
 
-    writeString(message, _fileName);
+    writeString(message, _fileName);  //Write the asset file name
 
     writeSpace(message);
 
-    writeNumber(message, _fileSize);
+    writeNumber(message, _fileSize);  //Write the asset file size
 
     writeSpace(message);
 
     for (int i = 0; i < _fileSize; i++) {
+        //Write each char of the asset file
         char c = readChar(_fileData);
 
         writeChar(message, c);
     }
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void ShowAssetCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RSA");
+    readIdentifier(message, "RSA");  //Read the identifier "RSA"
 
     readSpace(message);
 
+    //Read the status, checking if it is one of the options
     _status = readString(message, std::vector<std::string>({"OK", "NOK"}));
 
     if (_status != "OK") {
+        //If the status is not OK, write the delimiter and return
         readDelimiter(message);
 
         return;
@@ -1129,27 +1178,28 @@ void ShowAssetCommunication::decodeResponse(MessageSource &message) {
 
     readSpace(message);
 
-    _fileName = readString(message, 24);
+    _fileName = readString(message, 24);  //Read the asset file name
 
     readSpace(message);
 
-    _fileSize = readNumber(message);
+    _fileSize = readNumber(message);  //Read the asset file size
 
     readSpace(message);
 
     for (int i = 0; i < _fileSize; i++) {
+        //Read each char of the asset file
         char c = readChar(message);
 
         writeChar(_fileData, c);
     }
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream BidCommunication::encodeRequest() {
     std::stringstream message;
 
-    writeString(message, "BID");
+    writeString(message, "BID");  //Write the identifier "BID"
 
     writeSpace(message);
 
@@ -1165,15 +1215,15 @@ std::stringstream BidCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    writeNumber(message, _value);
+    writeNumber(message, _value);  //Write the bid value
 
-    writeDelimiter(message);
+    writeDelimiter(message);  //Put delimiter at the end
 
     return message;
 }
 
 void BidCommunication::decodeRequest(MessageSource &message) {
-    // readString(message, "BID");
+    // readString(message, "BID"); The identifier is already read by the server
 
     readSpace(message);
 
@@ -1189,19 +1239,19 @@ void BidCommunication::decodeRequest(MessageSource &message) {
 
     readSpace(message);
 
-    _value = readNumber(message);
+    _value = readNumber(message);  //Read the bid value
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
 
 std::stringstream BidCommunication::encodeResponse() {
     std::stringstream message;
 
-    writeString(message, "RBD");
+    writeString(message, "RBD");  //Write the identifier "RBD"
 
     writeSpace(message);
 
-    writeString(message, _status);
+    writeString(message, _status);  //Write the status
 
     writeDelimiter(message);
 
@@ -1209,11 +1259,12 @@ std::stringstream BidCommunication::encodeResponse() {
 }
 
 void BidCommunication::decodeResponse(MessageSource &message) {
-    readIdentifier(message, "RBD");
+    readIdentifier(message, "RBD");  //Read the identifier "RBD"
 
     readSpace(message);
 
+    //Read the status, checking if it is one of the options
     _status = readString(message, {"NLG", "NOK", "ACC", "ILG", "REF"});
 
-    readDelimiter(message);
+    readDelimiter(message);  //Read the delimiter
 }
