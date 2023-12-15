@@ -25,6 +25,10 @@ class Message {
     static void WrongPassword();
 
     /**
+     * @brief Displays a message for wrong username or password entered during login.
+     */
+    static void WrongUsernameOrPassword();
+    /**
      * @brief Displays a message for successful user registration.
      */
     static void UserRegisterSuccess();
