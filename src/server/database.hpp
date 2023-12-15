@@ -510,36 +510,64 @@ class Database {
     bool hasAuctionEnded(std::string aid);
 };
 
+/**
+ * @brief  General Exception thrown by database functions.
+ */
 class DatabaseException : public std::runtime_error {
   public:
     DatabaseException(std::string message) : std::runtime_error(message) {}
 };
 
+/**
+ * @brief  Exception thrown when the user is not logged in.
+ */
 class LoginException : public DatabaseException {
   public:
     LoginException() : DatabaseException("User is not logged in") {}
 };
 
+/**
+ * @brief  Exception thrown when the user is not registered.
+ */
 class UnregisteredException : public DatabaseException {
   public:
     UnregisteredException() : DatabaseException("User is not registered") {}
 };
 
+/**
+ * @brief  Exception thrown when there are no more auction id's availlable.
+ * @note   
+ * @retval None
+ */
 class AidException : public DatabaseException {
   public:
     AidException() : DatabaseException("Auction ID unavaillable.") {}
 };
 
+/**
+ * @brief  Exception thrown when the value of a bid is invalid.
+ * @note   
+ * @retval None
+ */
 class BidValueException : public DatabaseException {
   public:
     BidValueException() : DatabaseException("Bid value is invalid.") {}
 };
 
+/**
+ * @brief  Exception thrown when an auction does not exist.
+ * @note   
+ * @retval None
+ */
 class AuctionException : public DatabaseException {
   public:
     AuctionException() : DatabaseException("Auction does not exist.") {}
 };
 
+/**
+ * @brief  Exception thrown when the host of an auction tries to
+ * do something that requires him not to be the host. Or vice-versa.
+ */
 class AuctionOwnerException : public DatabaseException {
   public:
     AuctionOwnerException()
@@ -547,17 +575,45 @@ class AuctionOwnerException : public DatabaseException {
               "This user is unnable to do this action to this auction.") {}
 };
 
+/**
+ * @brief  Exception thrown when an operation requires the
+ * auction to be open but the auction is closed.
+ */
 class AuctionEndedException : public DatabaseException {
   public:
     AuctionEndedException() : DatabaseException("Auction has ended.") {}
 };
 
+/**
+ * @brief  Converts an AID in string form to int form.
+ * @note   
+ * @param  aid AID in string form.
+ * @retval AID in int form.
+ */
 int AidStrToInt(std::string aid);
 
+/**
+ * @brief  Converts an AID in int form to string form, XXX.
+ * @note   
+ * @param  aid AID in int form.
+ * @retval AID in string form.
+ */
 std::string AidIntToStr(int aid);
 
+/**
+ * @brief  Converts bid value in string form to int form
+ * @note   
+ * @param  bidValue in string form
+ * @retval value in int form
+ */
 int BidValueToInt(std::string bidValue);
 
+/**
+ * @brief  Converts bid value in int form to string form, XXXXXX.
+ * @note   
+ * @param  bidValue in int form.
+ * @retval value in string form.
+ */
 std::string BidValueToString(int bidValue);
 
 #endif
