@@ -303,45 +303,210 @@ class DatabaseCore {
     std::vector<std::string> getAllAuctions();
 };
 
+/**
+ * @brief Final class that represents the database.
+ * 
+ * This class uses the DatabaseLock and DatabaseCore to implement
+ * high level functions that are thread/multiprocess safe.
+ */
 class Database {
   private:
     std::unique_ptr<DatabaseLock> _lock;
     std::unique_ptr<DatabaseCore> _core;
 
   public:
+    /**
+     * @brief  Basic constructor, initializes the core and lock.
+     * @param  path Path of the directory with the contents of the database.
+     */
     Database(std::string path);
 
+    /**
+     * @brief  Locks the db.
+     */
     void lock();
+
+    /**
+     * @brief  Unlocks the db.
+     */
     void unlock();
 
+    /**
+     * @brief  Handles the whole process of login of a user.
+     * @param  uid User's UID.
+     * @param  password User's password.
+     * @retval true if the user got registered, false if it was already registered.
+     */
     bool loginUser(std::string uid, std::string password);
-    void logoutUser(std::string uid, std::string password);
-    void unregisterUser(std::string uid, std::string password);
-    void handleAutoClosing(std::string uid);
 
+    /**
+     * @brief  Handles the logout process of a user.
+     * @param  uid User's UID.
+     * @param  password User's password.
+     */
+    void logoutUser(std::string uid, std::string password);
+
+    /**
+     * @brief  Handles the unregidter process of a user.
+     * @note   
+     * @param  uid User's UID.
+     * @param  password User's password.
+     */
+    void unregisterUser(std::string uid, std::string password);
+
+    /**
+     * @brief  Checks if the given auction is already closed, and closes if that is needed.
+     * 
+     * This function is not thread safe.
+     * @param  aid Auction's AID.
+     */
+    void handleAutoClosing(std::string aid);
+
+    /**
+     * @brief  Checks if a given user is logged in and his password is correct.
+     * 
+     * This function is not thread safe.
+     * @param  uid User's UID.
+     * @param  password User's password.
+     * @retval true if user is logged in, false otherwise.
+     */
     bool checkLoggedIn(std::string uid, std::string password);
+
+    /**
+     * @brief  Checks if a given user is registered.
+     * 
+     * This function is not thread safe.
+     * @param  uid User's UID.
+     * @retval true if user is registered in, false otherwise.
+     */
     bool checkUserRegistered(std::string uid);
 
+    /**
+     * @brief  Gets all the auctions as well as their state.
+     * @retval map with AID's as the keys and state as the values.
+     */
     std::map<std::string, std::string> getAllAuctions();
+
+    /**
+     * @brief   Gets the user's auctions aswell as their state.
+     * @param   uid User's UID.
+     * @retval  map with AID's as the keys and state as the values.
+     */
     std::map<std::string, std::string> getUserAuctions(std::string uid);
+
+    /**
+     * @brief   Gets the user's bidded auctions aswell as their state.
+     * @param   uid User's UID.
+     * @retval  map with AID's as the keys and state as the values.
+     */
     std::map<std::string, std::string> getUserBids(std::string uid);
 
+    /**
+     * @brief  Generates a new AID (1 more than the previous max).
+     * 
+     * This function is not thread safe.
+     * @retval new AID as a string.
+     */
     std::string generateAid();
+
+    /**
+     * @brief  Handles the creation of an auction.
+     * @param  uid Auction Host's UID.
+     * @param  password Auction Host's password.
+     * @param  name Auction's name.
+     * @param  startValue Auction's start value.
+     * @param  timeActive Auction's max time active.
+     * @param  fileName Auction's asset file name.
+     * @param  file Stream containing auction's asset file content.
+     * @retval the auction's AID in string format.
+     */
     std::string createAuction(std::string uid, std::string password,
                               std::string name, int startValue,
                               time_t timeActive, std::string fileName,
                               std::stringstream &file);
+
+    /**
+     * @brief  Gets the auction's max bid value, if the auction has no bids,
+     * the value will be the start value minus 1.
+     * 
+     * This function is not thread safe.
+     * @param  aid Auction's AID.
+     * @retval auction's max bid value
+     */
     int getAuctionCurrentMaxValue(std::string aid);
+
+    /**
+     * @brief  Gets a specific auction's host UID.
+     *
+     * This function is not thread safe.
+     * @param  aid Auction's AID.
+     * @retval auction's host UID.
+     */
     std::string getAuctionOwner(std::string aid);
+
+    /**
+     * @brief  Handles the process of bidding in an auction.
+     * @param  uid Bidder's UID.
+     * @param  password Bidder's password.
+     * @param  aid Auction's AID.
+     * @param  value Bid value.
+     */
     void bidAuction(std::string uid, std::string password, std::string aid,
                     int value);
+
+    /**
+     * @brief  Handle's the process of getting an auction's asset file.
+     * @param  aid Auction's AID.
+     * @param  fileName String to which the file name will be written.
+     * @param  file Stream to which the file content will be written.
+     * @retval file size.
+     */
     int getAuctionAsset(std::string aid, std::string &fileName,
                         std::stringstream &file);
+
+    /**
+     * @brief  Gets the name of and auction's asset file.
+     * @note   
+     * @param  aid Auction's AID.
+     * @retval asset file name.
+     */
     std::string getAssetName(std::string aid);
+
+    /**
+     * @brief  Handles the process of closing an auction.
+     * @note   
+     * @param  uid Host's UID.
+     * @param  password Host's password.
+     * @param  aid Auction's AID.
+     */
     void closeAuction(std::string uid, std::string password, std::string aid);
+
+    /**
+     * @brief  Gets the auction start information in order to help handling the show record process.
+     * @param  aid Auction's AID.
+     * @retval structure containing the start information.
+     */
     AuctionStartInfo getAuctionStartInfo(std::string aid);
+
+    /**
+     * @brief  Gets the auction's bids information in order to help handling the show record process.
+     * @param  aid Auction's AID.
+     * @retval vector of structures each containing the bid's information.
+     */
     std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
+
+    /**
+     * @brief  Gets the auction end information in order to help handling the show record process.
+     * @param  aid Auction's AID.
+     * @retval structure containing the end information.
+     */
     AuctionEndInfo getAuctionEndInfo(std::string aid);
+
+    /**
+     * @brief  Checks if an auction has ended in order to help the show record process.
+     * @param  aid Auction's AID.
+     * @retval true if auction has ended, false otherwise.
+     */
     bool hasAuctionEnded(std::string aid);
 };
 
