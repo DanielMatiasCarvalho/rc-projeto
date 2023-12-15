@@ -83,11 +83,11 @@ void Message::ShowUser(string uid) {
 }
 
 void Message::ListAuctionsAndState(const map<string, string> &list) {
-    for (auto auction : list) { //For each auction in the list
+    for (auto auction : list) {  //For each auction in the list
         string state;
-        if (auction.second == "0") { //If the auction is not active
+        if (auction.second == "0") {  //If the auction is not active
             state = " NOT ACTIVE";
-        } else { //If the auction is active
+        } else {  //If the auction is active
             state = " ACTIVE";
         }
         cout << "Auction " << auction.first << "-" << state << endl;
@@ -173,7 +173,7 @@ void Message::ShowRecordBids(vector<string> bidderUids, vector<int> bidValues,
     //The header of the bids
     cout << "Bidder ID\tBid Value\tBid Date and Time\tTime Elapsed (seconds)"
          << endl;
-    for (long unsigned int i = 0; i < size; i++) { //For each bid
+    for (long unsigned int i = 0; i < size; i++) {  //For each bid
         cout << " " << bidderUids[i] << "\t\t  " << bidValues[i] << "\t      "
              << DateTimeToString(bidDateTime[i]) << "\t\t" << bidSecTimes[i]
              << endl;
