@@ -9,8 +9,8 @@
 #include <fstream>
 #include <string>
 
-#include <sys/stat.h>
 #include <signal.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "network.hpp"
@@ -121,7 +121,6 @@ class Client {
      * @retval the prompt that should be used.
      */
     std::string getPrompt();
-
 
     /**
      * @brief  Gets the download folder path of the client.

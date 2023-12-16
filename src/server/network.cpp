@@ -30,10 +30,10 @@ UdpServer::UdpServer(std::string port) {
 }
 
 UdpServer::~UdpServer() {
-    if (!_closed) {    //Check if the socket has been closed
-        ::close(_fd);  //Close the socket
+    if (!_closed) {          //Check if the socket has been closed
+        ::close(_fd);        //Close the socket
+        freeaddrinfo(_res);  //Free the address info
     }
-    freeaddrinfo(_res);  //Free the address info
 }
 
 void UdpServer::send(std::stringstream &message) {
@@ -75,8 +75,10 @@ std::stringstream UdpServer::receive() {
 }
 
 void UdpServer::close() {
-    if (!_closed) {    //Check if the socket has been closed
-        ::close(_fd);  //Close the socket
+    if (!_closed) {          //Check if the socket has been closed
+        ::close(_fd);        //Close the socket
+        freeaddrinfo(_res);  //Free the address info
+        _closed = true;
     }
 }
 
@@ -124,10 +126,10 @@ TcpServer::TcpServer(std::string port) {
 }
 
 TcpServer::~TcpServer() {
-    if (!_closed) {    //Check if the socket has been closed
-        ::close(_fd);  //Close the socket
+    if (!_closed) {          //Check if the socket has been closed
+        ::close(_fd);        //Close the socket
+        freeaddrinfo(_res);  //Free the address info
     }
-    freeaddrinfo(_res);  //Free the address info
 }
 
 int TcpServer::acceptConnection(struct sockaddr_in &client,
@@ -142,7 +144,7 @@ int TcpServer::acceptConnection(struct sockaddr_in &client,
     clientSize = clientAddressSize;  //Set the client address size
 
     if (clientFd == -1) {  //Check for errors
-        throw SocketSetupException();
+        throw SocketCommunicationException();
     }
 
     return clientFd;
@@ -152,6 +154,7 @@ void TcpServer::close() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket
     }
+    _closed = true;
 }
 
 TcpSession::TcpSession(int fd, struct sockaddr_in client,
@@ -171,6 +174,7 @@ TcpSession::TcpSession(int fd, struct sockaddr_in client,
 TcpSession::~TcpSession() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket
+        _closed = true;
     }
 }
 
@@ -196,6 +200,7 @@ void TcpSession::send(std::stringstream &message) {
 void TcpSession::close() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket
+        _closed = true;
     }
 }
 

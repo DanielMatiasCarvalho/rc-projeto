@@ -12,11 +12,16 @@ void UDPServer(UdpServer &udpServer, CommandManager &manager, Server &server);
 
 void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server);
 
+void handler(int sig) {
+    // This is a handler used for the SIGINT command, it cannot be SIG_IGN because with that handler, blocking functions don't stop. With this handler, blocking functions will be interrupted throwing an exeption.
+    (void)sig;
+}
+
 int main(int argc, char **argv) {
-    Server server(argc, argv);  //Initialize the server
-    CommandManager manager;     //Initialize the command manager
-    struct sigaction act;       //Initialize the signal handler
-    pid_t pid;                  //Initialize the process ID
+    Server server(argc, argv);   //Initialize the server
+    CommandManager manager;      //Initialize the command manager
+    struct sigaction act, act2;  //Initialize the signal handler
+    pid_t pid;                   //Initialize the process ID
 
     act.sa_handler = SIG_IGN;  //Ignore the signal
     if (sigaction(SIGCHLD, &act, NULL) ==
@@ -25,6 +30,11 @@ int main(int argc, char **argv) {
     }
     if (sigaction(SIGPIPE, &act, NULL) ==
         -1) {  //Ignore the signal of the broken pipe
+        exit(1);
+    }
+
+    act2.sa_handler = handler;
+    if (sigaction(SIGINT, &act2, NULL) == -1) {
         exit(1);
     }
 
@@ -65,6 +75,8 @@ int main(int argc, char **argv) {
         std::cout << "Server could not connect to the sockets. Ensure that the "
                      "port is not being used by another process."
                   << std::endl;
+    } catch (SocketCommunicationException const &e) {
+        // We catch this exception because it will be thrown by functions that block (accept and recvfrom) when there is a signal that is not ignored (in this case SIGINT).
     }
 
     return 0;

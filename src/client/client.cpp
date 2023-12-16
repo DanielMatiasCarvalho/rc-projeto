@@ -20,7 +20,8 @@ int main(int argc, char **argv) {
 
     act.sa_handler = SIG_IGN;
 
-    if (sigaction(SIGPIPE, &act, NULL) == -1) {  //Ignore the signal of the broken pipe
+    if (sigaction(SIGPIPE, &act, NULL) ==
+        -1) {  //Ignore the signal of the broken pipe
         exit(1);
     }
 
