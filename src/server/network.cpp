@@ -62,6 +62,10 @@ std::stringstream UdpServer::receive() {
         _fd, messageBuffer, SOCKETS_MAX_DATAGRAM_SIZE_SERVER + 1, 0,
         (struct sockaddr *)&_client, &_clientSize);  // Receive the message
 
+    if (n <= 0) {
+        throw SocketCommunicationException();
+    }
+
     if (n > SOCKETS_MAX_DATAGRAM_SIZE_SERVER) {  // Check for errors
         throw SocketCommunicationException();
     }

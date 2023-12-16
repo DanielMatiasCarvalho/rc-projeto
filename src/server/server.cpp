@@ -89,7 +89,11 @@ int main(int argc, char **argv) {
 Server::Server(int argc, char **argv) {
     char c;
     // Parse command line arguments
-    while ((c = (char)getopt(argc, argv, "p:v")) != -1) {
+
+    std::string databasePath = "database";
+    bool wipeDatabase = false;
+
+    while ((c = (char)getopt(argc, argv, "p:vrd:")) != -1) {
         switch (c) {
             case 'p':  // Sets the port
                 _port = optarg;
@@ -97,13 +101,26 @@ Server::Server(int argc, char **argv) {
             case 'v':  // Sets the verbosity
                 _loggers.push_back(std::make_shared<Logger>());
                 break;
+            case 'r':
+                wipeDatabase = true;
+                break;
+            case 'd':
+                databasePath = optarg;
+                break;
             default:
                 break;
         }
     }
 
     _database = std::make_unique<Database>(
-        "database");  // Initialize the database in path ./database
+        databasePath);
+    // Initialize the database in path
+
+    if (wipeDatabase) {
+        _database->wipe();
+    }
+
+
 }
 
 void Server::ShowInfo() {
