@@ -965,7 +965,8 @@ void DatabaseCore::addAuctionBid(std::string aid, AuctionBidInfo &bidInfo) {
 }
 
 DatabaseLock::DatabaseLock(std::string name) {
-    // Unlink the semaphore if it already exists, to guarantee that the initialized value is correct
+    // Unlink the semaphore if it already exists, to guarantee that the
+    // initialized value is correct
     sem_unlink(name.c_str());
 
     // Create the semaphore

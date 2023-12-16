@@ -1,7 +1,7 @@
 /**
  * @file server.hpp
  * @brief Header file for the server program.
- * 
+ *
  * This file contains the class Server, used to represent a server object
  */
 #ifndef __CLIENT_HPP__
@@ -27,20 +27,20 @@ class Logger {
 
   public:
     /**
-      * @brief  Adds message to the log queue.
-      * @param  message message
-      */
+     * @brief  Adds message to the log queue.
+     * @param  message message
+     */
     void log(std::string message);
 
     /**
-      * @brief  Pushes the queue of messages to the logging target.
-      */
+     * @brief  Pushes the queue of messages to the logging target.
+     */
     void push();
 
     /**
-      * @brief  Adds a message to the queue and immediatly pushes the queue.
-      * @param  message: 
-      */
+     * @brief  Adds a message to the queue and immediatly pushes the queue.
+     * @param  message:
+     */
     void logPush(std::string message);
 };
 
@@ -58,15 +58,15 @@ class Server {
   public:
     std::unique_ptr<Database> _database; /**< The database. */
     /**
-         * @brief Constructs a Server object.
-         * @param argc The number of command-line arguments.
-         * @param argv The command-line arguments.
-         */
+     * @brief Constructs a Server object.
+     * @param argc The number of command-line arguments.
+     * @param argv The command-line arguments.
+     */
     Server(int argc, char **argv);
 
     /**
-         * @brief Displays information about the server.
-         */
+     * @brief Displays information about the server.
+     */
     void ShowInfo();
 
     void log(std::string message);
@@ -76,10 +76,10 @@ class Server {
     void logPush(std::string message);
 
     /**
-      * @brief Get the port number.
-      * 
-      * @return std::string The port number.
-      */
+     * @brief Get the port number.
+     *
+     * @return std::string The port number.
+     */
     std::string getPort() { return _port; }
 };
 
