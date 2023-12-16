@@ -69,6 +69,7 @@ void LoginCommand::handle(MessageSource &message, std::stringstream &response,
 
     LoginCommunication
         loginCommunication;  //Initialize the login communication object
+    std::string result;
     try {
         loginCommunication.decodeRequest(message);  //Decode the request
 
@@ -77,26 +78,30 @@ void LoginCommand::handle(MessageSource &message, std::stringstream &response,
                 loginCommunication
                     ._password)) {  //Check if the user is registered
             loginCommunication._status = "OK";
+            result = "Login Sucessful";
         } else {  //If the user is not registered, register the user
             loginCommunication._status = "REG";
+            result = "Registration Sucessful";
         }
     } catch (
         LoginException const &e) {  //If the login fails, set the status to NOK
         loginCommunication._status = "NOK";
+        result = "Login Failed";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         loginCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response = loginCommunication.encodeResponse();  //Encode the response
-    receiver.log(Message::ServerRequestDetails(
-        loginCommunication._uid, "Login",
-        loginCommunication._status));  //Display the message
+    receiver.log(Message::ServerRequestDetails(loginCommunication._uid, "Login",
+                                               result));  //Display the message
 }
 
 void LogoutCommand::handle(MessageSource &message, std::stringstream &response,
                            Server &receiver) {
     LogoutCommunication
         logoutCommunication;  //Initialize the logout communication object
+    std::string result;
     try {
         logoutCommunication.decodeRequest(message);  //Decode the request
         receiver._database->logoutUser(
@@ -104,26 +109,31 @@ void LogoutCommand::handle(MessageSource &message, std::stringstream &response,
             logoutCommunication._password);  //Logout the user
         logoutCommunication._status =
             "OK";  //Set the status to OK if everything goes right
+        result = "Logout Sucessful";
     } catch (
         LoginException const &e) {  //If the logout fails, set the status to NOK
         logoutCommunication._status = "NOK";
+        result = "Logout Failed";
     } catch (UnregisteredException const
                  &e) {  //If the user is not registered, set the status to UNR
         logoutCommunication._status = "UNR";
+        result = "User Not Registered";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         logoutCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response = logoutCommunication.encodeResponse();  //Encode the response
-    receiver.log(Message::ServerRequestDetails(
-        logoutCommunication._uid, "Logout",
-        logoutCommunication._status));  //Display the message
+    receiver.log(Message::ServerRequestDetails(logoutCommunication._uid,
+                                               "Logout",
+                                               result));  //Display the message
 }
 
 void UnregisterCommand::handle(MessageSource &message,
                                std::stringstream &response, Server &receiver) {
     UnregisterCommunication
         unregisterCommunication;  //Initialize the unregister communication object
+    std::string result;
     try {
         unregisterCommunication.decodeRequest(message);  //Decode the request
         receiver._database->unregisterUser(
@@ -131,20 +141,24 @@ void UnregisterCommand::handle(MessageSource &message,
             unregisterCommunication._password);  //Unregister the user
         unregisterCommunication._status =
             "OK";  //Set the status to OK if everything goes right
-    } catch (
-        LoginException const &e) {  //If the login fails, set the status to NOK
+        result = "Unregister Sucessful";
+    } catch (LoginException const
+                 &e) {  //If the unregister fails, set the status to NOK
         unregisterCommunication._status = "NOK";
+        result = "Unregister Failed";
     } catch (UnregisteredException const
                  &e) {  //If the user is not registered, set the status to UNR
         unregisterCommunication._status = "UNR";
+        result = "User Not Registered";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         unregisterCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response = unregisterCommunication.encodeResponse();
-    receiver.log(Message::ServerRequestDetails(
-        unregisterCommunication._uid, "Unregister",
-        unregisterCommunication._status));
+    receiver.log(Message::ServerRequestDetails(unregisterCommunication._uid,
+                                               "Unregister",
+                                               result));  //Display the message
 }
 
 void ListUserAuctionsCommand::handle(MessageSource &message,
@@ -153,6 +167,7 @@ void ListUserAuctionsCommand::handle(MessageSource &message,
 
     ListUserAuctionsCommunication
         listUserAuctionsCommunication;  //Initialize the list user auctions communication object
+    std::string result;
     try {
         listUserAuctionsCommunication.decodeRequest(
             message);  //Decode the request
@@ -162,21 +177,25 @@ void ListUserAuctionsCommand::handle(MessageSource &message,
         if (listUserAuctionsCommunication._auctions
                 .empty()) {  //If the user has no auctions, set the status to NOK
             listUserAuctionsCommunication._status = "NOK";
+            result = "No Auctions";
         } else {  //If the user has auctions, set the status to OK
             listUserAuctionsCommunication._status = "OK";
+            result = "Auctions Listed";
         }
     } catch (LoginException const
                  &e) {  //If user is not logged in, set the status to NLG
         listUserAuctionsCommunication._status = "NLG";
+        result = "User Not Logged In";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         listUserAuctionsCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response =
         listUserAuctionsCommunication.encodeResponse();  //Encode the response
     receiver.log(Message::ServerRequestDetails(
         listUserAuctionsCommunication._uid, "List User Auctions",
-        listUserAuctionsCommunication._status));  //Display the message
+        result));  //Display the message
 }
 
 void ListUserBidsCommand::handle(MessageSource &message,
@@ -185,6 +204,7 @@ void ListUserBidsCommand::handle(MessageSource &message,
 
     ListUserBidsCommunication
         listUserBidsCommunication;  //Initialize the list user bids communication object
+    std::string result;
     try {
         listUserBidsCommunication.decodeRequest(message);  //Decode the request
         listUserBidsCommunication._bids = receiver._database->getUserBids(
@@ -192,21 +212,25 @@ void ListUserBidsCommand::handle(MessageSource &message,
         if (listUserBidsCommunication._bids
                 .empty()) {  //If the user has no bids, set the status to NOK
             listUserBidsCommunication._status = "NOK";
+            result = "No Bids";
         } else {  //If the user has bids, set the status to OK
             listUserBidsCommunication._status = "OK";
+            result = "Auctions Listed";
         }
     } catch (LoginException const
                  &e) {  //If user is not logged in, set the status to NLG
         listUserBidsCommunication._status = "NLG";
+        result = "User Not Logged In";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         listUserBidsCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response =
         listUserBidsCommunication.encodeResponse();  //Encode the response
-    receiver.log(Message::ServerRequestDetails(
-        listUserBidsCommunication._uid, "List User Bids",
-        listUserBidsCommunication._status));  //Display the message
+    receiver.log(Message::ServerRequestDetails(listUserBidsCommunication._uid,
+                                               "List User Bids",
+                                               result));  //Display the message
 }
 
 void ListAllAuctionsCommand::handle(MessageSource &message,
@@ -214,6 +238,7 @@ void ListAllAuctionsCommand::handle(MessageSource &message,
                                     Server &receiver) {
     ListAllAuctionsCommunication
         listAllAuctionsCommunication;  //Initialize the list all auctions communication object
+    std::string result;
     try {
         listAllAuctionsCommunication.decodeRequest(
             message);  //Decode the request
@@ -222,24 +247,27 @@ void ListAllAuctionsCommand::handle(MessageSource &message,
         if (listAllAuctionsCommunication._auctions
                 .empty()) {  //If there are no auctions, set the status to NOK
             listAllAuctionsCommunication._status = "NOK";
+            result = "No Auctions";
         } else {  //If there are auctions, set the status to OK
             listAllAuctionsCommunication._status = "OK";
+            result = "Auctions Listed";
         }
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         listAllAuctionsCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response =
         listAllAuctionsCommunication.encodeResponse();  //Encode the response
-    receiver.log(Message::ServerRequestDetails(
-        "List Auctions",
-        listAllAuctionsCommunication._status));  //Display the message
+    receiver.log(Message::ServerRequestDetails("List Auctions",
+                                               result));  //Display the message
 }
 
 void ShowRecordCommand::handle(MessageSource &message,
                                std::stringstream &response, Server &receiver) {
     ShowRecordCommunication
         showRecordCommunication;  //Initialize the show record communication object
+    std::string result;
     try {
         showRecordCommunication.decodeRequest(message);  //Decode the request
         AuctionStartInfo auctionStartInfo =
@@ -298,23 +326,26 @@ void ShowRecordCommand::handle(MessageSource &message,
         }
 
         showRecordCommunication._status = "OK";  //Set the status to OK
+        result = "Record Shown";
     } catch (AuctionException const
                  &e) {  //If the auction does not exist, set the status to NOK
         showRecordCommunication._status = "NOK";
+        result = "Auction Does Not Exist";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         showRecordCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response = showRecordCommunication.encodeResponse();  //Encode the response
-    receiver.log(Message::ServerRequestDetails(
-        "Show Record", showRecordCommunication._status));  //Display the message
+    receiver.log(Message::ServerRequestDetails("Show Record",
+                                               result));  //Display the message
 }
 
 void OpenCommand::handle(MessageSource &message, std::stringstream &response,
                          Server &receiver) {
     OpenAuctionCommunication
         openAuctionCommunication;  //Initialize the open auction communication object
-
+    std::string result;
     try {
         openAuctionCommunication.decodeRequest(message);  //Decode the request
         std::string aid = receiver._database->createAuction(
@@ -326,28 +357,33 @@ void OpenCommand::handle(MessageSource &message, std::stringstream &response,
             openAuctionCommunication._fileData);  //Create the auction
         openAuctionCommunication._status =
             "OK";  //Set the status to OK if everything goes right
+        result = "Auction Created";
         openAuctionCommunication._aid = aid;  //Set the auction id
     } catch (LoginException const
                  &e) {  //If the user is not logged in, set the status to NLG
         openAuctionCommunication._status = "NLG";
+        result = "User Not Logged In";
     } catch (AidException const &
                  e) {  //If the auction id is unavailable, set the status to NOK
         openAuctionCommunication._status = "NOK";
+        result = "Auction ID Unavailable";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         openAuctionCommunication._status = "ERR";
+        result = "Protocol Error";
     }
 
     response = openAuctionCommunication.encodeResponse();  //Encode the response
-    receiver.log(Message::ServerRequestDetails(
-        openAuctionCommunication._uid, "Open Auction",
-        openAuctionCommunication._status));  //Display the message
+    receiver.log(Message::ServerRequestDetails(openAuctionCommunication._uid,
+                                               "Open Auction",
+                                               result));  //Display the message
 }
 
 void CloseCommand::handle(MessageSource &message, std::stringstream &response,
                           Server &receiver) {
     CloseAuctionCommunication
         closeAuctionCommunication;  //Initialize the close auction communication object
+    std::string result;
     try {
         closeAuctionCommunication.decodeRequest(message);  //Decode the request
         receiver._database->closeAuction(
@@ -355,34 +391,41 @@ void CloseCommand::handle(MessageSource &message, std::stringstream &response,
             closeAuctionCommunication._aid);  //Close the auction
         closeAuctionCommunication._status =
             "OK";  //Set the status to OK if everything goes right
+        result = "Auction Closed";
     } catch (LoginException const
                  &e) {  //If the user is not logged in, set the status to NLG
         closeAuctionCommunication._status = "NLG";
+        result = "User Not Logged In";
     } catch (AuctionException const
                  &e) {  //If the auction does not exist, set the status to NOK
         closeAuctionCommunication._status = "EAU";
+        result = "Auction Does Not Exist";
     } catch (AuctionEndedException const &
                  e) {  //If the auction has already ended, set the status to END
         closeAuctionCommunication._status = "END";
+        result = "Auction Already Ended";
     } catch (
         AuctionOwnerException const
             &e) {  //If the user is not the auction owner, set the status to EOW
         closeAuctionCommunication._status = "EOW";
+        result = "User Not Auction Owner";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         closeAuctionCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response =
         closeAuctionCommunication.encodeResponse();  //Encode the response
-    receiver.log(Message::ServerRequestDetails(
-        closeAuctionCommunication._uid, "Close Auction",
-        closeAuctionCommunication._status));  //Display the message
+    receiver.log(Message::ServerRequestDetails(closeAuctionCommunication._uid,
+                                               "Close Auction",
+                                               result));  //Display the message
 }
 
 void ShowAssetCommand::handle(MessageSource &message,
                               std::stringstream &response, Server &receiver) {
     ShowAssetCommunication
         showAssetCommunication;  //Initialize the show asset communication object
+    std::string result;
     try {
         showAssetCommunication.decodeRequest(message);  //Decode the request
         showAssetCommunication._fileSize = receiver._database->getAuctionAsset(
@@ -390,23 +433,27 @@ void ShowAssetCommand::handle(MessageSource &message,
             showAssetCommunication._fileData);  //Get the auction asset
         showAssetCommunication._status =
             "OK";  //Set the status to OK if everything goes right
+        result = "Asset Shown";
     } catch (
         AuctionException const &
             e) {  //If there is a problem with the auction or the file, set the status to NOK
         showAssetCommunication._status = "NOK";
+        result = "Problem With Auction Or File";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         showAssetCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response = showAssetCommunication.encodeResponse();  //Encode the response
-    receiver.log(Message::ServerRequestDetails(
-        "Show Asset", showAssetCommunication._status));  //Display the message
+    receiver.log(Message::ServerRequestDetails("Show Asset",
+                                               result));  //Display the message
 }
 
 void BidCommand::handle(MessageSource &message, std::stringstream &response,
                         Server &receiver) {
     BidCommunication
         bidCommunication;  //Initialize the bid communication object
+    std::string result;
     try {
         bidCommunication.decodeRequest(message);  //Decode the request
         receiver._database->bidAuction(
@@ -414,29 +461,35 @@ void BidCommand::handle(MessageSource &message, std::stringstream &response,
             bidCommunication._aid, bidCommunication._value);  //Bid the auction
         bidCommunication._status =
             "ACC";  //Set the status to ACC if everything goes right
+        result = "Bid Accepted";
     } catch (LoginException const
                  &e) {  //If the user is not logged in, set the status to NLG
         bidCommunication._status = "NLG";
+        result = "User Not Logged In";
     } catch (AuctionException const
                  &e) {  //If the auction does not exist, set the status to NOK
         bidCommunication._status = "NOK";
+        result = "Auction Does Not Exist";
     } catch (AuctionEndedException const &
                  e) {  //If the auction has already ended, set the status to NOK
         bidCommunication._status = "NOK";
+        result = "Auction Already Ended";
     } catch (BidValueException const
                  &e) {  //If the bid value is too low, set the status to REF
         bidCommunication._status = "REF";
+        result = "Bid Value Too Low";
     } catch (AuctionOwnerException const &
                  e) {  //If the user is the auction owner, set the status to ILG
         bidCommunication._status = "ILG";
+        result = "User Is Auction Owner";
     } catch (ProtocolException const
                  &e) {  //If the protocol is not valid, set the status to ERR
         bidCommunication._status = "ERR";
+        result = "Protocol Error";
     }
     response = bidCommunication.encodeResponse();  //Encode the response
-    receiver.log(Message::ServerRequestDetails(
-        bidCommunication._uid, "Bid",
-        bidCommunication._status));  //Display the message
+    receiver.log(Message::ServerRequestDetails(bidCommunication._uid, "Bid",
+                                               result));  //Display the message
 }
 
 void protocolError(std::stringstream &response) {
