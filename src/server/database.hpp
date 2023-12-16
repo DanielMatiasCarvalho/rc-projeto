@@ -20,7 +20,7 @@ namespace fs = std::filesystem;
 
 /**
  * @brief The DatabaseLock class represents a lock for the database.
- * 
+ *
  * This class provides a mechanism to lock and unlock a database to ensure
  * exclusive access during critical sections of code.
  */
@@ -31,26 +31,27 @@ class DatabaseLock {
   public:
     /**
      * @brief Constructs a new DatabaseLock object with the specified name.
-     * 
+     *
      * @param name The name of the database lock.
      */
     DatabaseLock(std::string name);
 
     /**
-     * @brief Destroys the DatabaseLock object and releases any associated resources.
+     * @brief Destroys the DatabaseLock object and releases any associated
+     * resources.
      */
     ~DatabaseLock();
 
     /**
      * @brief Locks the database.
-     * 
+     *
      * This function blocks until the lock is acquired.
      */
     void lock();
 
     /**
      * @brief Unlocks the database.
-     * 
+     *
      * This function releases the lock, allowing other threads to acquire it.
      */
     void unlock();
@@ -58,8 +59,9 @@ class DatabaseLock {
 
 /**
  * @brief Structure that contains the start info of an auction.
- * 
- * This structure is used to represent the content of the START_XXX file on the database.
+ *
+ * This structure is used to represent the content of the START_XXX file on the
+ * database.
  */
 struct AuctionStartInfo {
     std::string uid;
@@ -71,8 +73,9 @@ struct AuctionStartInfo {
 
 /**
  * @brief Structure that contains the end info of an auction.
- * 
- * This structure is used to represent the content of the END_XXX file on the database.
+ *
+ * This structure is used to represent the content of the END_XXX file on the
+ * database.
  */
 struct AuctionEndInfo {
     time_t endTime;
@@ -80,8 +83,9 @@ struct AuctionEndInfo {
 
 /**
  * @brief Structure that contains the info of a bid.
- * 
- * This structure is used to represent the content of a bid file on the database.
+ *
+ * This structure is used to represent the content of a bid file on the
+ * database.
  */
 struct AuctionBidInfo {
     std::string uid;
@@ -91,10 +95,11 @@ struct AuctionBidInfo {
 
 /**
  * @brief Class that represents the core functionality of the database.
- * 
+ *
  * An object of this class is bound to the directory in the _path argument.
- * This class implements the methods that guarantee the integrity of the database,
- * aswell as the basic methods to create, delete and edit each element of the database.
+ * This class implements the methods that guarantee the integrity of the
+ * database, aswell as the basic methods to create, delete and edit each element
+ * of the database.
  */
 class DatabaseCore {
   private:
@@ -102,9 +107,10 @@ class DatabaseCore {
 
   public:
     /**
-   * @brief  Constructor of the core, just initializes and creates the base structure.
-   * @param  path the path of the database directory.
-   */
+     * @brief  Constructor of the core, just initializes and creates the base
+     * structure.
+     * @param  path the path of the database directory.
+     */
     DatabaseCore(std::string path);
 
     /**
@@ -113,12 +119,14 @@ class DatabaseCore {
     void guaranteeBaseStructure();
 
     /**
-     * @brief  Guarantees that the structure of the directory of a specific user still exists.
+     * @brief  Guarantees that the structure of the directory of a specific user
+     * still exists.
      */
     void guaranteeUserStructure(std::string uid);
 
     /**
-     * @brief  Guarantees that the structure of the directory of a specific auction still exists.
+     * @brief  Guarantees that the structure of the directory of a specific
+     * auction still exists.
      */
     void guaranteeAuctionStructure(std::string aid);
 
@@ -129,14 +137,14 @@ class DatabaseCore {
 
     /**
      * @brief  Creates the entry of an user in the db directory.
-     * @note   
+     * @note
      * @param  uid The user's UID.
      * @param  password The password of the user.
      */
     void createUser(std::string uid, std::string password);
 
     /**
-     * @brief  Checks if the user exists in the db.  
+     * @brief  Checks if the user exists in the db.
      * @param  uid The user's UID.
      * @retval true if the user exists on the db, false otherwise
      */
@@ -150,22 +158,24 @@ class DatabaseCore {
     bool isUserRegistered(std::string uid);
 
     /**
-     * @brief  Sets the user to the logged in state, by creating the UID_LOGIN file.
-     * @note   
+     * @brief  Sets the user to the logged in state, by creating the UID_LOGIN
+     * file.
+     * @note
      * @param  uid The user's UID.
      */
     void setLoggedIn(std::string uid);
 
     /**
-     * @brief  Sets the user to the logged out state, by deleting the UID_LOGIN file.
-     * @note   
+     * @brief  Sets the user to the logged out state, by deleting the UID_LOGIN
+     * file.
+     * @note
      * @param  uid The user's UID.
      */
     void setLoggedOut(std::string uid);
 
     /**
      * @brief  Checks if the user is in the logged in state.
-     * @param  uid: 
+     * @param  uid:
      * @retval true if user is logged in, false otherwise.
      */
     bool isUserLoggedIn(std::string uid);
@@ -200,7 +210,8 @@ class DatabaseCore {
     /**
      * @brief  Gets all the auctions at which the user has bidded.
      * @param  uid The user's UID.
-     * @retval Vector containing the AIDs of all auctions the user has bidded in.
+     * @retval Vector containing the AIDs of all auctions the user has bidded
+     * in.
      */
     std::vector<std::string> getUserBids(std::string uid);
 
@@ -221,7 +232,8 @@ class DatabaseCore {
     /**
      * @brief  Creates an auction entry in the db.
      * @param  aid The auction's AID.
-     * @param  startInfo Structure containing the start information of the auction.
+     * @param  startInfo Structure containing the start information of the
+     * auction.
      */
     void createAuction(std::string aid, AuctionStartInfo &startInfo);
 
@@ -243,7 +255,7 @@ class DatabaseCore {
      * @brief  Sets an auction to the Ended state.
      * @param  aid The auction's AID.
      * @param  endInfo Structure containing the end information.
-    */
+     */
     void endAuction(std::string aid, AuctionEndInfo endInfo);
 
     /**
@@ -285,7 +297,8 @@ class DatabaseCore {
     /**
      * @brief  Gets all of the bid's from a specific auction.
      * @param  aid The auction's AID.
-     * @retval a vector of structures, each containing the information of a single bid.
+     * @retval a vector of structures, each containing the information of a
+     * single bid.
      */
     std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
 
@@ -305,7 +318,7 @@ class DatabaseCore {
 
 /**
  * @brief Final class that represents the database.
- * 
+ *
  * This class uses the DatabaseLock and DatabaseCore to implement
  * high level functions that are thread/multiprocess safe.
  */
@@ -335,7 +348,8 @@ class Database {
      * @brief  Handles the whole process of login of a user.
      * @param  uid User's UID.
      * @param  password User's password.
-     * @retval true if the user got registered, false if it was already registered.
+     * @retval true if the user got registered, false if it was already
+     * registered.
      */
     bool loginUser(std::string uid, std::string password);
 
@@ -348,15 +362,16 @@ class Database {
 
     /**
      * @brief  Handles the unregidter process of a user.
-     * @note   
+     * @note
      * @param  uid User's UID.
      * @param  password User's password.
      */
     void unregisterUser(std::string uid, std::string password);
 
     /**
-     * @brief  Checks if the given auction is already closed, and closes if that is needed.
-     * 
+     * @brief  Checks if the given auction is already closed, and closes if that
+     * is needed.
+     *
      * This function is not thread safe.
      * @param  aid Auction's AID.
      */
@@ -364,7 +379,7 @@ class Database {
 
     /**
      * @brief  Checks if a given user is logged in and his password is correct.
-     * 
+     *
      * This function is not thread safe.
      * @param  uid User's UID.
      * @param  password User's password.
@@ -374,7 +389,7 @@ class Database {
 
     /**
      * @brief  Checks if a given user is registered.
-     * 
+     *
      * This function is not thread safe.
      * @param  uid User's UID.
      * @retval true if user is registered in, false otherwise.
@@ -403,7 +418,7 @@ class Database {
 
     /**
      * @brief  Generates a new AID (1 more than the previous max).
-     * 
+     *
      * This function is not thread safe.
      * @retval new AID as a string.
      */
@@ -428,7 +443,7 @@ class Database {
     /**
      * @brief  Gets the auction's max bid value, if the auction has no bids,
      * the value will be the start value minus 1.
-     * 
+     *
      * This function is not thread safe.
      * @param  aid Auction's AID.
      * @retval auction's max bid value
@@ -466,7 +481,7 @@ class Database {
 
     /**
      * @brief  Gets the name of and auction's asset file.
-     * @note   
+     * @note
      * @param  aid Auction's AID.
      * @retval asset file name.
      */
@@ -474,7 +489,7 @@ class Database {
 
     /**
      * @brief  Handles the process of closing an auction.
-     * @note   
+     * @note
      * @param  uid Host's UID.
      * @param  password Host's password.
      * @param  aid Auction's AID.
@@ -482,28 +497,32 @@ class Database {
     void closeAuction(std::string uid, std::string password, std::string aid);
 
     /**
-     * @brief  Gets the auction start information in order to help handling the show record process.
+     * @brief  Gets the auction start information in order to help handling the
+     * show record process.
      * @param  aid Auction's AID.
      * @retval structure containing the start information.
      */
     AuctionStartInfo getAuctionStartInfo(std::string aid);
 
     /**
-     * @brief  Gets the auction's bids information in order to help handling the show record process.
+     * @brief  Gets the auction's bids information in order to help handling the
+     * show record process.
      * @param  aid Auction's AID.
      * @retval vector of structures each containing the bid's information.
      */
     std::vector<AuctionBidInfo> getAuctionBids(std::string aid);
 
     /**
-     * @brief  Gets the auction end information in order to help handling the show record process.
+     * @brief  Gets the auction end information in order to help handling the
+     * show record process.
      * @param  aid Auction's AID.
      * @retval structure containing the end information.
      */
     AuctionEndInfo getAuctionEndInfo(std::string aid);
 
     /**
-     * @brief  Checks if an auction has ended in order to help the show record process.
+     * @brief  Checks if an auction has ended in order to help the show record
+     * process.
      * @param  aid Auction's AID.
      * @retval true if auction has ended, false otherwise.
      */
@@ -536,7 +555,7 @@ class UnregisteredException : public DatabaseException {
 
 /**
  * @brief  Exception thrown when there are no more auction id's availlable.
- * @note   
+ * @note
  * @retval None
  */
 class AidException : public DatabaseException {
@@ -546,7 +565,7 @@ class AidException : public DatabaseException {
 
 /**
  * @brief  Exception thrown when the value of a bid is invalid.
- * @note   
+ * @note
  * @retval None
  */
 class BidValueException : public DatabaseException {
@@ -556,7 +575,7 @@ class BidValueException : public DatabaseException {
 
 /**
  * @brief  Exception thrown when an auction does not exist.
- * @note   
+ * @note
  * @retval None
  */
 class AuctionException : public DatabaseException {
@@ -586,7 +605,7 @@ class AuctionEndedException : public DatabaseException {
 
 /**
  * @brief  Converts an AID in string form to int form.
- * @note   
+ * @note
  * @param  aid AID in string form.
  * @retval AID in int form.
  */
@@ -594,7 +613,7 @@ int AidStrToInt(std::string aid);
 
 /**
  * @brief  Converts an AID in int form to string form, XXX.
- * @note   
+ * @note
  * @param  aid AID in int form.
  * @retval AID in string form.
  */
@@ -602,7 +621,7 @@ std::string AidIntToStr(int aid);
 
 /**
  * @brief  Converts bid value in string form to int form
- * @note   
+ * @note
  * @param  bidValue in string form
  * @retval value in int form
  */
@@ -610,7 +629,7 @@ int BidValueToInt(std::string bidValue);
 
 /**
  * @brief  Converts bid value in int form to string form, XXXXXX.
- * @note   
+ * @note
  * @param  bidValue in int form.
  * @retval value in string form.
  */

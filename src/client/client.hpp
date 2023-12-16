@@ -21,8 +21,8 @@
  */
 class User {
   private:
-    std::string _username;  //The username of the user
-    std::string _password;  //The password of the user
+    std::string _username;  // The username of the user
+    std::string _password;  // The password of the user
 
   public:
     /**
@@ -61,14 +61,15 @@ class User {
  */
 class Client {
   private:
-    std::string _hostname = DEFAULT_HOSTNAME;  //The hostname of the server
-    std::string _port = DEFAULT_PORT;          //The port of the server
+    std::string _hostname = DEFAULT_HOSTNAME;  // The hostname of the server
+    std::string _port = DEFAULT_PORT;          // The port of the server
     std::string _downloadPath =
-        "./auction_files/";  //The path to the directory where the downloaded files are stored
+        "./auction_files/";  // The path to the directory where the downloaded
+                             // files are stored
 
   public:
-    User _user;            //The user of the client
-    bool _toExit = false;  //Specifies whether the client should exit
+    User _user;            // The user of the client
+    bool _toExit = false;  // Specifies whether the client should exit
 
     /**
      * @brief Constructs a Client object with the given command line arguments.

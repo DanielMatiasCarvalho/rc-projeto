@@ -1,6 +1,6 @@
 /**
  * @file terminal.hpp
- * @brief This file contains the class Terminal, which allows 
+ * @brief This file contains the class Terminal, which allows
  *        our client to behave like a typical terminal.
  */
 #ifndef __TERMINAL_HPP__
@@ -12,7 +12,8 @@
 #include <string>
 
 /**
- * @brief The Terminal class provides functionality for reading input from the terminal.
+ * @brief The Terminal class provides functionality for reading input from the
+ * terminal.
  */
 class Terminal {
   public:
