@@ -413,7 +413,7 @@ void ShowAssetCommand::handle(std::vector<std::string> args, Client &receiver) {
 
     if (comm._status == "OK") {
         //If the response is OK, show a message and download the asset
-        Message::DownloadAsset(comm._fileName, comm._fileSize);
+        Message::DownloadAsset(receiver.getDownloadPath() + comm._fileName, comm._fileSize);
         receiver.writeFile(comm._fileName, comm._fileData);
     } else if (comm._status == "NOK") {
         //If the response is NOK, show a message

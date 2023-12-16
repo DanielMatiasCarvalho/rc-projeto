@@ -176,8 +176,10 @@ void Logger::push() {
     std::tm *currentTm = std::localtime(&currentTime);
     for (auto message : _messages) {
         std::cout << "[" << std::put_time(currentTm, "%Y-%m-%d %H:%M:%S")
-                  << "] [LOG] " << message << std::endl;
+                  << "] [LOG] " << message << '\n';
     }
+
+    std::cout << std::flush;
 
     _messages.clear();
 }
