@@ -33,8 +33,8 @@ int main(int argc, char **argv) {
 
     while (!client._toExit) {  // While the client is not exiting
         try {
-            std::string command =
-                terminal.readLine(client.getPrompt().c_str());  //Read a line from the terminal
+            std::string command = terminal.readLine(
+                client.getPrompt().c_str());  //Read a line from the terminal
             manager.readCommand(
                 command,
                 client);  //Reads the command  and its arguments, sending it to the correct handler

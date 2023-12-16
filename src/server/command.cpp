@@ -31,7 +31,7 @@ void CommandManager::readCommand(MessageSource &message,
         }
     } catch (ProtocolViolationException const &e) {
         protocolError(response);
-        receiver.showMessage(Message::ServerRequestDetails("Unknown", "ERR"));
+        receiver.log(Message::ServerRequestDetails("Unknown", "ERR"));
         return;
     }
 
@@ -42,8 +42,7 @@ void CommandManager::readCommand(MessageSource &message,
             this->_handlersTCP
                 .end()) {  //If the handler is not found, the command is not valid
             protocolError(response);
-            receiver.showMessage(
-                Message::ServerRequestDetails("Unknown", "ERR"));
+            receiver.log(Message::ServerRequestDetails("Unknown", "ERR"));
             return;
         }
         handler->second->handle(
@@ -56,8 +55,7 @@ void CommandManager::readCommand(MessageSource &message,
             this->_handlersUDP
                 .end()) {  //If the handler is not found, the command is not valid
             protocolError(response);
-            receiver.showMessage(
-                Message::ServerRequestDetails("Unknown", "ERR"));
+            receiver.log(Message::ServerRequestDetails("Unknown", "ERR"));
             return;
         }
         handler->second->handle(
@@ -90,7 +88,7 @@ void LoginCommand::handle(MessageSource &message, std::stringstream &response,
         loginCommunication._status = "ERR";
     }
     response = loginCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         loginCommunication._uid, "Login",
         loginCommunication._status));  //Display the message
 }
@@ -117,7 +115,7 @@ void LogoutCommand::handle(MessageSource &message, std::stringstream &response,
         logoutCommunication._status = "ERR";
     }
     response = logoutCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         logoutCommunication._uid, "Logout",
         logoutCommunication._status));  //Display the message
 }
@@ -144,7 +142,7 @@ void UnregisterCommand::handle(MessageSource &message,
         unregisterCommunication._status = "ERR";
     }
     response = unregisterCommunication.encodeResponse();
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         unregisterCommunication._uid, "Unregister",
         unregisterCommunication._status));
 }
@@ -176,7 +174,7 @@ void ListUserAuctionsCommand::handle(MessageSource &message,
     }
     response =
         listUserAuctionsCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         listUserAuctionsCommunication._uid, "List User Auctions",
         listUserAuctionsCommunication._status));  //Display the message
 }
@@ -206,7 +204,7 @@ void ListUserBidsCommand::handle(MessageSource &message,
     }
     response =
         listUserBidsCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         listUserBidsCommunication._uid, "List User Bids",
         listUserBidsCommunication._status));  //Display the message
 }
@@ -233,7 +231,7 @@ void ListAllAuctionsCommand::handle(MessageSource &message,
     }
     response =
         listAllAuctionsCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         "List Auctions",
         listAllAuctionsCommunication._status));  //Display the message
 }
@@ -308,7 +306,7 @@ void ShowRecordCommand::handle(MessageSource &message,
         showRecordCommunication._status = "ERR";
     }
     response = showRecordCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         "Show Record", showRecordCommunication._status));  //Display the message
 }
 
@@ -341,7 +339,7 @@ void OpenCommand::handle(MessageSource &message, std::stringstream &response,
     }
 
     response = openAuctionCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         openAuctionCommunication._uid, "Open Auction",
         openAuctionCommunication._status));  //Display the message
 }
@@ -376,7 +374,7 @@ void CloseCommand::handle(MessageSource &message, std::stringstream &response,
     }
     response =
         closeAuctionCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         closeAuctionCommunication._uid, "Close Auction",
         closeAuctionCommunication._status));  //Display the message
 }
@@ -401,7 +399,7 @@ void ShowAssetCommand::handle(MessageSource &message,
         showAssetCommunication._status = "ERR";
     }
     response = showAssetCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         "Show Asset", showAssetCommunication._status));  //Display the message
 }
 
@@ -436,7 +434,7 @@ void BidCommand::handle(MessageSource &message, std::stringstream &response,
         bidCommunication._status = "ERR";
     }
     response = bidCommunication.encodeResponse();  //Encode the response
-    receiver.showMessage(Message::ServerRequestDetails(
+    receiver.log(Message::ServerRequestDetails(
         bidCommunication._uid, "Bid",
         bidCommunication._status));  //Display the message
 }

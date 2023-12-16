@@ -110,6 +110,12 @@ class Client {
      */
     int getFileSize(std::string fName);
 
+    /**
+     * @brief  Gets the set of characters that will precede the prompt
+     * on the next command, shows the user uid if the client is logged in,
+     * otherwise a simple arrow.
+     * @retval the prompt that should be used.
+     */
     std::string getPrompt();
 };
 
