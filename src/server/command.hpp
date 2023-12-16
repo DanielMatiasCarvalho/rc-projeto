@@ -1,8 +1,9 @@
 /**
  * @file command.hpp
  * @brief Header file for the command program.
- * 
- * This file contains the declaration of the classes used in registering and handling a command request.
+ *
+ * This file contains the declaration of the classes used in registering and
+ * handling a command request.
  */
 
 #ifndef __COMMAND_HPP__
@@ -20,15 +21,16 @@
 
 /**
  * @brief Abstract base class for command handlers.
- * 
- * This class defines the interface for handling commands received by the server.
- * Subclasses must implement the handle() method to provide specific command handling logic.
+ *
+ * This class defines the interface for handling commands received by the
+ * server. Subclasses must implement the handle() method to provide specific
+ * command handling logic.
  */
 class CommandHandler {
   public:
     /**
      * @brief Handles a command message.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -41,14 +43,15 @@ class CommandHandler {
   protected:
     /**
      * @brief Constructs a CommandHandler object with the specified code.
-     * 
+     *
      * @param code The code associated with the command.
      */
     CommandHandler(std::string code) : _code{code} {}
 };
 
 /**
- * @brief Manages command handlers and dispatches commands to the appropriate handler.
+ * @brief Manages command handlers and dispatches commands to the appropriate
+ * handler.
  */
 class CommandManager {
   private:
@@ -60,7 +63,7 @@ class CommandManager {
   public:
     /**
      * @brief Registers a command handler.
-     * 
+     *
      * @param handler The command handler to register.
      * @param isTCP Specifies whether the command is for TCP or UDP.
      */
@@ -68,7 +71,7 @@ class CommandManager {
 
     /**
      * @brief Reads and handles a command message.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -90,7 +93,7 @@ class LoginCommand : public CommandHandler {
 
     /**
      * @brief Handles the "LIN" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -111,7 +114,7 @@ class LogoutCommand : public CommandHandler {
 
     /**
      * @brief Handles the "LOU" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -132,7 +135,7 @@ class UnregisterCommand : public CommandHandler {
 
     /**
      * @brief Handles the "UNR" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -153,7 +156,7 @@ class ListUserAuctionsCommand : public CommandHandler {
 
     /**
      * @brief Handles the "LMA" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -174,7 +177,7 @@ class ListUserBidsCommand : public CommandHandler {
 
     /**
      * @brief Handles the "LMB" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -195,7 +198,7 @@ class ListAllAuctionsCommand : public CommandHandler {
 
     /**
      * @brief Handles the "LST" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -216,7 +219,7 @@ class ShowRecordCommand : public CommandHandler {
 
     /**
      * @brief Handles the "SRC" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -237,7 +240,7 @@ class OpenCommand : public CommandHandler {
 
     /**
      * @brief Handles the "OPA" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -258,7 +261,7 @@ class CloseCommand : public CommandHandler {
 
     /**
      * @brief Handles the "CLS" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -279,7 +282,7 @@ class ShowAssetCommand : public CommandHandler {
 
     /**
      * @brief Handles the "SAS" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -300,7 +303,7 @@ class BidCommand : public CommandHandler {
 
     /**
      * @brief Handles the "BID" command.
-     * 
+     *
      * @param message The command message to handle.
      * @param response The response stream to write the command response to.
      * @param receiver The server instance that received the command.
@@ -311,7 +314,7 @@ class BidCommand : public CommandHandler {
 
 /**
  * @brief Writes a protocol error response to the response stream.
- * 
+ *
  * @param response The response stream to write the error response to.
  */
 void protocolError(std::stringstream &response);

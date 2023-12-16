@@ -1,6 +1,7 @@
 /**
  * @file network.hpp
- * @brief This file contains the declaration of the UdpClient, TcpClient, SocketException, and TimeoutException classes.
+ * @brief This file contains the declaration of the UdpClient, TcpClient,
+ * SocketException, and TimeoutException classes.
  */
 
 #ifndef __NETWORK_HPP__
@@ -22,18 +23,20 @@
 
 /**
  * @class UdpClient
- * @brief Represents a UDP client that can send and receive data over the network.
+ * @brief Represents a UDP client that can send and receive data over the
+ * network.
  */
 class UdpClient {
   private:
-    int _fd;                   //The file descriptor of the socket
-    struct addrinfo _hints;    //The address flags
-    struct addrinfo *_res;     //The address info
-    struct sockaddr_in _addr;  //The address
+    int _fd;                   // The file descriptor of the socket
+    struct addrinfo _hints;    // The address flags
+    struct addrinfo *_res;     // The address info
+    struct sockaddr_in _addr;  // The address
 
   public:
     /**
-     * @brief Constructs a UdpClient object with the specified hostname and port.
+     * @brief Constructs a UdpClient object with the specified hostname and
+     * port.
      * @param hostname The hostname or IP address of the server.
      * @param port The port number to connect to.
      */
@@ -59,17 +62,19 @@ class UdpClient {
 
 /**
  * @class TcpClient
- * @brief Represents a TCP client that can send and receive data over the network.
+ * @brief Represents a TCP client that can send and receive data over the
+ * network.
  */
 class TcpClient {
   private:
-    int _fd;                 //The file descriptor of the socket
-    struct addrinfo _hints;  //The address flags
-    struct addrinfo *_res;   //The address info
+    int _fd;                 // The file descriptor of the socket
+    struct addrinfo _hints;  // The address flags
+    struct addrinfo *_res;   // The address info
 
   public:
     /**
-     * @brief Constructs a TcpClient object with the specified hostname and port.
+     * @brief Constructs a TcpClient object with the specified hostname and
+     * port.
      * @param hostname The hostname or IP address of the server.
      * @param port The port number to connect to.
      */

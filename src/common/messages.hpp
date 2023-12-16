@@ -1,6 +1,7 @@
 /**
  * @file messages.hpp
- * @brief This file contains the class Message, which contains static methods for displaying various messages.
+ * @brief This file contains the class Message, which contains static methods
+ * for displaying various messages.
  */
 #ifndef __MESSAGES_HPP__
 #define __MESSAGES_HPP__
@@ -13,7 +14,8 @@
 #include "utils.hpp"
 
 /**
- * @brief The Message class contains static methods for displaying various messages.
+ * @brief The Message class contains static methods for displaying various
+ * messages.
  */
 class Message {
   public:
@@ -28,7 +30,8 @@ class Message {
     static void WrongPassword();
 
     /**
-     * @brief Displays a message for wrong username or password entered during login.
+     * @brief Displays a message for wrong username or password entered during
+     * login.
      */
     static void WrongUsernameOrPassword();
     /**
@@ -189,7 +192,8 @@ class Message {
      * @param bidderUids The IDs of the bidders.
      * @param bidValues The values of the bids.
      * @param bidDateTime The date and time of the bids.
-     * @param bidSecTimes The time in seconds of the bids, since the beginning of the auction.
+     * @param bidSecTimes The time in seconds of the bids, since the beginning
+     * of the auction.
      */
     static void ShowRecordBids(std::vector<std::string> bidderUids,
                                std::vector<int> bidValues,

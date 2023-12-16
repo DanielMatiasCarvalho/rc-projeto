@@ -16,19 +16,20 @@
 #include "utils.hpp"
 
 /**
- * @brief The CommandHandler class is an abstract base class for handling commands.
- * 
- * It provides a common interface for handling commands and defines common properties
- * such as name, description, usage, and aliases.
+ * @brief The CommandHandler class is an abstract base class for handling
+ * commands.
+ *
+ * It provides a common interface for handling commands and defines common
+ * properties such as name, description, usage, and aliases.
  */
 class CommandHandler {
   public:
     /**
      * @brief Handles the command with the given arguments.
-     * 
-     * This method should be implemented by derived classes to provide the specific
-     * functionality for handling the command.
-     * 
+     *
+     * This method should be implemented by derived classes to provide the
+     * specific functionality for handling the command.
+     *
      * @param args The arguments passed to the command.
      * @param receiver The client object that receives the command.
      */
@@ -42,7 +43,7 @@ class CommandHandler {
   protected:
     /**
      * @brief Constructs a CommandHandler object with the specified properties.
-     * 
+     *
      * @param name The name of the command.
      * @param description The description of the command.
      * @param usage The usage information of the command.
@@ -57,7 +58,8 @@ class CommandHandler {
 };
 
 /**
- * @brief The CommandManager class handles the registration and execution of commands.
+ * @brief The CommandManager class handles the registration and execution of
+ * commands.
  */
 class CommandManager {
   private:
@@ -85,7 +87,7 @@ class LoginCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the login command.
-     * 
+     *
      * @param args The arguments passed to the command.
      * @param receiver The client object.
      */
@@ -106,7 +108,7 @@ class LogoutCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the logout command.
-     * 
+     *
      * @param args The command arguments.
      * @param receiver The client object.
      */
@@ -121,13 +123,14 @@ class LogoutCommand : public CommandHandler {
 };
 
 /**
- * @brief Represents a command for unregistering the current logged in user in the server.
+ * @brief Represents a command for unregistering the current logged in user in
+ * the server.
  */
 class UnregisterCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the unregister command.
-     * 
+     *
      * @param args The command arguments.
      * @param receiver The client object.
      */
@@ -144,13 +147,13 @@ class UnregisterCommand : public CommandHandler {
 
 /**
  * @brief Represents a command for exiting the program.
- * 
+ *
  */
 class ExitCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the "exit" command.
-     * 
+     *
      * @param args The arguments passed to the command.
      * @param receiver The Client object that will handle the command.
      */
@@ -158,7 +161,7 @@ class ExitCommand : public CommandHandler {
 
     /**
      * @brief Constructs an ExitCommand object.
-     * 
+     *
      */
     ExitCommand()
         : CommandHandler("exit", "Unregisters current logged in user in server",
@@ -172,7 +175,7 @@ class OpenCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the open command.
-     * 
+     *
      * @param args The arguments passed to the command.
      * @param receiver The client object that will handle the command.
      */
@@ -194,7 +197,7 @@ class CloseCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the close command.
-     * 
+     *
      * @param args The command arguments.
      * @param receiver The client object.
      */
@@ -210,13 +213,14 @@ class CloseCommand : public CommandHandler {
 };
 
 /**
- * @brief A command handler for listing the auctions started by the logged in user.
+ * @brief A command handler for listing the auctions started by the logged in
+ * user.
  */
 class ListUserAuctionsCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the command to list user auctions.
-     * 
+     *
      * @param args The command arguments.
      * @param receiver The client object.
      */
@@ -232,13 +236,14 @@ class ListUserAuctionsCommand : public CommandHandler {
 };
 
 /**
- * @brief Represents a command handler for listing the bids started by the logged in user.
+ * @brief Represents a command handler for listing the bids started by the
+ * logged in user.
  */
 class ListUserBidsCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the execution of the command.
-     * 
+     *
      * @param args The command arguments.
      * @param receiver The client object.
      */
@@ -260,7 +265,7 @@ class ListAllAuctionsCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the execution of the command.
-     * 
+     *
      * @param args The command arguments.
      * @param receiver The client object.
      */
@@ -275,13 +280,14 @@ class ListAllAuctionsCommand : public CommandHandler {
 };
 
 /**
- * @brief Represents a command that requests the server to send the asset file of an auction.
+ * @brief Represents a command that requests the server to send the asset file
+ * of an auction.
  */
 class ShowAssetCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the execution of the command.
-     * 
+     *
      * @param args The command arguments.
      * @param receiver The client object.
      */
@@ -298,13 +304,14 @@ class ShowAssetCommand : public CommandHandler {
 };
 
 /**
- * @brief The BidCommand class represents a command that allows the user to bid a certain value in a certain auction.
+ * @brief The BidCommand class represents a command that allows the user to bid
+ * a certain value in a certain auction.
  */
 class BidCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the bid command.
-     * 
+     *
      * @param args The arguments passed to the command.
      * @param receiver The client object that will handle the bid.
      */
@@ -326,7 +333,7 @@ class ShowRecordCommand : public CommandHandler {
   public:
     /**
      * @brief Handles the show_record command.
-     * 
+     *
      * @param args The command arguments.
      * @param receiver The client object.
      */
@@ -342,15 +349,15 @@ class ShowRecordCommand : public CommandHandler {
 
 /**
  * @brief Exception class for command-related errors.
- * 
- * This class is derived from std::runtime_error and is used to represent exceptions
- * that occur during command execution.
+ *
+ * This class is derived from std::runtime_error and is used to represent
+ * exceptions that occur during command execution.
  */
 class CommandException : public std::runtime_error {
   public:
     /**
      * @brief Constructs a CommandException object with the specified reason.
-     * 
+     *
      * @param reason The reason for the exception.
      */
     CommandException(std::string reason)
@@ -363,8 +370,9 @@ class CommandException : public std::runtime_error {
 class CommandArgumentException : public CommandException {
   public:
     /**
-     * @brief Constructs a CommandArgumentException with the specified usage information.
-     * 
+     * @brief Constructs a CommandArgumentException with the specified usage
+     * information.
+     *
      * @param usage The usage information for the command.
      */
     CommandArgumentException(std::string usage)
