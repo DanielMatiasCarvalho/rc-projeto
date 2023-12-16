@@ -24,7 +24,8 @@ void CommandManager::readCommand(MessageSource &message,
                                  bool isTCP) {
     std::string code;
     try {
-        for (size_t i = 0; i < 3; i++) {  //Reads the 3 digit code from the message
+        for (size_t i = 0; i < 3;
+             i++) {  //Reads the 3 digit code from the message
             char c = message.get();
             code.push_back(c);
         }
@@ -33,7 +34,6 @@ void CommandManager::readCommand(MessageSource &message,
         receiver.showMessage(Message::ServerRequestDetails("Unknown", "ERR"));
         return;
     }
-    
 
     if (isTCP) {
         auto handler = this->_handlersTCP.find(
@@ -42,7 +42,8 @@ void CommandManager::readCommand(MessageSource &message,
             this->_handlersTCP
                 .end()) {  //If the handler is not found, the command is not valid
             protocolError(response);
-            receiver.showMessage(Message::ServerRequestDetails("Unknown", "ERR"));
+            receiver.showMessage(
+                Message::ServerRequestDetails("Unknown", "ERR"));
             return;
         }
         handler->second->handle(
@@ -55,7 +56,8 @@ void CommandManager::readCommand(MessageSource &message,
             this->_handlersUDP
                 .end()) {  //If the handler is not found, the command is not valid
             protocolError(response);
-            receiver.showMessage(Message::ServerRequestDetails("Unknown", "ERR"));
+            receiver.showMessage(
+                Message::ServerRequestDetails("Unknown", "ERR"));
             return;
         }
         handler->second->handle(

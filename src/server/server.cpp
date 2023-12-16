@@ -141,7 +141,7 @@ void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server) {
 
             try {
                 TcpMessage message(session._fd);  //Initialize the TCP message
-                std::stringstream response;       //Initialize the response stream
+                std::stringstream response;  //Initialize the response stream
                 manager.readCommand(
                     message, response, server,
                     true);  //Read the command, handle it and write the response
@@ -149,8 +149,8 @@ void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server) {
             } catch (SocketCommunicationException const &e) {
                 server.showMessage("Session ended prematurely.");
             }
-            
-            exit(0);                 //Exit the child process
+
+            exit(0);  //Exit the child process
         }
     }
 }
