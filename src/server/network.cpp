@@ -193,37 +193,6 @@ void TcpSession::send(std::stringstream &message) {
     }
 }
 
-std::stringstream TcpSession::receive() {
-    char messageBuffer[SOCKETS_TCP_BUFFER_SIZE];  //The message buffer
-    std::stringstream message;
-
-    ssize_t n =
-        read(_fd, messageBuffer,
-             SOCKETS_TCP_BUFFER_SIZE);  //Read the message from the socket
-
-    if (n == -1) {
-        throw SocketCommunicationException();
-    }
-
-    while (n != 0) {  //Do loop until the end of the message
-        message.write(messageBuffer,
-                      n);  //Write the message to the stringstream
-
-        n = read(_fd, messageBuffer,
-                 SOCKETS_TCP_BUFFER_SIZE);  //Read the message from the socket
-
-        if (n == -1) {  //Check for errors
-            if (errno == EAGAIN || errno == EWOULDBLOCK ||
-                errno == EINPROGRESS) {
-                break;
-            }
-            throw SocketCommunicationException();
-        }
-    }
-
-    return message;
-}
-
 void TcpSession::close() {
     if (!_closed) {    //Check if the socket has been closed
         ::close(_fd);  //Close the socket

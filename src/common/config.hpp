@@ -23,7 +23,7 @@
 #define SOCKETS_MAX_DATAGRAM_SIZE_CLIENT \
     (6001)  //The maximum size of a datagram for a client socket.
 #define SOCKETS_MAX_DATAGRAM_SIZE_SERVER \
-    (6001)  //The maximum size of a datagram for a server socket.
+    (20)  //The maximum size of a datagram for a server socket.
 #define SOCKETS_TCP_BUFFER_SIZE \
     (512)  //The size of the TCP buffer for socket communication.
 #define SOCKETS_UDP_TIMEOUT \
