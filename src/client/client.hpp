@@ -109,6 +109,8 @@ class Client {
      * @return The size of the file in bytes.
      */
     int getFileSize(std::string fName);
+
+    std::string getPrompt();
 };
 
 #endif
