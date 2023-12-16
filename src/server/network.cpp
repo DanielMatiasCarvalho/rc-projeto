@@ -8,7 +8,7 @@ UdpServer::UdpServer(std::string port) {
     _fd = socket(AF_INET, SOCK_DGRAM, 0);  //Create the socket
 
     if (_fd == -1) {  //Check for errors
-        throw SocketException();
+        throw SocketSetupException();
     }
 
     //Set the socket options
@@ -21,11 +21,11 @@ UdpServer::UdpServer(std::string port) {
         getaddrinfo(NULL, port.c_str(), &_hints, &_res);  //Get the address info
 
     if (err != 0) {  //Check for errors
-        throw SocketException();
+        throw SocketSetupException();
     }
 
     if (bind(_fd, _res->ai_addr, _res->ai_addrlen) == -1) {  //Bind the socket
-        throw SocketException();
+        throw SocketSetupException();
     }
 }
 
@@ -45,13 +45,13 @@ void UdpServer::send(std::stringstream &message) {
     std::streamsize n = message.gcount();  //Get the number of bytes read
 
     if (n <= 0) {  //Check for errors
-        throw SocketException();
+        throw SocketCommunicationException();
     }
 
     //Send the message
     if (sendto(_fd, messageBuffer, (size_t)n, 0, (struct sockaddr *)&_client,
                _clientSize) != n) {
-        throw SocketException();
+        throw SocketCommunicationException();
     }
 }
 
@@ -63,7 +63,7 @@ std::stringstream UdpServer::receive() {
         (struct sockaddr *)&_client, &_clientSize);  //Receive the message
 
     if (n > SOCKETS_MAX_DATAGRAM_SIZE_SERVER) {  //Check for errors
-        throw SocketException();
+        throw SocketCommunicationException();
     }
 
     std::stringstream message;
@@ -94,7 +94,7 @@ std::string UdpServer::getClientPort() {
 TcpServer::TcpServer(std::string port) {
     _fd = socket(AF_INET, SOCK_STREAM, 0);  //Create the socket
     if (_fd == -1) {                        //Check for errors
-        throw SocketException();
+        throw SocketSetupException();
     }
 
     int reuse_addr = 1;  //Set the socket options
@@ -111,15 +111,15 @@ TcpServer::TcpServer(std::string port) {
         getaddrinfo(NULL, port.c_str(), &_hints, &_res);  //Get the address info
 
     if (n != 0) {  //Check for errors
-        throw SocketException();
+        throw SocketSetupException();
     }
 
     if (bind(_fd, _res->ai_addr, _res->ai_addrlen) == -1) {  //Bind the socket
-        throw SocketException();
+        throw SocketSetupException();
     }
 
     if (listen(_fd, 20) == -1) {  //Listen for connections
-        throw SocketException();
+        throw SocketSetupException();
     }
 }
 
@@ -142,7 +142,7 @@ int TcpServer::acceptConnection(struct sockaddr_in &client,
     clientSize = clientAddressSize;  //Set the client address size
 
     if (clientFd == -1) {  //Check for errors
-        throw SocketException();
+        throw SocketSetupException();
     }
 
     return clientFd;
@@ -185,7 +185,7 @@ void TcpSession::send(std::stringstream &message) {
 
     while (n != 0) {  //Do loop until the end of the message
         if (write(_fd, messageBuffer, (size_t)n) == -1) {  //Send the message
-            throw SocketException();
+            throw SocketCommunicationException();
         }
         message.read(messageBuffer,
                      SOCKETS_TCP_BUFFER_SIZE);  //Read the message
@@ -202,7 +202,7 @@ std::stringstream TcpSession::receive() {
              SOCKETS_TCP_BUFFER_SIZE);  //Read the message from the socket
 
     if (n == -1) {
-        throw SocketException();
+        throw SocketCommunicationException();
     }
 
     while (n != 0) {  //Do loop until the end of the message
@@ -217,7 +217,7 @@ std::stringstream TcpSession::receive() {
                 errno == EINPROGRESS) {
                 break;
             }
-            throw SocketException();
+            throw SocketCommunicationException();
         }
     }
 

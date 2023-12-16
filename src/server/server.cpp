@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
                 "TCP server started");  //Display a message if verbose mode is enabled
             TCPServer(tcpServer, manager, server);  //Start the TCP server
         }
-    } catch (SocketException const
+    } catch (SocketSetupException const
                  &e) {  //If the server could not connect to the sockets
         std::cout << "Server could not connect to the sockets. Ensure that the "
                      "port is not being used by another process."
@@ -133,17 +133,23 @@ void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server) {
         if ((pid = fork()) == -1) {  //Fork the process
             exit(1);
         } else if (pid == 0) {  //If the process is a child process
-            tcpServer.close();  //Close the TCP server
+            tcpServer.close();  //Close the TCP server socket
             server.showMessage(
                 Message::
                     ServerConnectionDetails(  //Display the client information if verbose mode is enabled
                         session.getClientIP(), session.getClientPort(), "TCP"));
-            TcpMessage message(session._fd);  //Initialize the TCP message
-            std::stringstream response;       //Initialize the response stream
-            manager.readCommand(
-                message, response, server,
-                true);  //Read the command, handle it and write the response
-            session.send(response);  //Send the response to the client
+
+            try {
+                TcpMessage message(session._fd);  //Initialize the TCP message
+                std::stringstream response;       //Initialize the response stream
+                manager.readCommand(
+                    message, response, server,
+                    true);  //Read the command, handle it and write the response
+                session.send(response);  //Send the response to the client
+            } catch (SocketCommunicationException const &e) {
+                server.showMessage("Session ended prematurely.");
+            }
+            
             exit(0);                 //Exit the child process
         }
     }
