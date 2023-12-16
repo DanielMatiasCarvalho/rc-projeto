@@ -46,22 +46,21 @@ int main(int argc, char **argv) {
         TcpServer tcpServer(server.getPort());  //Initialize the TCP server
 
         //Display the server information if verbose mode is enabled
-        server.showMessage("Listening on port " + server.getPort());
-
+        server.logPush("Listening on port " + server.getPort());
         if ((pid = fork()) == -1) {  //Fork the process
             exit(1);
         } else if (pid == 0) {  //If the process is a child process
             tcpServer.close();  //Close the TCP server
-            server.showMessage(
+            server.logPush(
                 "UDP server started");  //Display a message if verbose mode is enabled
             UDPServer(udpServer, manager, server);  //Start the UDP server
         } else {                //If the process is a parent process
             udpServer.close();  //Close the UDP server
-            server.showMessage(
+            server.logPush(
                 "TCP server started");  //Display a message if verbose mode is enabled
             TCPServer(tcpServer, manager, server);  //Start the TCP server
         }
-    } catch (SocketException const
+    } catch (SocketSetupException const
                  &e) {  //If the server could not connect to the sockets
         std::cout << "Server could not connect to the sockets. Ensure that the "
                      "port is not being used by another process."
@@ -80,7 +79,7 @@ Server::Server(int argc, char **argv) {
                 _port = optarg;
                 break;
             case 'v':  //Sets the verbosity
-                _verbose = true;
+                _loggers.push_back(std::make_shared<Logger>());
                 break;
             default:
                 break;
@@ -96,9 +95,21 @@ void Server::ShowInfo() {
               << "Verbose: " << _verbose << std::endl;
 }
 
-void Server::showMessage(std::string message) {
-    if (_verbose) {
-        std::cout << "[LOG] " << message << std::endl;
+void Server::log(std::string message) {
+    for (auto x : _loggers) {
+        x->log(message);
+    }
+}
+
+void Server::push() {
+    for (auto x : _loggers) {
+        x->push();
+    }
+}
+
+void Server::logPush(std::string message) {
+    for (auto x : _loggers) {
+        x->logPush(message);
     }
 }
 
@@ -106,7 +117,7 @@ void UDPServer(UdpServer &udpServer, CommandManager &manager, Server &server) {
     while (1) {
         std::stringstream message =
             udpServer.receive();  //Receive a message from the client
-        server.showMessage(
+        server.log(
             Message::
                 ServerConnectionDetails(  //Display the client information if verbose mode is enabled
                     udpServer.getClientIP(), udpServer.getClientPort(), "UDP"));
@@ -116,6 +127,7 @@ void UDPServer(UdpServer &udpServer, CommandManager &manager, Server &server) {
             streamMessage, response, server,
             false);  //Read the command, handle it and write the response
         udpServer.send(response);  //Send the response to the client
+        server.push();
     }
 }
 
@@ -133,18 +145,41 @@ void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server) {
         if ((pid = fork()) == -1) {  //Fork the process
             exit(1);
         } else if (pid == 0) {  //If the process is a child process
-            tcpServer.close();  //Close the TCP server
-            server.showMessage(
+            tcpServer.close();  //Close the TCP server socket
+            server.log(
                 Message::
                     ServerConnectionDetails(  //Display the client information if verbose mode is enabled
                         session.getClientIP(), session.getClientPort(), "TCP"));
-            TcpMessage message(session._fd);  //Initialize the TCP message
-            std::stringstream response;       //Initialize the response stream
-            manager.readCommand(
-                message, response, server,
-                true);  //Read the command, handle it and write the response
-            session.send(response);  //Send the response to the client
-            exit(0);                 //Exit the child process
+
+            try {
+                TcpMessage message(session._fd);  //Initialize the TCP message
+                std::stringstream response;  //Initialize the response stream
+                manager.readCommand(
+                    message, response, server,
+                    true);  //Read the command, handle it and write the response
+                session.send(response);  //Send the response to the client
+            } catch (SocketCommunicationException const &e) {
+                server.log("Session ended prematurely.");
+            }
+            server.push();
+            exit(0);  //Exit the child process
         }
     }
+}
+
+void Logger::log(std::string message) {
+    _messages.push_back(message);
+}
+
+void Logger::push() {
+    for (auto message : _messages) {
+        std::cout << "[LOG] " << message << std::endl;
+    }
+
+    _messages.clear();
+}
+
+void Logger::logPush(std::string message) {
+    log(message);
+    push();
 }

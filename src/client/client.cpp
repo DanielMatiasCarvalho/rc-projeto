@@ -33,8 +33,8 @@ int main(int argc, char **argv) {
 
     while (!client._toExit) {  // While the client is not exiting
         try {
-            std::string command =
-                terminal.readLine("> ");  //Read a line from the terminal
+            std::string command = terminal.readLine(
+                client.getPrompt().c_str());  //Read a line from the terminal
             manager.readCommand(
                 command,
                 client);  //Reads the command  and its arguments, sending it to the correct handler
@@ -191,4 +191,12 @@ int Client::getFileSize(std::string fName) {
     std::filesystem::path p(fName);  //Create a path with the given name
 
     return (int)std::filesystem::file_size(p);  //Return the size of the file
+}
+
+std::string Client::getPrompt() {
+    if (!_user.isLoggedIn()) {
+        return "> ";
+    }
+
+    return "[" + _user.getUsername() + "] > ";
 }

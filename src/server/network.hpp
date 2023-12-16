@@ -185,6 +185,10 @@ class SocketException : public std::runtime_error {
     SocketException() : std::runtime_error("A network error has occurred."){};
 };
 
+class SocketSetupException : public SocketException {};
+
+class SocketCommunicationException : public SocketException {};
+
 /**
  * @class TimeoutException
  * @brief Represents an exception that is thrown when the server has timed out.
