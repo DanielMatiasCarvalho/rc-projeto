@@ -63,13 +63,13 @@ int main(int argc, char **argv) {
             exit(1);
         } else if (pid == 0) {  // If the process is a child process
             tcpServer.close();  // Close the TCP server
-            server.logPush("UDP server started");  // Display a message if
-                                                   // verbose mode is enabled
+            server.logPush("UDP server started");   // Display a message if
+                                                    // verbose mode is enabled
             UDPServer(udpServer, manager, server);  // Start the UDP server
         } else {                // If the process is a parent process
             udpServer.close();  // Close the UDP server
-            server.logPush("TCP server started");  // Display a message if
-                                                   // verbose mode is enabled
+            server.logPush("TCP server started");   // Display a message if
+                                                    // verbose mode is enabled
             TCPServer(tcpServer, manager, server);  // Start the TCP server
         }
     } catch (SocketSetupException const
@@ -175,7 +175,7 @@ void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server) {
                 manager.readCommand(message, response, server,
                                     true);  // Read the command, handle it and
                                             // write the response
-                session.send(response);  // Send the response to the client
+                session.send(response);     // Send the response to the client
             } catch (SocketCommunicationException const &e) {
                 server.log("Session ended prematurely.");
             }

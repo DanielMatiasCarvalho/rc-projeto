@@ -127,8 +127,8 @@ class TcpServer {
  */
 class TcpSession {
   private:
-    bool _closed = false;  // Flag indicating whether the session has been
-                           // closed
+    bool _closed = false;        // Flag indicating whether the session has been
+                                 // closed
     struct sockaddr_in _client;  // The client address
     socklen_t _clientSize;       // The client address size
 
