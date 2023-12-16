@@ -11,6 +11,11 @@
 #define PROTOCOL_PASSWORD_SIZE (8)  // The size of the password in the protocol.
 #define PROTOCOL_AID_SIZE \
     (3)  // The size of the AID (Action ID) in the protocol.
+#define PROTOCOL_AUCTIONNAME_SIZE (10)
+#define PROTOCOL_FNAME_SIZE (24)
+#define PROTOCOL_FSIZE_SIZE (8)
+#define PROTOCOL_STARTVALUE_SIZE (6)
+#define PROTOCOL_AUCTIONTIME_SIZE (5)
 #define PROTOCOL_ERROR_IDENTIFIER \
     "ERR"  // The identifier used to indicate an error in the protocol.
 #define PROTOCOL_MAX_FILE_SIZE \

@@ -208,6 +208,16 @@ std::string ProtocolCommunication::readAid(MessageSource &message) {
     return aid;
 }
 
+std::string ProtocolCommunication::readFileName(MessageSource &message) {
+    std::string filename = readString(message, PROTOCOL_FNAME_SIZE);
+
+    if (!isValidFileName(filename)) {
+        throw ProtocolViolationException();
+    }
+
+    return filename;
+}
+
 void ProtocolCommunication::readIdentifier(MessageSource &message,
                                            std::string identifier) {
     std::string identifierRecieved = readString(message, 3);  // Read a string
@@ -289,6 +299,15 @@ void ProtocolCommunication::writeAid(std::stringstream &message,
     }
 
     writeString(message, aid);  // write the string
+}
+
+void ProtocolCommunication::writeFileName(std::stringstream &message,
+                                          std::string fileName) {
+    if (!isValidFileName(fileName) || fileName.length() > PROTOCOL_FNAME_SIZE) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, fileName);
 }
 
 std::stringstream LoginCommunication::encodeRequest() {
@@ -937,7 +956,7 @@ std::stringstream OpenAuctionCommunication::encodeRequest() {
         throw ProtocolViolationException();
     }
 
-    writeString(message, _fileName);  // Write the asset file name
+    writeFileName(message, _fileName);  // Write the asset file name
 
     writeSpace(message);
 
@@ -983,7 +1002,7 @@ void OpenAuctionCommunication::decodeRequest(MessageSource &message) {
 
     readSpace(message);
 
-    _fileName = readString(message, 24);  // Read the asset file name
+    _fileName = readFileName(message);  // Read the asset file name
 
     readSpace(message);
 
@@ -1152,7 +1171,7 @@ std::stringstream ShowAssetCommunication::encodeResponse() {
         throw ProtocolViolationException();
     }
 
-    writeString(message, _fileName);  // Write the asset file name
+    writeFileName(message, _fileName);  // Write the asset file name
 
     writeSpace(message);
 
@@ -1189,7 +1208,7 @@ void ShowAssetCommunication::decodeResponse(MessageSource &message) {
 
     readSpace(message);
 
-    _fileName = readString(message, 24);  // Read the asset file name
+    _fileName = readFileName(message);  // Read the asset file name
 
     readSpace(message);
 

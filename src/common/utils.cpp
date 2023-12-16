@@ -27,6 +27,20 @@ bool isAlphaNumeric(std::string string) {
     return true;
 }
 
+bool isValidFileName(std::string string) {
+    if (string == "." || string == "..") {
+        return false;  // Not allow special paths in order to avoid exploits
+    }
+
+    for (auto c : string) {
+        if (c == '/') {
+            return false;  // Not allow slashes in order to avoid exploits
+        }
+    }
+
+    return true;
+}
+
 std::string DateTimeToString(std::time_t time) {
     std::tm tm =
         *(std::localtime(&time));  // Convert the time value to a tm struct

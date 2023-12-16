@@ -363,6 +363,8 @@ class ProtocolCommunication {
      */
     std::string readAid(MessageSource &message);
 
+    std::string readFileName(MessageSource &message);
+
     /**
      * @brief Reads a identifier from a MessageSource.
      *
@@ -440,6 +442,8 @@ class ProtocolCommunication {
      * @param aid The AID to write.
      */
     void writeAid(std::stringstream &message, std::string aid);
+
+    void writeFileName(std::stringstream &message, std::string fileName);
 
     /**
      * @brief Checks if the communication protocol uses TCP.
