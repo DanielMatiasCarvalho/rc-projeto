@@ -33,6 +33,8 @@ bool isAlphaNumeric(std::string string);
  */
 bool isValidFileName(std::string string);
 
+bool isValidAuctionName(std::string string);
+
 /**
  * @brief Converts a time value to a string representation.
  *

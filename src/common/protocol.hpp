@@ -331,6 +331,8 @@ class ProtocolCommunication {
      */
     int readNumber(MessageSource &message);
 
+    int readNumber(MessageSource &message, size_t size);
+
     /**
      * @brief Reads a DateTime from a MessageSource.
      *
@@ -364,6 +366,8 @@ class ProtocolCommunication {
     std::string readAid(MessageSource &message);
 
     std::string readFileName(MessageSource &message);
+
+    std::string readAuctionName(MessageSource &message);
 
     /**
      * @brief Reads a identifier from a MessageSource.
@@ -444,6 +448,8 @@ class ProtocolCommunication {
     void writeAid(std::stringstream &message, std::string aid);
 
     void writeFileName(std::stringstream &message, std::string fileName);
+
+    void writeAuctionName(std::stringstream &message, std::string name);
 
     /**
      * @brief Checks if the communication protocol uses TCP.

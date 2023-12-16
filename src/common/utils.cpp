@@ -41,6 +41,17 @@ bool isValidFileName(std::string string) {
     return true;
 }
 
+bool isValidAuctionName(std::string string) {
+    for (auto c : string) {
+        if ((c < '0' || c > '9') && (c < 'a' || c > 'z') &&
+            (c < 'A' || c > 'Z') && c != '-' && c != '_') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 std::string DateTimeToString(std::time_t time) {
     std::tm tm =
         *(std::localtime(&time));  // Convert the time value to a tm struct
