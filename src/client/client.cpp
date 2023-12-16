@@ -16,6 +16,14 @@ int main(int argc, char **argv) {
         argv);  // Create object Client, parsing command line arguments in the construction
     CommandManager manager;  // Create object CommandManager
     Terminal terminal;       // Create object Terminal
+    struct sigaction act;
+
+    act.sa_handler = SIG_IGN;
+
+    if (sigaction(SIGPIPE, &act, NULL) ==
+        -1) {  //Ignore the signal of the broken pipe
+        exit(1);
+    }
 
     // Register commands to the CommandManager
     manager.registerCommand(std::make_shared<LoginCommand>());
@@ -199,4 +207,8 @@ std::string Client::getPrompt() {
     }
 
     return "[" + _user.getUsername() + "] > ";
+}
+
+std::string Client::getDownloadPath() {
+    return _downloadPath;
 }

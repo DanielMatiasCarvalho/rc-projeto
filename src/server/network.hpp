@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <cstring>
+#include <iostream>
 
 #include "config.hpp"
 
@@ -185,20 +186,16 @@ class SocketException : public std::runtime_error {
     SocketException() : std::runtime_error("A network error has occurred."){};
 };
 
+/**
+ * @class SocketSetupException
+ * @brief Exception thrown when there is a problem setting up the sockets.
+ */
 class SocketSetupException : public SocketException {};
 
-class SocketCommunicationException : public SocketException {};
-
 /**
- * @class TimeoutException
- * @brief Represents an exception that is thrown when the server has timed out.
+ * @class SocketCommunicationException
+ * @brief Exception thrown when there is a problem reading/writing from/to a socket.
  */
-class TimeoutException : public std::runtime_error {
-  public:
-    /**
-     * @brief Constructs a TimeoutException object.
-     */
-    TimeoutException() : std::runtime_error("Server has timed out."){};
-};
+class SocketCommunicationException : public SocketException {};
 
 #endif

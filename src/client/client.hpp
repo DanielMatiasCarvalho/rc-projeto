@@ -5,10 +5,14 @@
 #ifndef __CLIENT_HPP__
 #define __CLIENT_HPP__
 
-#include <sys/stat.h>
 #include <filesystem>
 #include <fstream>
 #include <string>
+
+#include <signal.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "network.hpp"
 #include "protocol.hpp"
 
@@ -117,6 +121,12 @@ class Client {
      * @retval the prompt that should be used.
      */
     std::string getPrompt();
+
+    /**
+     * @brief  Gets the download folder path of the client.
+     * @retval string containing the folder name
+     */
+    std::string getDownloadPath();
 };
 
 #endif

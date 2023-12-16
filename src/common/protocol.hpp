@@ -145,7 +145,7 @@ class TcpMessage : public MessageSource {
 
         ssize_t n = read(_fd, buf, 128);
 
-        if (n == -1 || n == 0) {
+        if (n <= 0) {
             throw ProtocolViolationException();
         }
 
