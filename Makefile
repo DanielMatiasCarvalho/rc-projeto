@@ -60,6 +60,7 @@ CXXFLAGS += -Wswitch-enum
 CXXFLAGS += -Wundef
 CXXFLAGS += -Wunreachable-code
 CXXFLAGS += -Wunused
+LDFLAGS  += -pthread
 LDLIBS 	 += -lreadline
 
 .PHONY: all clean fmt fmt-check
