@@ -121,6 +121,17 @@ int ProtocolCommunication::readNumber(MessageSource &message) {
     return stoi(string);  // Convert string to int
 }
 
+int ProtocolCommunication::readNumber(MessageSource &message, size_t size) {
+    std::string string = readString(message, size);
+
+    // Check if string only contains digits
+    if (!isNumeric(string)) {
+        throw ProtocolViolationException();
+    }
+
+    return stoi(string);  // Convert string to int
+}
+
 std::time_t ProtocolCommunication::readDateTime(MessageSource &message) {
     std::stringstream stream;
     std::string aux;
@@ -208,6 +219,26 @@ std::string ProtocolCommunication::readAid(MessageSource &message) {
     return aid;
 }
 
+std::string ProtocolCommunication::readFileName(MessageSource &message) {
+    std::string filename = readString(message, PROTOCOL_FNAME_SIZE);
+
+    if (!isValidFileName(filename)) {
+        throw ProtocolViolationException();
+    }
+
+    return filename;
+}
+
+std::string ProtocolCommunication::readAuctionName(MessageSource &message) {
+    std::string name = readString(message, PROTOCOL_AUCTIONNAME_SIZE);
+
+    if (!isValidAuctionName(name)) {
+        throw ProtocolViolationException();
+    }
+
+    return name;
+}
+
 void ProtocolCommunication::readIdentifier(MessageSource &message,
                                            std::string identifier) {
     std::string identifierRecieved = readString(message, 3);  // Read a string
@@ -289,6 +320,25 @@ void ProtocolCommunication::writeAid(std::stringstream &message,
     }
 
     writeString(message, aid);  // write the string
+}
+
+void ProtocolCommunication::writeFileName(std::stringstream &message,
+                                          std::string fileName) {
+    if (!isValidFileName(fileName) || fileName.length() > PROTOCOL_FNAME_SIZE) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, fileName);
+}
+
+void ProtocolCommunication::writeAuctionName(std::stringstream &message,
+                                             std::string name) {
+    if (!isValidAuctionName(name) ||
+        name.length() > PROTOCOL_AUCTIONNAME_SIZE) {
+        throw ProtocolViolationException();
+    }
+
+    writeString(message, name);
 }
 
 std::stringstream LoginCommunication::encodeRequest() {
@@ -729,12 +779,7 @@ std::stringstream ShowRecordCommunication::encodeResponse() {
 
     writeSpace(message);
 
-    if (_auctionName.size() > 10) {
-        // If the auction name is too big, throw an exception
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _auctionName);  // Write the auction name
+    writeAuctionName(message, _auctionName);  // Write the auction name
 
     writeSpace(message);
 
@@ -820,12 +865,7 @@ void ShowRecordCommunication::decodeResponse(MessageSource &message) {
 
     readSpace(message);
 
-    _auctionName = readString(message, 10);  // Read the auction name
-
-    if (_auctionName.size() > 10) {
-        // If the auction name is too big, throw an exception
-        throw ProtocolViolationException();
-    }
+    _auctionName = readAuctionName(message);  // Read the auction name
 
     readSpace(message);
 
@@ -838,7 +878,8 @@ void ShowRecordCommunication::decodeResponse(MessageSource &message) {
 
     readSpace(message);
 
-    _startValue = readNumber(message);  // Read the start value
+    _startValue =
+        readNumber(message, PROTOCOL_STARTVALUE_SIZE);  // Read the start value
 
     readSpace(message);
 
@@ -846,7 +887,8 @@ void ShowRecordCommunication::decodeResponse(MessageSource &message) {
 
     readSpace(message);
 
-    _timeActive = readNumber(message);  // Read the time active
+    _timeActive =
+        readNumber(message, PROTOCOL_AUCTIONTIME_SIZE);  // Read the time active
 
     char c;
 
@@ -870,7 +912,8 @@ void ShowRecordCommunication::decodeResponse(MessageSource &message) {
 
             readSpace(message);
 
-            _bidValues.push_back(readNumber(message));  // Read the bid value
+            _bidValues.push_back(readNumber(
+                message, PROTOCOL_STARTVALUE_SIZE));  // Read the bid value
 
             readSpace(message);
 
@@ -879,8 +922,8 @@ void ShowRecordCommunication::decodeResponse(MessageSource &message) {
 
             readSpace(message);
 
-            _bidSecTimes.push_back(
-                readNumber(message));  // Read the bid sec time
+            _bidSecTimes.push_back(readNumber(
+                message, PROTOCOL_AUCTIONTIME_SIZE));  // Read the bid sec time
         }
 
         if (c == 'E') {
@@ -895,7 +938,8 @@ void ShowRecordCommunication::decodeResponse(MessageSource &message) {
 
     readSpace(message);
 
-    _endSecTime = readNumber(message);  // Read the end sec time
+    _endSecTime = readNumber(
+        message, PROTOCOL_AUCTIONTIME_SIZE);  // Read the end sec time
 
     readDelimiter(message);
 }
@@ -915,12 +959,7 @@ std::stringstream OpenAuctionCommunication::encodeRequest() {
 
     writeSpace(message);
 
-    if (_name.length() > 10) {
-        // If the auction name is too big, throw an exception
-        throw ProtocolViolationException();
-    }
-
-    writeString(message, _name);  // Write the auction name
+    writeAuctionName(message, _name);  // Write the auction name
 
     writeSpace(message);
 
@@ -937,9 +976,13 @@ std::stringstream OpenAuctionCommunication::encodeRequest() {
         throw ProtocolViolationException();
     }
 
-    writeString(message, _fileName);  // Write the asset file name
+    writeFileName(message, _fileName);  // Write the asset file name
 
     writeSpace(message);
+
+    if (_fileSize > PROTOCOL_MAX_FILE_SIZE) {
+        throw ProtocolViolationException();
+    }
 
     writeNumber(message, _fileSize);  // Write the asset file size
 
@@ -971,23 +1014,30 @@ void OpenAuctionCommunication::decodeRequest(MessageSource &message) {
 
     readSpace(message);
 
-    _name = readString(message, 10);  // Read the auction name
+    _name = readAuctionName(message);  // Read the auction name
 
     readSpace(message);
 
-    _startValue = readNumber(message);  // Read the start value
+    _startValue =
+        readNumber(message, PROTOCOL_STARTVALUE_SIZE);  // Read the start value
 
     readSpace(message);
 
-    _timeActive = readNumber(message);  // Read the time active
+    _timeActive =
+        readNumber(message, PROTOCOL_AUCTIONTIME_SIZE);  // Read the time active
 
     readSpace(message);
 
-    _fileName = readString(message, 24);  // Read the asset file name
+    _fileName = readFileName(message);  // Read the asset file name
 
     readSpace(message);
 
-    _fileSize = readNumber(message);  // Read the asset file size
+    _fileSize =
+        readNumber(message, PROTOCOL_FSIZE_SIZE);  // Read the asset file size
+
+    if (_fileSize > PROTOCOL_MAX_FILE_SIZE) {
+        throw ProtocolViolationException();
+    }
 
     readSpace(message);
 
@@ -1152,9 +1202,13 @@ std::stringstream ShowAssetCommunication::encodeResponse() {
         throw ProtocolViolationException();
     }
 
-    writeString(message, _fileName);  // Write the asset file name
+    writeFileName(message, _fileName);  // Write the asset file name
 
     writeSpace(message);
+
+    if (_fileSize > PROTOCOL_MAX_FILE_SIZE) {
+        throw ProtocolViolationException();
+    }
 
     writeNumber(message, _fileSize);  // Write the asset file size
 
@@ -1189,11 +1243,16 @@ void ShowAssetCommunication::decodeResponse(MessageSource &message) {
 
     readSpace(message);
 
-    _fileName = readString(message, 24);  // Read the asset file name
+    _fileName = readFileName(message);  // Read the asset file name
 
     readSpace(message);
 
-    _fileSize = readNumber(message);  // Read the asset file size
+    _fileSize =
+        readNumber(message, PROTOCOL_FSIZE_SIZE);  // Read the asset file size
+
+    if (_fileSize > PROTOCOL_MAX_FILE_SIZE) {
+        throw ProtocolViolationException();
+    }
 
     readSpace(message);
 
@@ -1250,7 +1309,8 @@ void BidCommunication::decodeRequest(MessageSource &message) {
 
     readSpace(message);
 
-    _value = readNumber(message);  // Read the bid value
+    _value =
+        readNumber(message, PROTOCOL_STARTVALUE_SIZE);  // Read the bid value
 
     readDelimiter(message);  // Read the delimiter
 }

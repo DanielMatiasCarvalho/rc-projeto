@@ -332,6 +332,18 @@ class ProtocolCommunication {
     int readNumber(MessageSource &message);
 
     /**
+     * @brief Reads a number from the given message source.
+     *
+     * This function reads a number from the specified message source
+     * with the specified size.
+     *
+     * @param message The message source to read from.
+     * @param size The size of the number to read.
+     * @return The number read from the message source.
+     */
+    int readNumber(MessageSource &message, size_t size);
+
+    /**
      * @brief Reads a DateTime from a MessageSource.
      *
      * @param message The MessageSource to read from.
@@ -362,6 +374,22 @@ class ProtocolCommunication {
      * @return The AID read from the MessageSource.
      */
     std::string readAid(MessageSource &message);
+
+    /**
+     * @brief Reads the file name from the given MessageSource.
+     *
+     * @param message The MessageSource from which to read the file name.
+     * @return The file name as a std::string.
+     */
+    std::string readFileName(MessageSource &message);
+
+    /**
+     * Reads the auction name from the given message source.
+     *
+     * @param message The message source to read from.
+     * @return The auction name as a string.
+     */
+    std::string readAuctionName(MessageSource &message);
 
     /**
      * @brief Reads a identifier from a MessageSource.
@@ -440,6 +468,22 @@ class ProtocolCommunication {
      * @param aid The AID to write.
      */
     void writeAid(std::stringstream &message, std::string aid);
+
+    /**
+     * @brief Writes the file name to the given message.
+     *
+     * @param message The message to write the file name to.
+     * @param fileName The name of the file to be written.
+     */
+    void writeFileName(std::stringstream &message, std::string fileName);
+
+    /**
+     * @brief Writes the auction name to the given message stream.
+     *
+     * @param message The message stream to write to.
+     * @param name The name of the auction.
+     */
+    void writeAuctionName(std::stringstream &message, std::string name);
 
     /**
      * @brief Checks if the communication protocol uses TCP.

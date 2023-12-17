@@ -420,6 +420,11 @@ void Database::unlock() {
     _lock->unlock();
 }
 
+void Database::wipe() {
+    _core->wipe();
+    _core->guaranteeBaseStructure();
+}
+
 DatabaseCore::DatabaseCore(std::string path) {
     _path = std::make_unique<fs::path>(path);
 

@@ -27,6 +27,20 @@ bool isNumeric(std::string string);
 bool isAlphaNumeric(std::string string);
 
 /**
+ * @brief  Checks if the string has the format of a valid file name
+ * @param  string The string to be checked.
+ * @retval true if is valid, false otherwise.
+ */
+bool isValidFileName(std::string string);
+
+/**
+ * @brief  Checks if the string has the format of a valid auction name
+ * @param  string The string to be checked.
+ * @retval true if is valid, false otherwise.
+ */
+bool isValidAuctionName(std::string string);
+
+/**
  * @brief Converts a time value to a string representation.
  *
  * @param value The time value to be converted.

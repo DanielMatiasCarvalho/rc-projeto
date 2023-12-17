@@ -527,6 +527,8 @@ class Database {
      * @retval true if auction has ended, false otherwise.
      */
     bool hasAuctionEnded(std::string aid);
+
+    void wipe();
 };
 
 /**

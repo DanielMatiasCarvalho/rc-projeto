@@ -27,6 +27,31 @@ bool isAlphaNumeric(std::string string) {
     return true;
 }
 
+bool isValidFileName(std::string string) {
+    if (string == "." || string == "..") {
+        return false;  // Not allow special paths in order to avoid exploits
+    }
+
+    for (auto c : string) {
+        if (c == '/') {
+            return false;  // Not allow slashes in order to avoid exploits
+        }
+    }
+
+    return true;
+}
+
+bool isValidAuctionName(std::string string) {
+    for (auto c : string) {
+        if ((c < '0' || c > '9') && (c < 'a' || c > 'z') &&
+            (c < 'A' || c > 'Z') && c != '-' && c != '_') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 std::string DateTimeToString(std::time_t time) {
     std::tm tm =
         *(std::localtime(&time));  // Convert the time value to a tm struct
