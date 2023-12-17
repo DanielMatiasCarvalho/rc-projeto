@@ -44,8 +44,6 @@ ifeq ($(strip $(DEBUG)), yes)
 	CXXFLAGS += -g
 endif
 
-#LDFLAGS = -fsanitize=address -lasan
-
 CXXFLAGS += -fdiagnostics-color=always
 CXXFLAGS += -Wall
 CXXFLAGS += -Werror
@@ -62,8 +60,7 @@ CXXFLAGS += -Wswitch-enum
 CXXFLAGS += -Wundef
 CXXFLAGS += -Wunreachable-code
 CXXFLAGS += -Wunused
-LDFLAGS += -pthread
-LDLIBS += -lreadline
+LDLIBS 	 += -lreadline
 
 .PHONY: all clean fmt fmt-check
 
