@@ -80,18 +80,18 @@ void Message::UserNotMadeAuction() {
 }
 
 void Message::ShowUser(string uid) {
-    cout << "User " << uid;
+    cout << "User " << uid << endl;
 }
 
 void Message::ListAuctionsAndState(const map<string, string> &list) {
     for (auto auction : list) {  // For each auction in the list
         string state;
         if (auction.second == "0") {  // If the auction is not active
-            state = " NOT ACTIVE";
+            state = "NOT ACTIVE";
         } else {  // If the auction is active
-            state = " ACTIVE";
+            state = "ACTIVE";
         }
-        cout << "Auction " << auction.first << "-" << state << endl;
+        cout << "Auction " << auction.first << " - " << state << endl;
     }
 }
 
