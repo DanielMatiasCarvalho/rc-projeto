@@ -43,10 +43,10 @@ UdpClient::~UdpClient() {
 }
 
 void UdpClient::send(std::stringstream &message) {
-    char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_CLIENT];
+    char messageBuffer[SOCKETS_MAX_DATAGRAM_SIZE_SERVER];
 
     message.read(messageBuffer,
-                 SOCKETS_MAX_DATAGRAM_SIZE_CLIENT);  // Read the message
+                 SOCKETS_MAX_DATAGRAM_SIZE_SERVER);  // Read the message
 
     std::streamsize n = message.gcount();  // Get the size of the message
 
