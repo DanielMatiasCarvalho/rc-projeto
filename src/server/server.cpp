@@ -14,15 +14,16 @@ void TCPServer(TcpServer &tcpServer, CommandManager &manager, Server &server);
 
 void handler(int sig) {
     // This is a handler used for the SIGINT command, it cannot be SIG_IGN
-    // because with that handler, blocking functions don't stop. With this
-    // handler, blocking functions will be interrupted throwing an exeption.
+    // because with that handler, blocking functions don't get interrupted. With
+    // this handler, blocking functions will be interrupted throwing an
+    // exception.
     (void)sig;
 }
 
 int main(int argc, char **argv) {
     Server server(argc, argv);   // Initialize the server
     CommandManager manager;      // Initialize the command manager
-    struct sigaction act, act2;  // Initialize the signal handler
+    struct sigaction act, act2;  // Initialize the signal handlers
     pid_t pid;                   // Initialize the process ID
 
     act.sa_handler = SIG_IGN;  // Ignore the signal
@@ -102,25 +103,22 @@ Server::Server(int argc, char **argv) {
                 _loggers.push_back(std::make_shared<Logger>());
                 break;
             case 'r':
-                wipeDatabase = true;
+                wipeDatabase = true;  // Sets the wipe db option to true
                 break;
             case 'd':
-                databasePath = optarg;
+                databasePath = optarg;  // Sets the new database path
                 break;
             default:
                 break;
         }
     }
 
-    _database = std::make_unique<Database>(
-        databasePath);
+    _database = std::make_unique<Database>(databasePath);
     // Initialize the database in path
 
     if (wipeDatabase) {
         _database->wipe();
     }
-
-
 }
 
 void Server::ShowInfo() {
